@@ -2,7 +2,7 @@
 #include "BSFatFile.h"
 
 
-BSFatFile::BSFatFile(char *name, char *attributes, int size) : AbstractFile(name, attributes, size) {
+BSFatFile::BSFatFile(char *name, Attributes *attributes, int size) : AbstractFile(name, attributes, size) {
 
 }
 

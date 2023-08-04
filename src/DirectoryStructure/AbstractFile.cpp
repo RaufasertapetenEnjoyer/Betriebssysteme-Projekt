@@ -1,11 +1,10 @@
-
-
 #include "AbstractFile.h"
 #include <string>
 
 
-AbstractFile::AbstractFile(char *name, char *attributes, int size) : AbstractElement(name, attributes, size) {
-
+AbstractFile::AbstractFile(char *name, Attributes *attributes, int size) : AbstractElement(name, attributes, size) {
+    m_nextFile = nullptr;
+    m_prevFile = nullptr;
 }
 
 /**
@@ -50,4 +49,8 @@ AbstractFile *AbstractFile::getPrevFile() {
 
 void AbstractFile::setPrevFile(AbstractFile *fileToSet) {
     this->m_prevFile = fileToSet;
+}
+
+AbstractFile::~AbstractFile() {
+    AbstractElement::~AbstractElement();
 }

@@ -14,7 +14,7 @@ Directory::Directory(char* name, Attributes* attributes) : AbstractElement(testC
 
 Directory::~Directory(){
     AbstractElement::~AbstractElement();
-    delete this;
+
 };
 
 /**
@@ -57,10 +57,18 @@ bool Directory::testConvention(char *nameToTest) {
  */
 void Directory::createChildDirectory(char *name,Attributes *attributes) {
     Directory* directoryToAdd = new Directory(name, attributes);
-    Directory* directory = getLastDirectoryOfTheList();
 
-    directory->m_nextDirectory = directoryToAdd;
-    directoryToAdd->m_prevDirectory = directory;
+    Directory* directory = getLastDirectoryOfTheList();
+    if(directory == nullptr){
+        directoryToAdd->setNextDirectory(nullptr);
+        directoryToAdd->setPreviousDirectory(nullptr);
+        m_directoryList = directoryToAdd;
+    } else{
+        directory->m_nextDirectory = directoryToAdd;
+        directoryToAdd->m_prevDirectory = directory;
+        directoryToAdd->m_nextDirectory = nullptr;
+    }
+    directoryToAdd->setParentDirectory(this);
 }
 
 /**
@@ -72,11 +80,15 @@ void Directory::createChildFile(AbstractFile *file) {
 }
 
 Directory *Directory::getLastDirectoryOfTheList() {
-    Directory* directory = m_directoryList;
-    while (directory->m_nextDirectory != nullptr){
-        directory = directory->m_nextDirectory;
+    if(m_directoryList != nullptr){
+        Directory* directory = m_directoryList;
+        while (directory->m_nextDirectory != nullptr){
+            directory = directory->m_nextDirectory;
+        }
+        return directory;
+    } else{
+        return nullptr;
     }
-    return directory;
 }
 
 void Directory::setLastDirectoryOfTheList(Directory* directoryToSet) {
@@ -97,11 +109,18 @@ AbstractFile *Directory::getLastFileOfTheList(AbstractFile *fileToSet) {
 }
 
 void Directory::setLastFileOfTheList(AbstractFile* fileToSet) {
-    AbstractFile* file = m_fileList;
-    while (file->getNextFile() != nullptr){
-        file = file->getNextFile();
+    if(m_fileList != nullptr){
+        AbstractFile* file = m_fileList;
+        while (file->getNextFile() != nullptr){
+            file = file->getNextFile();
+        }
+        file->setNextFile(fileToSet);
+        fileToSet->setNextFile(nullptr);
+        fileToSet->setPrevFile(file);
+    }else{
+        m_fileList = fileToSet;
+        fileToSet->setNextFile(nullptr);
     }
-    file->setNextFile(fileToSet);
 }
 
 int Directory::deleteChildDirectroy(char *name) {

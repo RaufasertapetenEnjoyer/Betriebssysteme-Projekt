@@ -7,7 +7,8 @@
 
 class AbstractFile: public AbstractElement {
 public:
-    AbstractFile(char* name, char* attributes, int size);
+    AbstractFile(char* name, Attributes* attributes, int size);
+    ~AbstractFile() override;
     bool testConvention(char* name) override;
 
     AbstractFile* getNextFile();

@@ -20,7 +20,9 @@ struct Attributes{
     time_t dateOfCreation;
     time_t dateOfLastEdit;
     char* attributes;
+    int size;
 };
+
 
 class AbstractElement {
 public:
@@ -36,18 +38,12 @@ public:
     int getSize();
     void setSize(int sizeToSet);
 
-    void setBit(char* array, int bitToSet);
-    void clrBit(char* array, int bitToClear);
-    int tstBit(char* array, int bitToTest);
-
     virtual bool testConvention(char* name) = 0;
 
 private:
     char* m_name;
     Attributes* m_attributes;
     int m_size;
-    const int m_lengthAttributesArray = 1;
 };
-
 
 #endif //BS_ELEMENT_H
