@@ -2,6 +2,7 @@
 #include <string>
 
 
+
 AbstractFile::AbstractFile(char *name, Attributes *attributes, int size) : AbstractElement(name, attributes, size) {
     m_nextFile = nullptr;
     m_prevFile = nullptr;
@@ -52,5 +53,5 @@ void AbstractFile::setPrevFile(AbstractFile *fileToSet) {
 }
 
 AbstractFile::~AbstractFile() {
-    AbstractElement::~AbstractElement();
+    //AbstractElement::~AbstractElement();
 }

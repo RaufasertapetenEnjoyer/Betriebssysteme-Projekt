@@ -1,7 +1,7 @@
 
 #ifndef BS_PROJEKT_BSFATSIMULATION_H
 #define BS_PROJEKT_BSFATSIMULATION_H
-#include "Directory.h"
+#include "DirectoryStructure/Directory.h"
 #include "BSCluster.h"
 
 #define RESERVED 'R'

@@ -2,6 +2,8 @@
 #include "BSFatSimulation.h"
 #include "BSCluster.h"
 #include "BSFatFile.h"
+#include "DirectoryStructure/Directory.h"
+#include "time.h"
 #include "iostream"
 #include <cmath>
 
@@ -27,9 +29,10 @@ void BSFatSimulation::simulate() {
     Directory* directory = new Directory(root, new Attributes());
     directory->setParentDirectory(nullptr);
     m_currentDirectory = directory;
-    char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+    //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+    char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     createFilesForSim(fileNamesForRoot, 10);
-    createDirectoriesForSim();
+    //createDirectoriesForSim();
     //TODO
 
 }
@@ -410,10 +413,12 @@ unsigned int BSFatSimulation::getNumberOfCurrentlySavedFiles() {
 void BSFatSimulation::createDirectoriesForSim() {
     m_currentDirectory = getRootDirectory();
 
-    char** directoryNames = new char*[] {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
-
+    //char** directoryNames = new char*[] {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
+    char* directoryNames[] = {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
     m_currentDirectory->createChildDirectory(directoryNames[0], new Attributes());
-    char** fileNames = new char*[] {"main.c", "hallo.txt", "Presentation.docx"};
+
+    //char** fileNames = new char*[] {"main.c", "hallo.txt", "Presentation.docx"};
+    char* fileNames[] = {"main.c", "hallo.txt", "Presentation.docx"};
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
     createFilesForSim(fileNames, 3);
     m_currentDirectory = getRootDirectory();

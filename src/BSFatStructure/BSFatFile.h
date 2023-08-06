@@ -1,7 +1,8 @@
 
 #ifndef BS_PROJEKT_BSFATFILE_H
 #define BS_PROJEKT_BSFATFILE_H
-#include "AbstractFile.h"
+#include "DirectoryStructure/AbstractFile.h"
+#include "DirectoryStructure/AbstractElement.h"
 #include "BSCluster.h"
 
 

@@ -1,5 +1,5 @@
-
 #include "BSFatFile.h"
+#include "../DirectoryStructure/AbstractElement.h"
 
 
 BSFatFile::BSFatFile(char *name, Attributes *attributes, int size) : AbstractFile(name, attributes, size) {

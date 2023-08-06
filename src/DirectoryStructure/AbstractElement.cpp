@@ -1,5 +1,8 @@
+#include <string.h>
 #include "AbstractElement.h"
-#include <cstring>
+
+
+
 
 
 AbstractElement::AbstractElement(char *name, Attributes* attributes, int size) {
