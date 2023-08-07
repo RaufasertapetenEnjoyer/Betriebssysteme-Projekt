@@ -39,7 +39,6 @@ public:
     void setPreviousDirectory(Directory* directoryToSet);
 
 
-
 private:
     /**
      * List of all directories, which are under the current.

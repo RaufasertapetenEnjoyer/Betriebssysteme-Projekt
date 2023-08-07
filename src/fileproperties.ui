@@ -81,7 +81,7 @@
     <string>Attribute:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="fileName">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -91,10 +91,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>NamePH</string>
+    <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label_5">
+  <widget class="QLabel" name="path">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -104,10 +104,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>PfadPH</string>
+    <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
+  <widget class="QLineEdit" name="fileSize">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -129,6 +129,21 @@
      <height>22</height>
     </rect>
    </property>
+   <item>
+    <property name="text">
+     <string>bit</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>byte</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string/>
+    </property>
+   </item>
   </widget>
   <widget class="QListWidget" name="listWidget">
    <property name="geometry">

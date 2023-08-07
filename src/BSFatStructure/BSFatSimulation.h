@@ -73,6 +73,8 @@ public:
 
     int tstBit(char *array, int bitToTest);
 
+    char * getPath();
+
 private:
     Directory* m_currentDirectory;
     unsigned char* m_statusArray;

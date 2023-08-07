@@ -5,7 +5,7 @@
 #include "DirectoryStructure/Directory.h"
 #include "time.h"
 #include "iostream"
-#include <cmath>
+#include <math.h>
 
 
 /**
@@ -24,7 +24,11 @@ void BSFatSimulation::simulate() {
             m_statusArray[rand() % getNumberOfFilesThatCanBeSaved()] = RESERVED;
         }
     }
-
+   /* m_statusArray[5]=CORRUPTED;
+    m_statusArray[7]=CORRUPTED;
+    m_statusArray[10]=CORRUPTED;
+    m_statusArray[13]=CORRUPTED;
+    m_statusArray[14]=RESERVED;*/
     char root[] = "root";
     Directory* directory = new Directory(root, new Attributes());
     directory->setParentDirectory(nullptr);
@@ -32,7 +36,7 @@ void BSFatSimulation::simulate() {
     //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     createFilesForSim(fileNamesForRoot, 10);
-    //createDirectoriesForSim();
+    createDirectoriesForSim();
     //TODO
 
 }
@@ -270,7 +274,7 @@ BSFatSimulation::BSFatSimulation(unsigned int blockSize, unsigned int fatSize) {
 
 void BSFatSimulation::createFilesForSim(char** names, unsigned int length) {
     for (int i = 0; i < length; i++) {
-        createFile(names[i], true, false, false, true, (int) (rand() % 2100 + 1));
+        createFile(names[i], true, false, false, true, (int) (rand() % 2100 +1));
     }
 }
 
@@ -472,5 +476,12 @@ BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned
             return found;
         }
         subDirectory = subDirectory->getNextDirectory();
+    }
+}
+
+char * BSFatSimulation::getPath(){
+    Directory* directory = m_currentDirectory;
+    while(directory->getParentDirectory()!=nullptr){
+
     }
 }
