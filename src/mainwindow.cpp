@@ -37,11 +37,12 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::reload(){
+    ui->listWidget->clear();
     float f = sim->getFragmentation(sim->getRootDirectory(),0.0);
     std::cout<<"Fragmentierung:" << f<<std::endl;
     ui->progressBar->setValue(f);
     Directory* d = sim->getCurrentDirectory();
-    d = d->getSubDirectoryList();
+    //d = d->getSubDirectoryList();
     char* path =  d->getName();
     ui->lineEdit->setText(path);
 
@@ -68,6 +69,40 @@ void MainWindow::reload(){
     }
     ui->listWidget->sortItems();
 
+    ui->treeWidget->clear();
+    Directory * dir = sim->getRootDirectory();
+    buildTree(dir,NULL);
+    ui->treeWidget->expandAll();
+    ui->treeWidget->sortItems(0,Qt::AscendingOrder);
+}
+
+void MainWindow::buildTree(Directory* dir,QTreeWidgetItem *parent){
+
+    QTreeWidgetItem * root;
+    QString path;
+    if(parent == NULL){
+        root = new QTreeWidgetItem(ui->treeWidget);
+        path = dir->getName();
+        path += "/";
+        root->setData(0,Qt::UserRole,QVariant(path));
+    }
+    else{
+        path = parent->data(0,Qt::UserRole).toString();
+        path += dir->getName();
+        path += "/";
+        root = new QTreeWidgetItem(parent);
+        root->setData(0,Qt::UserRole,QVariant(path));
+    }
+    root->setText(0,dir->getName());
+    root->setIcon(0,QIcon(":/Icons/directoryIcon.png"));
+    ui->treeWidget->addTopLevelItem(root);
+
+    dir=dir->getSubDirectoryList();
+
+    while(dir!=nullptr){
+        buildTree(dir,root);
+        dir=dir->getNextDirectory();
+    }
 
 }
 
@@ -82,7 +117,10 @@ void MainWindow::deleteFile(){
 
 void MainWindow::fileProperties(){
     FileProperties *prop = new FileProperties(this, selectedFile);
-    prop->open();
+    if(prop->exec() == QDialog::Accepted){
+        std::cout<<"save File: "<<selectedFile->getName()<<std::endl;
+        reload();
+    }
 }
 
 void MainWindow::createFile(){
@@ -114,7 +152,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
     if(icon == "File"){
         selectedDir=nullptr;
         QString name = item->text();
-        AbstractFile * file = sim->getCurrentDirectory()->getSubDirectoryList()->getFileList();//to change to just current Directory
+        AbstractFile * file = sim->getCurrentDirectory()->getFileList();//to change to just current Directory
         if(file==nullptr){
             std::cout<<"Error: File clicked but no files found in Simulation"<<std::endl;
         }
@@ -136,7 +174,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
     else{
         std::cout<<"Directory"<<std::endl;
         selectedFile=nullptr;
-        Directory* directory = sim->getCurrentDirectory()->getSubDirectoryList(); //to change to just current Directory
+        Directory* directory = sim->getCurrentDirectory()->getSubDirectoryList();
         if(directory==nullptr){
             std::cout<<"Error: Directory clicked but no directories found in Simulation"<<std::endl;
         }
@@ -146,7 +184,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
         }
         selectedDir = directory;
 
-        //sim->setCurrentDirectory(selectedDir);
+        sim->setCurrentDirectory(selectedDir);
         reload();
     }
 
@@ -194,7 +232,32 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    //sim->setCurrentDirectory(sim->getCurrentDirectory()->getParentDirectory());
-    //reload();
+    if(sim->getCurrentDirectory() != sim->getRootDirectory()){
+        sim->setCurrentDirectory(sim->getCurrentDirectory()->getParentDirectory());
+
+        reload();
+    }
+}
+
+
+void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    QString path = item->data(0,Qt::UserRole).toString();
+    QStringList p = path.split("/");
+
+    Directory *dir = sim->getRootDirectory();
+    if(p.size()!=1){
+
+        for(int i =1; i<p.size()-1; i++){
+            dir = dir->getSubDirectoryList();
+            while(dir != nullptr && dir->getName()!=p.at(i)){
+                dir = dir->getNextDirectory();
+            }
+        }
+        sim->setCurrentDirectory(dir);
+        reload();
+    }
+
+
 }
 

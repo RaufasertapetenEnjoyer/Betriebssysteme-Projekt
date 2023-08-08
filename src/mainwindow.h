@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QTreeWidgetItem>
+#include "DirectoryStructure/Directory.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,6 +18,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void reload();
+    void buildTree(Directory * dir, QTreeWidgetItem *parent);
 private slots:
     void deleteFile();
     void fileProperties();
@@ -24,7 +27,7 @@ private slots:
     void deleteDir();
     void dirProperties();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
-
+    void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_pushButton_2_clicked();
 
     void on_pushButton_clicked();

@@ -73,6 +73,7 @@ void Directory::createChildDirectory(char *name,Attributes *attributes) {
         directoryToAdd->m_prevDirectory = directory;
         directoryToAdd->m_nextDirectory = nullptr;
     }
+    //directoryToAdd->setLastFileOfTheList(nullptr);
     directoryToAdd->setParentDirectory(this);
 }
 
