@@ -1,6 +1,7 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource>
-     <file>Icons/fileIcon.png</file>
-     <file>Icons/directoryIcon.png</file>
- </qresource>
- </RCC>
+<RCC>
+    <qresource prefix="/">
+        <file>Icons/fileIcon.png</file>
+        <file>Icons/directoryIcon.png</file>
+        <file>Icons/searchIcon.png</file>
+    </qresource>
+</RCC>

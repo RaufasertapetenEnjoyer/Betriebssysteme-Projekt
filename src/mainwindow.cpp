@@ -148,8 +148,8 @@ void MainWindow::dirProperties(){
 
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
-    QString icon = item->data(Qt::UserRole).toString();
-    if(icon == "File"){
+    QString content = item->data(Qt::UserRole).toString();
+    if(content == "File"){
         selectedDir=nullptr;
         QString name = item->text();
         AbstractFile * file = sim->getCurrentDirectory()->getFileList();//to change to just current Directory
@@ -243,21 +243,45 @@ void MainWindow::on_pushButton_4_clicked()
 void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     QString path = item->data(0,Qt::UserRole).toString();
+    openPath(path);
+
+}
+
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    QString path = ui->lineEdit->text();
+    openPath(path);
+}
+
+void MainWindow::openPath(QString path){
     QStringList p = path.split("/");
 
     Directory *dir = sim->getRootDirectory();
+    if(p.at(0)!= dir->getName() || p.at(p.size()-1) != ""){
+        std::cout<<"path wrong or nonexistent"<<std::endl;
+        return;
+    }
     if(p.size()!=1){
-
         for(int i =1; i<p.size()-1; i++){
             dir = dir->getSubDirectoryList();
             while(dir != nullptr && dir->getName()!=p.at(i)){
                 dir = dir->getNextDirectory();
             }
+            if(dir==nullptr){
+                std::cout<<"path wrong or nonexistent"<<std::endl;
+            }
         }
-        sim->setCurrentDirectory(dir);
-        reload();
+        if(dir!=nullptr){
+            sim->setCurrentDirectory(dir);
+            reload();
+        }
+    }else{
+        if(dir->getName() == p.at(1)){
+            sim->setCurrentDirectory(dir);
+            reload();
+        }else{
+            std::cout<<"path wrong or nonexistent"<<std::endl;
+        }
     }
-
-
 }
-

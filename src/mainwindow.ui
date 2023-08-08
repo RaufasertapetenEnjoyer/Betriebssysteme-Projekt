@@ -34,7 +34,7 @@
       <rect>
        <x>20</x>
        <y>30</y>
-       <width>531</width>
+       <width>491</width>
        <height>21</height>
       </rect>
      </property>
@@ -120,6 +120,23 @@
       <string>Zurück</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="pushButton_5">
+     <property name="geometry">
+      <rect>
+       <x>510</x>
+       <y>30</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/Icons/searchIcon.png</normaloff>:/Icons/searchIcon.png</iconset>
+     </property>
+    </widget>
    </widget>
    <widget class="QTreeWidget" name="treeWidget">
     <property name="geometry">
@@ -171,6 +188,8 @@ border-color: rgb(10, 10, 10);</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
