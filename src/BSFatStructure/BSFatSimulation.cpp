@@ -539,3 +539,16 @@ void BSFatSimulation::freeFileMemory(AbstractFile *file) {
         delete pre;
     }
 }
+
+const char *BSFatSimulation::getPath() {
+    Directory* directory = m_currentDirectory;
+    std::string path;
+    while (directory != nullptr){
+        std::string preName = directory->getName();
+        path = preName + "/" + path;
+        directory = directory->getParentDirectory();
+    }
+    const char* pathAsChar = path.c_str();
+
+    return pathAsChar;
+}

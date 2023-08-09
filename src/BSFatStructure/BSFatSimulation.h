@@ -34,7 +34,7 @@ public:
 
     void updateDirectory();
 
-    char* getPath();
+    const char* getPath();
 
     BSCluster* initBSCluster(int numberOfBlocks);
 
