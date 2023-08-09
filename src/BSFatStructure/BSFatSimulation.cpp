@@ -306,33 +306,108 @@ void BSFatSimulation::createDirectoriesForSim() {
 
     char** directoryNames = new char*[] {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
 
+    //user-directory Michael
+    //      with three files in it (main.c, hallo.txt and Presentation.docx)
+    //      with three subdirectories (Betriebssysteme, Algo and SWT)
+        //Subdirectory Betriebssysteme
+        //      with one subdirectory (Projekt)
+        //      with one file in it
+            //Subdirectory Projekt is empty
+        //Subdirectory Algo is empty
+        //Subdirectory SWT
+        //      with two files in it (
+    char** fileNamesMichael = new char*[] {"main.c", "hallo.txt", "Presentation.docx"};
+    char** fileNameBetriebssysteme = new char*[] {"BSSimulation.h"};
+    char** fileNamesSWT = new char *[] {"AbstractAnimal.java", "Dog.java"};
+
     m_currentDirectory->createChildDirectory(directoryNames[0], new Attributes());
-    char** fileNames = new char*[] {"main.c", "hallo.txt", "Presentation.docx"};
-    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-    createFilesForSim(fileNames, 3);
-    m_currentDirectory = getRootDirectory();
 
-    m_currentDirectory->createChildDirectory(directoryNames[1], new Attributes());
-    m_currentDirectory->createChildDirectory(directoryNames[2], new Attributes());
-
-    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-
+    //Michael/
     m_currentDirectory->createChildDirectory(directoryNames[3], new Attributes());
     m_currentDirectory->createChildDirectory(directoryNames[4], new Attributes());
     m_currentDirectory->createChildDirectory(directoryNames[5], new Attributes());
 
-    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    createFilesForSim(fileNamesMichael, 3);
 
+    //Michael/Betriebssysteme
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    createFilesForSim(fileNameBetriebssysteme, 1);
+
+    //Michael/Betriebssysteme/Projekt
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
     m_currentDirectory->createChildDirectory(directoryNames[9], new Attributes());
 
-    m_currentDirectory = getRootDirectory()->getSubDirectoryList()->getNextDirectory();
+    //Michael/SWT
+    m_currentDirectory = getRootDirectory()
+            ->getSubDirectoryList()
+            ->getNextDirectory()
+            ->getNextDirectory();
+    createFilesForSim(fileNamesSWT, 2);
 
+
+    m_currentDirectory = getRootDirectory();
+
+
+    //user-directory Jan
+    //      with two subdirectories (Mathe1 and Mathe2)
+        //Subdirectory Mathe1 is empty
+        //Subdirectory Mateh2
+        //      with two files
+    char** fileNamesMathe2 = new char*[]{"dgl.docx", "Mathe_abgabe.pdf"};
+    m_currentDirectory->createChildDirectory(directoryNames[1], new Attributes());
+
+    //Jan/
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList()
+            ->getNextDirectory();
     m_currentDirectory->createChildDirectory(directoryNames[6], new Attributes());
     m_currentDirectory->createChildDirectory(directoryNames[7], new Attributes());
 
-    m_currentDirectory = getRootDirectory()->getSubDirectoryList()->getNextDirectory()->getNextDirectory();
+    //Jan/Mathe2
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList()->getNextDirectory();
+    createFilesForSim(fileNamesMathe2, 2);
 
-    m_currentDirectory->createChildDirectory(directoryNames[8], new Attributes());
+
+    m_currentDirectory = getRootDirectory();
+
+
+    //user-directory Simon
+    //      with one subdirectory (com)
+        //Subdirectory com
+        //      with one subdirectory (de)
+            //Subdirectory de
+            //      with one subdirectory (bs)
+                //Subdirectory bs
+                //      with one subdirectory (BsProjekt)
+                    //Subdirectory BsProjekt
+                    //      with three files
+    char** fileNamesBsProjekt = new char*[]{"main.cpp", "icon1.png", "mainWindow.qt"};
+    char** directoryNamesSimon = new char*[]{"com", "de", "bs", "bsProjekt"};
+    m_currentDirectory->createChildDirectory(directoryNames[2], new Attributes());
+
+    //Simon/
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList()
+            ->getNextDirectory()
+            ->getNextDirectory();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[0], new Attributes());
+
+    //Simon/com
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[1], new Attributes());
+
+    //Simon/com/de
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[2], new Attributes());
+
+    //Simon/com/de/bs
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[3], new Attributes());
+
+    //Simon/com/de/bs/bsProjekt
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    createFilesForSim(fileNamesBsProjekt,3);
+
+
+    m_currentDirectory = getRootDirectory();
 }
 
 /**
@@ -447,8 +522,17 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
     }
 }
 
-void BSFatSimulation::updateFile(char *name, Attributes *attributes, bool isEditable, bool isSystem, bool isAscii,
-                                 bool isRamFile,
+/**
+ * Updates the attributes of a given file.
+ * @param char* name
+ * @param bool isEditable
+ * @param bool isSystem
+ * @param bool isAscii
+ * @param bool isRamFile
+ * @param AbstractFile* file
+ * @param int size
+ */
+void BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
                                  AbstractFile *file, int size) {//evtl. ausgaben oder ähnliches nötig
     if(file->tstBit(file->getAttributes()->attributes, 0)){
         if(!file->isSystem()){
@@ -484,6 +568,11 @@ void BSFatSimulation::updateDirectory() {
 
 }
 
+/**
+ * Initialize the cluster structures for a file, occupies the needed memory and returns a pointer to the first cluster.
+ * @param int numberOfBlocks
+ * @return BSCluster* firstCluster
+ */
 BSCluster *BSFatSimulation::initBSCluster(int numberOfBlocks) {
     if(numberOfBlocks <= getFreeDiskSpace() && numberOfBlocks != 0){
         auto **bsClusters = new BSCluster *[numberOfBlocks];
@@ -526,6 +615,10 @@ BSCluster *BSFatSimulation::initBSCluster(int numberOfBlocks) {
     }
 }
 
+/**
+ * Frees the memory of the given file.
+ * @param AbstractFile*  file
+ */
 void BSFatSimulation::freeFileMemory(AbstractFile *file) {
     BSFatFile* bsFatFile = dynamic_cast<BSFatFile*>(file);
     BSCluster* cluster = bsFatFile->getFirstBlock();
@@ -540,6 +633,10 @@ void BSFatSimulation::freeFileMemory(AbstractFile *file) {
     }
 }
 
+/**
+ * Returns the path of the current directory.
+ * @return const char* path
+ */
 const char *BSFatSimulation::getPath() {
     Directory* directory = m_currentDirectory;
     std::string path;
