@@ -5,6 +5,7 @@
 #include "iostream"
 #include <cmath>
 #include <cstring>
+#include <time.h>
 
 
 /**
@@ -24,12 +25,14 @@ void BSFatSimulation::simulate() {
         }
     }
 
-    char root[] = "root";
+    char* root =  {"root"};
     auto* directory = new Directory(root, new Attributes());
     std::cout << directory->getName() << '\n' << std::endl;
     directory->setParentDirectory(nullptr);
     m_currentDirectory = directory;
-    char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+
+    //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+    char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     createFilesForSim(fileNamesForRoot, 10);
     createDirectoriesForSim();
     //TODO
@@ -304,7 +307,7 @@ unsigned int BSFatSimulation::getNumberOfCurrentlySavedFiles() {
 void BSFatSimulation::createDirectoriesForSim() {
     m_currentDirectory = getRootDirectory();
 
-    char** directoryNames = new char*[] {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
+    char* directoryNames[] = {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
 
     //user-directory Michael
     //      with three files in it (main.c, hallo.txt and Presentation.docx)
@@ -316,11 +319,14 @@ void BSFatSimulation::createDirectoriesForSim() {
         //Subdirectory Algo is empty
         //Subdirectory SWT
         //      with two files in it (
-    char** fileNamesMichael = new char*[] {"main.c", "hallo.txt", "Presentation.docx"};
-    char** fileNameBetriebssysteme = new char*[] {"BSSimulation.h"};
-    char** fileNamesSWT = new char *[] {"AbstractAnimal.java", "Dog.java"};
+    char* fileNamesMichael[] =  {"main.c", "hallo.txt", "Presentation.docx"};
+    char* fileNameBetriebssysteme[] = {"BSSimulation.h"};
+    char* fileNamesSWT[] = {"AbstractAnimal.java", "Dog.java"};
 
     m_currentDirectory->createChildDirectory(directoryNames[0], new Attributes());
+    std::cout<<m_currentDirectory->getSubDirectoryList()->getName()<<std::endl;
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+
 
     //Michael/
     m_currentDirectory->createChildDirectory(directoryNames[3], new Attributes());
@@ -332,16 +338,10 @@ void BSFatSimulation::createDirectoriesForSim() {
     //Michael/Betriebssysteme
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
     createFilesForSim(fileNameBetriebssysteme, 1);
-
-    //Michael/Betriebssysteme/Projekt
-    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
     m_currentDirectory->createChildDirectory(directoryNames[9], new Attributes());
 
     //Michael/SWT
-    m_currentDirectory = getRootDirectory()
-            ->getSubDirectoryList()
-            ->getNextDirectory()
-            ->getNextDirectory();
+    m_currentDirectory = m_currentDirectory->getNextDirectory()->getNextDirectory();
     createFilesForSim(fileNamesSWT, 2);
 
 
@@ -353,7 +353,7 @@ void BSFatSimulation::createDirectoriesForSim() {
         //Subdirectory Mathe1 is empty
         //Subdirectory Mateh2
         //      with two files
-    char** fileNamesMathe2 = new char*[]{"dgl.docx", "Mathe_abgabe.pdf"};
+    char* fileNamesMathe2[] = {"dgl.docx", "Mathe_abgabe.pdf"};
     m_currentDirectory->createChildDirectory(directoryNames[1], new Attributes());
 
     //Jan/
@@ -380,8 +380,8 @@ void BSFatSimulation::createDirectoriesForSim() {
                 //      with one subdirectory (BsProjekt)
                     //Subdirectory BsProjekt
                     //      with three files
-    char** fileNamesBsProjekt = new char*[]{"main.cpp", "icon1.png", "mainWindow.qt"};
-    char** directoryNamesSimon = new char*[]{"com", "de", "bs", "bsProjekt"};
+    char* fileNamesBsProjekt[] = {"main.cpp", "icon1.png", "mainWindow.qt"};
+    char* directoryNamesSimon[] = {"com", "de", "bs", "bsProjekt"};
     m_currentDirectory->createChildDirectory(directoryNames[2], new Attributes());
 
     //Simon/
@@ -639,7 +639,7 @@ void BSFatSimulation::freeFileMemory(AbstractFile *file) {
  */
 const char *BSFatSimulation::getPath() {
     Directory* directory = m_currentDirectory;
-    std::string path;
+    std::string path = "";
     while (directory != nullptr){
         std::string preName = directory->getName();
         path = preName + "/" + path;

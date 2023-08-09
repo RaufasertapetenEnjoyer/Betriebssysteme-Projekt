@@ -43,8 +43,20 @@ void MainWindow::reload(){
     ui->progressBar->setValue(f);
     Directory* d = sim->getCurrentDirectory();
     //d = d->getSubDirectoryList();
-    char* path =  d->getName();
-    ui->lineEdit->setText(path);
+
+    //const char* path =  sim->getPath();
+    Directory* directoryCur = sim->getCurrentDirectory();
+    std::string path = "";
+    while (directoryCur != nullptr){
+        std::string preName = directoryCur->getName();
+        path = preName + "/" + path;
+        directoryCur = directoryCur->getParentDirectory();
+    }
+    const char* pathAsChar = path.c_str();
+
+
+    std::cout<<pathAsChar<<std::endl;
+    ui->lineEdit->setText(pathAsChar);
 
     for (int i = 0; i < sim->getNumberOfFilesThatCanBeSaved(); i++) {
             std::cout << sim->getStatusArray()[i] << ", ";

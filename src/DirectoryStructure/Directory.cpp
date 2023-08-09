@@ -13,7 +13,7 @@ Directory::Directory(char* name, Attributes* attributes) : AbstractElement(testC
 }
 
 Directory::~Directory(){
-    AbstractElement::~AbstractElement();
+    //AbstractElement::~AbstractElement();
 };
 
 /**
@@ -57,16 +57,18 @@ bool Directory::testConvention(char *nameToTest) {
 void Directory::createChildDirectory(char *name,Attributes *attributes) {
     Directory* directoryToAdd = new Directory(name, attributes);
 
-    Directory* directory = getLastDirectoryOfTheList();
+    Directory* directory = m_directoryList;
     if(directory == nullptr){
         directoryToAdd->setNextDirectory(nullptr);
         directoryToAdd->setPreviousDirectory(nullptr);
         m_directoryList = directoryToAdd;
     } else{
+        directory = getLastDirectoryOfTheList();
         directory->m_nextDirectory = directoryToAdd;
         directoryToAdd->m_prevDirectory = directory;
         directoryToAdd->m_nextDirectory = nullptr;
     }
+
     directoryToAdd->setParentDirectory(this);
 }
 
