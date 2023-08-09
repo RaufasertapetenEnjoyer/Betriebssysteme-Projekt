@@ -1,3 +1,4 @@
+
 #include "Directory.h"
 #include "AbstractFile.h"
 #include <string>
@@ -12,14 +13,7 @@ Directory::Directory(char* name, Attributes* attributes) : AbstractElement(testC
 }
 
 Directory::~Directory(){
-    //AbstractElement::~AbstractElement();
-
-    delete m_fileList;
-    delete m_directoryList;
-    delete m_nextDirectory;
-    delete m_prevDirectory;
-    delete m_parentDirectory;
-
+    AbstractElement::~AbstractElement();
 };
 
 /**
@@ -73,7 +67,6 @@ void Directory::createChildDirectory(char *name,Attributes *attributes) {
         directoryToAdd->m_prevDirectory = directory;
         directoryToAdd->m_nextDirectory = nullptr;
     }
-    //directoryToAdd->setLastFileOfTheList(nullptr);
     directoryToAdd->setParentDirectory(this);
 }
 
@@ -85,6 +78,10 @@ void Directory::createChildFile(AbstractFile *file) {
     setLastFileOfTheList(file);
 }
 
+/**
+ * Get the last element of the directory list.
+ * @return Directory* last directory
+ */
 Directory *Directory::getLastDirectoryOfTheList() {
     if(m_directoryList != nullptr){
         Directory* directory = m_directoryList;
@@ -127,38 +124,6 @@ void Directory::setLastFileOfTheList(AbstractFile* fileToSet) {
         m_fileList = fileToSet;
         fileToSet->setNextFile(nullptr);
     }
-}
-
-int Directory::deleteChildDirectroy(char *name) {
-    Directory* directory = m_directoryList;
-    while (directory != nullptr){
-        if(strcmp(name, directory->getName()) == 0){
-            Directory* prevDi = directory->m_prevDirectory;
-            Directory* nextDi = directory->m_nextDirectory;
-            prevDi->m_nextDirectory = nextDi;
-            nextDi->m_prevDirectory = prevDi;
-            delete directory;
-            return 0;
-        }
-        directory->m_nextDirectory = directory->m_nextDirectory;
-    }
-    return 1;
-}
-
-int Directory::deleteChildElement(char *name) {
-    AbstractFile* file = m_fileList;
-    while (file != nullptr){
-        if(strcmp(name, file->getName()) == 0){
-            AbstractFile* prevDi = file->getPrevFile();
-            AbstractFile* nextDi = file->getNextFile();
-            prevDi->setNextFile(nextDi);
-            nextDi->setPrevFile(prevDi);
-            delete file;
-            return 0;
-        }
-        file->setNextFile(file->getNextFile());
-    }
-    return 1;
 }
 
 bool Directory::checkIfDirectoryNameExists(char *name) {
@@ -207,7 +172,21 @@ void Directory::setPreviousDirectory(Directory *directoryToSet) {
     this->m_prevDirectory = directoryToSet;
 }
 
+void Directory::setFileList(AbstractFile *file) {
+    this->m_fileList = file;
+}
 
+void Directory::setDirectoryList(Directory *directory) {
+    this->m_directoryList = directory;
+}
+
+unsigned int Directory::getNumberOfFiles(){
+    return m_numberOfFiles;
+}
+
+void Directory::setNumberOfFiles(unsigned int numberOfFiles){
+    m_numberOfFiles = numberOfFiles;
+}
 
 
 

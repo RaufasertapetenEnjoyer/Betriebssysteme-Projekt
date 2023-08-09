@@ -2,10 +2,9 @@
 #include "BSFatSimulation.h"
 #include "BSCluster.h"
 #include "BSFatFile.h"
-#include "DirectoryStructure/Directory.h"
-#include "time.h"
 #include "iostream"
-#include <math.h>
+#include <cmath>
+#include <cstring>
 
 
 /**
@@ -24,17 +23,13 @@ void BSFatSimulation::simulate() {
             m_statusArray[rand() % getNumberOfFilesThatCanBeSaved()] = RESERVED;
         }
     }
-   /* m_statusArray[5]=CORRUPTED;
-    m_statusArray[7]=CORRUPTED;
-    m_statusArray[10]=CORRUPTED;
-    m_statusArray[13]=CORRUPTED;
-    m_statusArray[14]=RESERVED;*/
+
     char root[] = "root";
-    Directory* directory = new Directory(root, new Attributes());
+    auto* directory = new Directory(root, new Attributes());
+    std::cout << directory->getName() << '\n' << std::endl;
     directory->setParentDirectory(nullptr);
     m_currentDirectory = directory;
-    //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
-    char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+    char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     createFilesForSim(fileNamesForRoot, 10);
     createDirectoriesForSim();
     //TODO
@@ -76,76 +71,12 @@ int BSFatSimulation::getFreeDiskSpace() {
  * Defragment the whole file-system (recursive traverse algorithm).
  * @param Directory* directory
  */
-/*void BSFatSimulation::defragmentDisk(Directory* directory) {
-    if(directory == nullptr){
-        return;
-    }
-
-    int counter = 0;
-    BSFatFile* file = dynamic_cast<BSFatFile*>(directory->getFileList());
-
-    while(file != nullptr){
-        std::cout << "Beginne Degragmentierung von Datei: " << file->getName() << std::endl;
-
-        BSCluster* current = file->getFirstBlock();
-
-        while (current != nullptr) {
-            if (m_statusArray[counter] == FREE) {
-                m_statusArray[counter] = RESERVED;
-                m_statusArray[current->getIndex()] = FREE;
-                current->setIndex(counter);
-                m_statusArray[counter] = OCCUPIED;
-            } else {
-
-                while (m_statusArray[counter] == RESERVED || m_statusArray[counter] == CORRUPTED) {
-                    counter++;
-                }
-
-                if(m_statusArray[counter] == FREE){
-                    m_statusArray[counter] = RESERVED;
-                    m_statusArray[current->getIndex()] = FREE;
-                    current->setIndex(counter);
-                    m_statusArray[counter] = OCCUPIED;
-                }
-
-                BSFatFile* file2 = dynamic_cast<BSFatFile*>(directory->getFileList());
-
-                while(file2 != nullptr) {
-                    BSCluster *secondCurrent = file2->getFirstBlock();
-
-                    while (secondCurrent != nullptr) {
-                        if (secondCurrent->getIndex() == counter) {
-                            int saver = current->getIndex();
-                            current->setIndex(secondCurrent->getIndex());
-                            secondCurrent->setIndex(saver);
-                            break;
-                        }
-                        secondCurrent = secondCurrent->getNextBlock();
-                    }
-                    file2 = dynamic_cast<BSFatFile*>(file2->getNextFile());
-                }
-            }
-            counter++;
-            current = current->getNextBlock();
-        }
-        file = dynamic_cast<BSFatFile*>(file->getNextFile());
-        //std::cout << "Beende Defragmentierung von Datei: " << file->getName() << std::endl;
-        //std::cout << "Grad der Fragmentierung betraegt nun: " << getFragmentation(pFat) * 100 << "%\n"  << std::endl;
-    }
-
-    Directory* subDirectory = directory->getSubDirectoryList();
-    while(subDirectory != nullptr){
-        defragmentDisk(subDirectory);
-        subDirectory = subDirectory->getNextDirectory();
-    }
-}*/
-
 void BSFatSimulation::defragmentDisk(Directory *directory, int currentPosition) {
     if(directory == nullptr){
         return;
     }
 
-    BSFatFile* file = dynamic_cast<BSFatFile*>(directory->getFileList());
+    auto* file = dynamic_cast<BSFatFile*>(directory->getFileList());
 
     while (file != nullptr){
         BSCluster* current = file->getFirstBlock();
@@ -168,7 +99,6 @@ void BSFatSimulation::defragmentDisk(Directory *directory, int currentPosition) 
                     m_statusArray[currentPosition] = OCCUPIED;
                 }else{
                     if(currentPosition != current->getIndex()){
-                        BSCluster* test = nullptr;
                         BSCluster* secondCurrent = searchClusterByIndex(getRootDirectory(), currentPosition);
                         int saver = current->getIndex();
                         current->setIndex(secondCurrent->getIndex());
@@ -187,7 +117,6 @@ void BSFatSimulation::defragmentDisk(Directory *directory, int currentPosition) 
         defragmentDisk(subDirectory, currentPosition);
         subDirectory = subDirectory->getNextDirectory();
     }
-
 }
 
 /**
@@ -200,62 +129,31 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
     int numberOfBlocks = ceil((double) size / (double) m_blockSize);
 
     if(getFreeDiskSpace() < numberOfBlocks){
-        std::cout << "Speicher aufgebraucht, es können keine Datein mehr erstellt werden!";
+        std::cout << "Disk is full, the file can't be created!";
     }else {
-        Attributes *attributes = new Attributes();
-        char *att = new char[1];
+        auto *attributes = new Attributes();
         attributes->dateOfCreation = time(nullptr);
         attributes->dateOfLastEdit = time(nullptr);
         attributes->size = size;
-        attributes->attributes = att;
-        setEditable(attributes, editable);
-        setSystem(attributes, system);
-        setAsccii(attributes, ascii);
-        setRandAccFile(attributes, randAccFile);
 
-        BSFatFile *file = new BSFatFile(name, attributes, size);
+        auto *file = new BSFatFile(name, attributes, size);
 
-        file->setAttributes(attributes);
+        file->setEditable(editable);
+        file->setSystem(system);
+        file->setAscii(ascii);
+        file->setRandAccFile(randAccFile);
 
-        if (numberOfBlocks <= getFreeDiskSpace()) {
-            BSCluster **bsClusters = new BSCluster *[numberOfBlocks];
+        file->setFirstBlock(initBSCluster(numberOfBlocks));
 
-            for (int i = 0; i < numberOfBlocks; i++) {
-                bsClusters[i] = new BSCluster();
-            }
+        m_numberOfFiles++;
 
-            bsClusters[0]->setPrevElement(nullptr);
-            bsClusters[numberOfBlocks - 1]->setNextElement(nullptr);
-            file->setFirstBlock(bsClusters[0]);
-
-            if (numberOfBlocks > 2) {
-                for (int i = 1; i < numberOfBlocks - 1; i++) {
-                    bsClusters[i - 1]->setNextElement(bsClusters[i]);
-                    bsClusters[i]->setPrevElement(bsClusters[i - 1]);
-                    bsClusters[i]->setNextElement(bsClusters[i + 1]);
-                    bsClusters[i + 1]->setPrevElement(bsClusters[i]);
-                }
-
-                bsClusters[numberOfBlocks - 1]->setPrevElement(bsClusters[numberOfBlocks - 2]);
-
-            } else if (numberOfBlocks == 2) {
-                bsClusters[1]->setPrevElement(bsClusters[0]);
-                bsClusters[0]->setNextElement(bsClusters[1]);
-            }
-
-            unsigned int pos;
-
-            for (int i = 0; i < numberOfBlocks; i++) {
-                pos = (rand() % (m_fatSize / m_blockSize));
-                while (m_statusArray[pos] != FREE) {
-                    pos = (rand() % (m_fatSize / m_blockSize));
-                }
-                bsClusters[i]->setIndex(pos);
-                m_statusArray[pos] = OCCUPIED;
-            }
-            m_numberOfFiles++;
-        }
         m_currentDirectory->createChildFile((AbstractFile *) file);
+
+        Directory* directory = m_currentDirectory;
+        while (directory->getParentDirectory() != nullptr){
+            directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
+            directory = directory->getParentDirectory();
+        }
     }
 }
 
@@ -263,6 +161,7 @@ BSFatSimulation::BSFatSimulation(unsigned int blockSize, unsigned int fatSize) {
     m_statusArray = new unsigned char[fatSize / blockSize];
     m_blockSize = blockSize;
     m_fatSize = fatSize;
+    m_numberOfFiles = 0;
 
     for (int i = 0; i < (fatSize/blockSize); i++) {
         m_statusArray[i] = FREE;
@@ -270,14 +169,26 @@ BSFatSimulation::BSFatSimulation(unsigned int blockSize, unsigned int fatSize) {
 
     simulate();
     m_currentDirectory = getRootDirectory();
+    std::cout << m_currentDirectory->getName() << std::endl;
 }
 
+/**
+ * Creates some files with random size under the current directory.
+ * @param char** names, name array
+ * @param length, length of the array
+ */
 void BSFatSimulation::createFilesForSim(char** names, unsigned int length) {
     for (int i = 0; i < length; i++) {
-        createFile(names[i], true, false, false, true, (int) (rand() % 2100 +1));
+        createFile(names[i], true, false, false, true, (int) (rand() % 2100 + 1));
     }
 }
 
+/**
+ * Calculates the fragmentation of the whole disk (recursive).
+ * @param Directory* directory (start from root)
+ * @param float fragmentation (start with 0.0)
+ * @return
+ */
 float BSFatSimulation::getFragmentation(Directory* directory, float fragmentation) {
     if(directory == nullptr){
         return 0.0;
@@ -287,7 +198,7 @@ float BSFatSimulation::getFragmentation(Directory* directory, float fragmentatio
         return 0.0;
     }
 
-    BSFatFile* file = dynamic_cast<BSFatFile*>(directory->getFileList());
+    auto* file = dynamic_cast<BSFatFile*>(directory->getFileList());
     float sumOfFrag = 0.0;
 
     while(file != nullptr) {
@@ -322,107 +233,81 @@ float BSFatSimulation::getFragmentation(Directory* directory, float fragmentatio
     return (fragmentation / (float) m_numberOfFiles) * 100;
 }
 
+/**
+ * Creates an subdirectory under the current directory.
+ * @param char* name, nam of the directory
+ * @param Attributes* attributes
+ */
 void BSFatSimulation::createDirectory(char* name, Attributes* attributes) {
     m_currentDirectory->createChildDirectory(name, attributes);
 }
 
 /**
- * Sets a bit of an char array (0-index-based).
- * @param char* array, array where to set the bit
- * @param int bitToSet, bit which has to be set
+ * Returns the current directory.
+ * @return Directory* directory
  */
-void BSFatSimulation::setBit(char *array, int bitToSet) {
-    array[bitToSet/8] = array[bitToSet/8] | ((int) pow(2, (bitToSet % 8)));
-}
-
-/**
- * Clears a bit of an char array (0-index-based).
- * @param char* array, array where to clear the bit
- * @param int bitToClear, bit which has to be cleared
- */
-void BSFatSimulation::clrBit(char *array, int bitToClear) {
-    array[bitToClear/8] = array[bitToClear/8] & ~((int) pow(2, (bitToClear % 8)));
-}
-
-/**
- * Test a bit of an char array (0-index-based).
- * @param char* array, where to test the bit
- * @param int bitToTest, bit which has to be tested
- * @return int bit, the bit it self 0 or 1
- */
-int BSFatSimulation::tstBit(char *array, int bitToTest) {
-    return (array[bitToTest/8] & (int) pow(2, (bitToTest % 8))) ? 1 : 0;
-}
-
-bool BSFatSimulation::isEditable(Attributes* attributes) {
-    return tstBit(attributes->attributes, 0);
-}
-
-void BSFatSimulation::setEditable(Attributes *attributes, bool isEditable) {
-    isEditable ? setBit(attributes->attributes, 0) : clrBit(attributes->attributes, 0);
-}
-
-bool BSFatSimulation::isSystem(Attributes *attributes) {
-    return tstBit(attributes->attributes, 1);
-}
-
-void BSFatSimulation::setSystem(Attributes *attributes, bool isService) {
-    isService ? setBit(attributes->attributes, 1) : clrBit(attributes->attributes, 1);
-}
-
-bool BSFatSimulation::isAsccii(Attributes *attributes) {
-    return tstBit(attributes->attributes, 2);
-}
-
-void BSFatSimulation::setAsccii(Attributes *attributes, bool isAsccii) {
-    isAsccii ? setBit(attributes->attributes, 2) : clrBit(attributes->attributes, 2);
-}
-
-bool BSFatSimulation::isRandAccFile(Attributes *attributes) {
-    return tstBit(attributes->attributes, 3);
-}
-
-void BSFatSimulation::setRandAccFile(Attributes *attributes, bool isRandAccFile) {
-    isRandAccFile ? setBit(attributes->attributes, 3) : clrBit(attributes->attributes, 3);
-}
-
 Directory *BSFatSimulation::getCurrentDirectory() {
     return m_currentDirectory;
 }
 
+/**
+ * Sets the current directory.
+ * @param Directory* directoryToSet
+ */
 void BSFatSimulation::setCurrentDirectory(Directory *directory) {
     m_currentDirectory = directory;
 }
 
+/**
+ * Returns the status array.
+ * @return char* statusArray
+ */
 unsigned char * BSFatSimulation::getStatusArray() {
     return m_statusArray;
 }
 
+/**
+ * Returns the block size of the bsFat.
+ * @return unsigned int blockSize
+ */
 unsigned int BSFatSimulation::getBlockSize() {
     return m_blockSize;
 }
 
+/**
+ * Returns the fat size of the bsFat.
+ * @return unsigned int fatSize
+ */
 unsigned int BSFatSimulation::getFatSize() {
     return m_fatSize;
 }
 
+/**
+ * Returns the number of blocks that potentially can be saved.
+ * @return unsigned int numberOfBlocks
+ */
 unsigned int BSFatSimulation::getNumberOfFilesThatCanBeSaved() {
     return m_fatSize / m_blockSize;
 }
 
+/**
+ * Returns the number of files that are currently saved in the bsFat.
+ * @return unsigned int numberOfFiles
+ */
 unsigned int BSFatSimulation::getNumberOfCurrentlySavedFiles() {
     return m_numberOfFiles;
 }
 
+/**
+ * Creates some directories for the simulation.
+ */
 void BSFatSimulation::createDirectoriesForSim() {
     m_currentDirectory = getRootDirectory();
 
-    //char** directoryNames = new char*[] {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
-    char* directoryNames[] = {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
-    m_currentDirectory->createChildDirectory(directoryNames[0], new Attributes());
+    char** directoryNames = new char*[] {"Michael", "Jan", "Simon", "Betriebssysteme", "Algo", "SWT", "Mathe1", "Mathe2", "Datenbanken", "Projekt"};
 
-    //char** fileNames = new char*[] {"main.c", "hallo.txt", "Presentation.docx"};
-    char* fileNames[] = {"main.c", "hallo.txt", "Presentation.docx"};
+    m_currentDirectory->createChildDirectory(directoryNames[0], new Attributes());
+    char** fileNames = new char*[] {"main.c", "hallo.txt", "Presentation.docx"};
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
     createFilesForSim(fileNames, 3);
     m_currentDirectory = getRootDirectory();
@@ -450,12 +335,18 @@ void BSFatSimulation::createDirectoriesForSim() {
     m_currentDirectory->createChildDirectory(directoryNames[8], new Attributes());
 }
 
+/**
+ * Searches and returns the cluster with the given index.
+ * @param Directory* directory
+ * @param unsigned int index
+ * @return BsCluster* cluster
+ */
 BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned int index) {
     if(directory == nullptr){
         return nullptr;
     }
 
-    BSFatFile* file = dynamic_cast<BSFatFile*>(directory->getFileList());
+    auto* file = dynamic_cast<BSFatFile*>(directory->getFileList());
     BSCluster* bsCluster;
     while(file != nullptr){
         bsCluster = file->getFirstBlock();
@@ -479,9 +370,172 @@ BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned
     }
 }
 
-char * BSFatSimulation::getPath(){
-    Directory* directory = m_currentDirectory;
-    while(directory->getParentDirectory()!=nullptr){
+/**
+ * Deletes the given file from the current directory.
+ * @param AbstractFile* file
+ */
+void BSFatSimulation::deleteFile(AbstractFile *file) {
+    if(file->getNextFile() == nullptr && file->getPrevFile() != nullptr){
+        AbstractFile* prevFile = file->getPrevFile();
+        prevFile->setNextFile(nullptr);
 
+        file->setNextFile(nullptr);
+        file->setPrevFile(nullptr);
+
+        freeFileMemory(file);
+
+        delete file;
+    }else if(file->getNextFile() != nullptr && file->getPrevFile() == nullptr){
+        AbstractFile* nextFile = file->getNextFile();
+        nextFile->setPrevFile(nullptr);
+
+        file->setNextFile(nullptr);
+
+        m_currentDirectory->setFileList(nextFile);
+
+        freeFileMemory(file);
+
+        delete file;
+    }else if(file->getNextFile() != nullptr && file->getPrevFile() != nullptr){
+        AbstractFile* nextFile = file->getNextFile();
+        AbstractFile* prevFile = file->getPrevFile();
+        nextFile->setPrevFile(prevFile);
+        prevFile->setNextFile(nextFile);
+
+        file->setNextFile(nullptr);
+        file->setPrevFile(nullptr);
+
+        freeFileMemory(file);
+
+        delete file;
+    }
+}
+
+/**
+ * Deletes the given directory under the current directory, if and only if the directory is empty.
+ * @param directory
+ */
+void BSFatSimulation::deleteDirectory(Directory *directory) {
+    if(directory->getSubDirectoryList() == nullptr && directory->getFileList() == nullptr){
+        if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() != nullptr){
+            Directory* preDirectory = directory->getPrevDirectory();
+            preDirectory->setNextDirectory(nullptr);
+
+            directory->setPreviousDirectory(nullptr);
+
+            delete directory;
+        }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() == nullptr){
+            Directory* nextDirectory = directory->getNextDirectory();
+            nextDirectory->setPreviousDirectory(nullptr);
+
+            m_currentDirectory->setDirectoryList(nextDirectory);
+
+            directory->setNextDirectory(nullptr);
+
+            delete directory;
+        }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() != nullptr){
+            Directory* nextDirectory = directory->getNextDirectory();
+            Directory* prevDirectory = directory->getPrevDirectory();
+            nextDirectory->setPreviousDirectory(prevDirectory);
+            prevDirectory->setNextDirectory(nextDirectory);
+
+            directory->setPreviousDirectory(nullptr);
+            directory->setNextDirectory(nullptr);
+
+            delete directory;
+        }
+    }
+}
+
+void BSFatSimulation::updateFile(char *name, Attributes *attributes, bool isEditable, bool isSystem, bool isAscii,
+                                 bool isRamFile,
+                                 AbstractFile *file, int size) {//evtl. ausgaben oder ähnliches nötig
+    if(file->tstBit(file->getAttributes()->attributes, 0)){
+        if(!file->isSystem()){
+            if(strcmp(file->getName(), name) != 0){
+                file->setName(name);
+            }
+            if(isSystem != file->isSystem()){
+                file->tstBit(file->getAttributes()->attributes, 1) ? file->clrBit(file->getAttributes()->attributes, 1) : file->setBit(file->getAttributes()->attributes, 1);
+            }
+            int numberOfBlocks = ceil((double) size / (double) m_blockSize);
+            if(numberOfBlocks <= getFreeDiskSpace() && size != file->getSize()){
+                BSFatFile* bsFatFile = dynamic_cast<BSFatFile*>(file);
+                freeFileMemory(file);
+                bsFatFile->setFirstBlock(initBSCluster(numberOfBlocks));
+            }
+        }
+        //nur attribute können gesetzt werden
+        if(isEditable){
+            file->clrBit(file->getAttributes()->attributes, 0);
+        }
+        if(isAscii != file->isAscii()){
+            file->tstBit(file->getAttributes()->attributes, 2) ? file->clrBit(file->getAttributes()->attributes, 2) : file->setBit(file->getAttributes()->attributes, 2);
+        }
+        if (isRamFile != file->isRandAccFile()){
+            file->tstBit(file->getAttributes()->attributes, 3) ? file->clrBit(file->getAttributes()->attributes, 3) : file->setBit(file->getAttributes()->attributes, 3);
+        }
+        file->getAttributes()->dateOfLastEdit = time(nullptr);
+    }
+    //keine Bearbeitung möglich
+}
+
+void BSFatSimulation::updateDirectory() {
+
+}
+
+BSCluster *BSFatSimulation::initBSCluster(int numberOfBlocks) {
+    if(numberOfBlocks <= getFreeDiskSpace() && numberOfBlocks != 0){
+        auto **bsClusters = new BSCluster *[numberOfBlocks];
+
+        for (int i = 0; i < numberOfBlocks; i++) {
+            bsClusters[i] = new BSCluster();
+        }
+
+        bsClusters[0]->setPrevElement(nullptr);
+        bsClusters[numberOfBlocks - 1]->setNextElement(nullptr);
+
+        if (numberOfBlocks > 2) {
+            for (int i = 1; i < numberOfBlocks - 1; i++) {
+                bsClusters[i - 1]->setNextElement(bsClusters[i]);
+                bsClusters[i]->setPrevElement(bsClusters[i - 1]);
+                bsClusters[i]->setNextElement(bsClusters[i + 1]);
+                bsClusters[i + 1]->setPrevElement(bsClusters[i]);
+            }
+
+            bsClusters[numberOfBlocks - 1]->setPrevElement(bsClusters[numberOfBlocks - 2]);
+
+        } else if (numberOfBlocks == 2) {
+            bsClusters[1]->setPrevElement(bsClusters[0]);
+            bsClusters[0]->setNextElement(bsClusters[1]);
+        }
+
+        unsigned int pos;
+
+        for (int i = 0; i < numberOfBlocks; i++) {
+            pos = (rand() % (m_fatSize / m_blockSize));
+            while (m_statusArray[pos] != FREE) {
+                pos = (rand() % (m_fatSize / m_blockSize));
+            }
+            bsClusters[i]->setIndex(pos);
+            m_statusArray[pos] = OCCUPIED;
+        }
+        return bsClusters[0];
+    }else{
+        return nullptr;
+    }
+}
+
+void BSFatSimulation::freeFileMemory(AbstractFile *file) {
+    BSFatFile* bsFatFile = dynamic_cast<BSFatFile*>(file);
+    BSCluster* cluster = bsFatFile->getFirstBlock();
+
+    bsFatFile->setFirstBlock(nullptr);
+
+    while(cluster->getNextBlock() != nullptr){
+        m_statusArray[cluster->getIndex()] = FREE;
+        BSCluster* pre = cluster;
+        cluster->getNextBlock();
+        delete pre;
     }
 }

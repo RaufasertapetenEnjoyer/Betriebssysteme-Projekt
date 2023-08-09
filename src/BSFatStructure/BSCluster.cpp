@@ -1,10 +1,10 @@
-
-
 #include "BSCluster.h"
 
 
 BSCluster::BSCluster() {
-
+    m_prevElement = nullptr;
+    m_nextElement = nullptr;
+    m_statusArrayIndex = -1;
 }
 
 /**

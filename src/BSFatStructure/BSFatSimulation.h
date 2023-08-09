@@ -1,7 +1,7 @@
 
 #ifndef BS_PROJEKT_BSFATSIMULATION_H
 #define BS_PROJEKT_BSFATSIMULATION_H
-#include "DirectoryStructure/Directory.h"
+#include "../DirectoryStructure/Directory.h"
 #include "BSCluster.h"
 
 #define RESERVED 'R'
@@ -23,35 +23,26 @@ public:
 
     void createFile(char* name, bool editable, bool system, bool asccii, bool randAccFile, int size);
 
-    bool isEditable(Attributes* attributes);
-
-    void setEditable(Attributes *attributes, bool isEditable);
-
-    bool isSystem(Attributes* attributes);
-
-    void setSystem(Attributes *attributes, bool isSystem);
-
-    bool isAsccii(Attributes* attributes);
-
-    void setAsccii(Attributes *attributes, bool isAsccii);
-
-    bool isRandAccFile(Attributes* attributes);
-
-    void setRandAccFile(Attributes *attributes, bool isRandAccFile);
-
     void createFilesForSim(char** names, unsigned int length);
 
     void createDirectoriesForSim();
 
     void createDirectory(char* name, Attributes* attributes);
 
-    void updateFile();
+    void updateFile(char *name, Attributes *attributes, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
+                    AbstractFile *file, int size);
 
     void updateDirectory();
 
-    void deleteFile();
+    char* getPath();
 
-    void deleteDirectory();
+    BSCluster* initBSCluster(int numberOfBlocks);
+
+    void freeFileMemory(AbstractFile* file);
+
+    void deleteFile(AbstractFile* file);
+
+    void deleteDirectory(Directory *directory);
 
     Directory* getCurrentDirectory();
 
@@ -66,14 +57,6 @@ public:
     unsigned int getNumberOfFilesThatCanBeSaved();
 
     unsigned int getNumberOfCurrentlySavedFiles();
-
-    void setBit(char *array, int bitToSet);
-
-    void clrBit(char *array, int bitToClear);
-
-    int tstBit(char *array, int bitToTest);
-
-    char * getPath();
 
 private:
     Directory* m_currentDirectory;

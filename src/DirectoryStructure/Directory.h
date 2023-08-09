@@ -4,6 +4,11 @@
 #include "AbstractElement.h"
 #include "AbstractFile.h"
 
+/**
+ * First bit of attributes is the editable flag
+ *
+ */
+
 class Directory: public AbstractElement {
 public:
     Directory(char *name, Attributes *attributes);
@@ -21,10 +26,8 @@ public:
     bool testConvention(char *nameToTest) override;
 
     void createChildDirectory(char* name, Attributes* attributes);
-    int deleteChildDirectroy(char* name);
 
     void createChildFile(AbstractFile *file);
-    int deleteChildElement(char* name);
 
     bool checkIfDirectoryNameExists(char* name);
     bool checkIfFileNameExists(char* name);
@@ -38,6 +41,11 @@ public:
     Directory* getPrevDirectory();
     void setPreviousDirectory(Directory* directoryToSet);
 
+    void setFileList(AbstractFile* file);
+    void setDirectoryList(Directory* directory);
+
+    unsigned int getNumberOfFiles();
+    void setNumberOfFiles(unsigned int numberOfFiles);
 
 private:
     /**

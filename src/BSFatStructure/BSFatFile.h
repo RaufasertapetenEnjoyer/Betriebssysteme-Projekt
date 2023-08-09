@@ -1,10 +1,8 @@
 
 #ifndef BS_PROJEKT_BSFATFILE_H
 #define BS_PROJEKT_BSFATFILE_H
-#include "DirectoryStructure/AbstractFile.h"
-#include "DirectoryStructure/AbstractElement.h"
+#include "../DirectoryStructure/AbstractFile.h"
 #include "BSCluster.h"
-
 
 class BSFatFile : public AbstractFile{
 public:

@@ -3,6 +3,7 @@
 #define BS_ELEMENT_H
 
 #include <cstdlib>
+#include "cmath"
 
 /**
  * Profs whether a pointer of type T is also convertable to a pointer of type Base.
@@ -19,7 +20,7 @@ inline bool instanceof(const T* ptr){
 struct Attributes{
     time_t dateOfCreation;
     time_t dateOfLastEdit;
-    char* attributes;
+    char* attributes = new char[1];
     int size;
 };
 
@@ -39,6 +40,12 @@ public:
     void setSize(int sizeToSet);
 
     virtual bool testConvention(char* name) = 0;
+
+    void setBit(char *array, int bitToSet);
+
+    void clrBit(char *array, int bitToClear);
+
+    int tstBit(char *array, int bitToTest);
 
 private:
     char* m_name;
