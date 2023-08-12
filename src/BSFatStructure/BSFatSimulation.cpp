@@ -74,7 +74,7 @@ int BSFatSimulation::getFreeDiskSpace() {
  * Defragment the whole file-system (recursive traverse algorithm).
  * @param Directory* directory
  */
-void BSFatSimulation::defragmentDisk(Directory *directory, int currentPosition) {
+void BSFatSimulation::defragmentDisk(Directory *directory, int &currentPosition) {
     if(directory == nullptr){
         return;
     }
@@ -150,7 +150,8 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
 
         m_numberOfFiles++;
 
-        m_currentDirectory->createChildFile((AbstractFile *) file);
+        AbstractFile* file1 = dynamic_cast<AbstractFile*>(file);
+        m_currentDirectory->createChildFile( file1);
 
         Directory* directory = m_currentDirectory;
         while (directory->getParentDirectory() != nullptr){
@@ -192,14 +193,12 @@ void BSFatSimulation::createFilesForSim(char** names, unsigned int length) {
  * @param float fragmentation (start with 0.0)
  * @return
  */
-float BSFatSimulation::getFragmentation(Directory* directory, float fragmentation) {
+float BSFatSimulation::getFragmentation(Directory* directory) {
     if(directory == nullptr){
         return 0.0;
     }
 
-    if(directory->getFileList() == nullptr){
-        return 0.0;
-    }
+
 
     auto* file = dynamic_cast<BSFatFile*>(directory->getFileList());
     float sumOfFrag = 0.0;
@@ -225,15 +224,14 @@ float BSFatSimulation::getFragmentation(Directory* directory, float fragmentatio
         file = dynamic_cast<BSFatFile*>(file->getNextFile());
     }
 
-    fragmentation += sumOfFrag;
-
     Directory* subDirectory = directory->getSubDirectoryList();
     while(subDirectory != nullptr){
-        getFragmentation(subDirectory, fragmentation);
+
+        sumOfFrag += getFragmentation(subDirectory);
         subDirectory = subDirectory->getNextDirectory();
     }
 
-    return (fragmentation / (float) m_numberOfFiles) * 100;
+    return (sumOfFrag / (float) m_numberOfFiles);
 }
 
 /**
@@ -381,7 +379,7 @@ void BSFatSimulation::createDirectoriesForSim() {
                     //Subdirectory BsProjekt
                     //      with three files
     char* fileNamesBsProjekt[] = {"main.cpp", "icon1.png", "mainWindow.qt"};
-    char* directoryNamesSimon[] = {"com", "de", "bs", "bsProjekt"};
+    char* directoryNamesSimon[] = {"comic", "de", "bs", "bsProjekt"};
     m_currentDirectory->createChildDirectory(directoryNames[2], new Attributes());
 
     //Simon/
@@ -436,13 +434,18 @@ BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned
     }
 
     Directory* subDirectory = directory->getSubDirectoryList();
-    while(subDirectory != nullptr){
-        BSCluster* found = searchClusterByIndex(subDirectory, index);
+    /*if(subDirectory == nullptr){
+        std::cout<<directory->getName()<<"==null"<<std::endl;
+    }*/
+    BSCluster* found;
+    while(subDirectory != nullptr || subDirectory != 0x0){
+        found = searchClusterByIndex(subDirectory, index);
         if(found != nullptr){
             return found;
         }
         subDirectory = subDirectory->getNextDirectory();
     }
+    return found;
 }
 
 /**
@@ -483,7 +486,13 @@ void BSFatSimulation::deleteFile(AbstractFile *file) {
         freeFileMemory(file);
 
         delete file;
+    }else if(file->getNextFile() == nullptr && file->getPrevFile() == nullptr){
+        m_currentDirectory->setFileList(nullptr);
+        freeFileMemory(file);
+
+        delete file;
     }
+    m_numberOfFiles--;
 }
 
 /**
@@ -628,7 +637,7 @@ void BSFatSimulation::freeFileMemory(AbstractFile *file) {
     while(cluster->getNextBlock() != nullptr){
         m_statusArray[cluster->getIndex()] = FREE;
         BSCluster* pre = cluster;
-        cluster->getNextBlock();
+        cluster = cluster->getNextBlock();
         delete pre;
     }
 }

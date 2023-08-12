@@ -103,6 +103,7 @@ void Directory::setLastDirectoryOfTheList(Directory* directoryToSet) {
     }
     directory->m_nextDirectory = directoryToSet;
     directoryToSet->m_prevDirectory = directory;
+    directoryToSet->setNextDirectory(nullptr);
 }
 
 AbstractFile *Directory::getLastFileOfTheList(AbstractFile *fileToSet) {

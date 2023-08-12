@@ -39,7 +39,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Dateipfad</string>
+      <string/>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton">
@@ -73,7 +73,7 @@
       <rect>
        <x>20</x>
        <y>530</y>
-       <width>91</width>
+       <width>101</width>
        <height>16</height>
       </rect>
      </property>

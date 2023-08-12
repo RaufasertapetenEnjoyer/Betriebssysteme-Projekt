@@ -10,7 +10,7 @@ AbstractElement::AbstractElement(char *name, Attributes* attributes, int size) {
 
 AbstractElement::~AbstractElement() {
     if(m_name != nullptr){
-        delete m_name;
+        //delete m_name;
     }
     if(m_attributes != nullptr){
         delete m_attributes;

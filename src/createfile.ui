@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>421</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>370</y>
+     <x>30</x>
+     <y>250</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -26,7 +26,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+    <set>QDialogButtonBox::Save</set>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -68,9 +68,9 @@
   <widget class="QLineEdit" name="lineEdit_2">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>120</x>
      <y>70</y>
-     <width>101</width>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -78,12 +78,17 @@
   <widget class="QComboBox" name="comboBox">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>260</x>
      <y>70</y>
      <width>72</width>
      <height>22</height>
     </rect>
    </property>
+   <item>
+    <property name="text">
+     <string>Kilobyte</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
@@ -98,14 +103,56 @@
     <string>Attribute:</string>
    </property>
   </widget>
-  <widget class="QListWidget" name="listWidget">
+  <widget class="QCheckBox" name="editable">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>141</y>
-     <width>351</width>
-     <height>211</height>
+     <x>120</x>
+     <y>120</y>
+     <width>72</width>
+     <height>19</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>editierbar</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="system">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>150</y>
+     <width>72</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>System</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="ascii">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>180</y>
+     <width>72</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ASCII</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_4">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>210</y>
+     <width>121</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Random Access File</string>
    </property>
   </widget>
  </widget>

@@ -17,9 +17,9 @@ public:
 
     int getFreeDiskSpace();
 
-    void defragmentDisk(Directory *directory, int currentPosition);
+    void defragmentDisk(Directory *directory, int &currentPosition);
 
-    float getFragmentation(Directory* directory, float fragmentation);
+    float getFragmentation(Directory* directory);
 
     void createFile(char* name, bool editable, bool system, bool asccii, bool randAccFile, int size);
 

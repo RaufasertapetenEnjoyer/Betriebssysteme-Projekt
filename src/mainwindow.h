@@ -20,6 +20,7 @@ public:
     void reload();
     void buildTree(Directory * dir, QTreeWidgetItem *parent);
     void openPath(QString path);
+    std::string getPath();
 private slots:
     void deleteFile();
     void fileProperties();
@@ -36,6 +37,8 @@ private slots:
     void on_pushButton_4_clicked();
 
     void on_pushButton_5_clicked();
+
+    void on_pushButton_3_clicked();
 
 private:
     Ui::MainWindow *ui;

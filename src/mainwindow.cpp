@@ -11,6 +11,7 @@
 #include <QDialog>
 #include <QAction>
 #include <iostream>
+#include <cstring>
 
 BSFatSimulation * sim = new BSFatSimulation(512,16384*4);
 AbstractFile * selectedFile;
@@ -38,25 +39,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::reload(){
     ui->listWidget->clear();
-    float f = sim->getFragmentation(sim->getRootDirectory(),0.0);
+    float f = sim->getFragmentation(sim->getRootDirectory())*100;
     std::cout<<"Fragmentierung:" << f<<std::endl;
     ui->progressBar->setValue(f);
     Directory* d = sim->getCurrentDirectory();
     //d = d->getSubDirectoryList();
 
-    //const char* path =  sim->getPath();
-    Directory* directoryCur = sim->getCurrentDirectory();
-    std::string path = "";
-    while (directoryCur != nullptr){
-        std::string preName = directoryCur->getName();
-        path = preName + "/" + path;
-        directoryCur = directoryCur->getParentDirectory();
-    }
-    const char* pathAsChar = path.c_str();
+    std::string pathAsChar = getPath();
 
 
     std::cout<<pathAsChar<<std::endl;
-    ui->lineEdit->setText(pathAsChar);
+    ui->lineEdit->setText(QString::fromStdString(pathAsChar));
 
     for (int i = 0; i < sim->getNumberOfFilesThatCanBeSaved(); i++) {
             std::cout << sim->getStatusArray()[i] << ", ";
@@ -64,6 +57,7 @@ void MainWindow::reload(){
         std::cout << std::endl;
     AbstractFile * file = d->getFileList();
     while(file != nullptr){
+        std::cout<<file->getName()<<std::endl;
         QListWidgetItem *item = new QListWidgetItem(file->getName());
         item->setIcon(QIcon(":/Icons/fileIcon.png"));
         QString type("File");
@@ -86,6 +80,18 @@ void MainWindow::reload(){
     buildTree(dir,NULL);
     ui->treeWidget->expandAll();
     ui->treeWidget->sortItems(0,Qt::AscendingOrder);
+}
+
+std::string MainWindow::getPath(){
+    Directory* directoryCur = sim->getCurrentDirectory();
+    std::string path = "";
+    while (directoryCur != nullptr){
+        std::string preName = directoryCur->getName();
+        path = preName + "/" + path;
+        directoryCur = directoryCur->getParentDirectory();
+    }
+    //const char* pathAsChar = path.c_str();
+    return path;
 }
 
 void MainWindow::buildTree(Directory* dir,QTreeWidgetItem *parent){
@@ -121,14 +127,14 @@ void MainWindow::buildTree(Directory* dir,QTreeWidgetItem *parent){
 void MainWindow::deleteFile(){
     DeleteFile *deleteDia = new DeleteFile(this);
     if(deleteDia->exec() == QDialog::Accepted){
-        //sim->deleteFile();
+        sim->deleteFile(selectedFile);
         std::cout<<"delete File: "<<selectedFile->getName()<<std::endl;
         reload();
     }
 }
 
 void MainWindow::fileProperties(){
-    FileProperties *prop = new FileProperties(this, selectedFile);
+    FileProperties *prop = new FileProperties(this, selectedFile, getPath());
     if(prop->exec() == QDialog::Accepted){
         std::cout<<"save File: "<<selectedFile->getName()<<std::endl;
         reload();
@@ -138,7 +144,11 @@ void MainWindow::fileProperties(){
 void MainWindow::createFile(){
    CreateFile *file = new CreateFile(this);
     if(file->exec() == QDialog::Accepted){
-
+        std::string name = file->getName().toStdString();
+        char* nameP = new char[name.length()];
+        strcpy(nameP,name.c_str());
+        sim->createFile(nameP, file->getEditable(), file->getSystem(), file->getAscii(), file->getRandomAccess(), file->getSize());
+        reload();
     }
 }
 
@@ -164,7 +174,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
     if(content == "File"){
         selectedDir=nullptr;
         QString name = item->text();
-        AbstractFile * file = sim->getCurrentDirectory()->getFileList();//to change to just current Directory
+        AbstractFile * file = sim->getCurrentDirectory()->getFileList();
         if(file==nullptr){
             std::cout<<"Error: File clicked but no files found in Simulation"<<std::endl;
         }
@@ -231,7 +241,9 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-    float f = sim->getFragmentation(sim->getRootDirectory(),0.0);
+    int currPos = 0;
+    sim->defragmentDisk(sim->getRootDirectory(), currPos);
+    float f = sim->getFragmentation(sim->getRootDirectory()) * 100;
     std::cout<<"Fragmentierung:" << f<<std::endl;
     ui->progressBar->setValue(f);
 
@@ -246,7 +258,6 @@ void MainWindow::on_pushButton_4_clicked()
 {
     if(sim->getCurrentDirectory() != sim->getRootDirectory()){
         sim->setCurrentDirectory(sim->getCurrentDirectory()->getParentDirectory());
-
         reload();
     }
 }
@@ -297,3 +308,12 @@ void MainWindow::openPath(QString path){
         }
     }
 }
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    Dialog *dia = new Dialog(this);
+    if(dia->exec() == QDialog::Accepted){
+           reload();
+    }
+}
+
