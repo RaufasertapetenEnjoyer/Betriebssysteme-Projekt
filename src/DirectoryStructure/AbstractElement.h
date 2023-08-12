@@ -20,7 +20,7 @@ inline bool instanceof(const T* ptr){
 struct Attributes{
     time_t dateOfCreation;
     time_t dateOfLastEdit;
-    char* attributes = new char[1];
+    char* attributes;
     int size;
 };
 

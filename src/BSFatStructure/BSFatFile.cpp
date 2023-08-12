@@ -11,3 +11,11 @@ BSCluster *BSFatFile::getFirstBlock() {
 void BSFatFile::setFirstBlock(BSCluster *block) {
     m_bsCluster = block;
 }
+
+BSCluster* BSFatFile::getLastBlock() {
+    BSCluster* cluster = this->getFirstBlock();
+    while (cluster->getNextBlock() != nullptr){
+        cluster = cluster->getNextBlock();
+    }
+    return cluster;
+}

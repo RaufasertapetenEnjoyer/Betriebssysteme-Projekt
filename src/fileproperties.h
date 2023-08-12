@@ -15,6 +15,12 @@ class FileProperties : public QDialog
 public:
     explicit FileProperties(QWidget *parent = nullptr, AbstractFile *file = nullptr, std::string path = NULL);
     ~FileProperties();
+    QString getName();
+    int getSize();
+    bool getEditable();
+    bool getSystem();
+    bool getAscii();
+    bool getRandomAccess();
 
 private slots:
     void on_fileSize_textChanged(const QString &arg1);
@@ -31,6 +37,7 @@ private slots:
 
 private:
     Ui::FileProperties *ui;
+    bool nameIsNotEmpty();
 };
 
 #endif // FILEPROPERTIES_H

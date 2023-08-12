@@ -9,6 +9,7 @@ public:
     BSFatFile(char* name, Attributes* attributes, int size);
     BSCluster* getFirstBlock();
     void setFirstBlock(BSCluster* block);
+    BSCluster* getLastBlock();
 
 private:
     /**

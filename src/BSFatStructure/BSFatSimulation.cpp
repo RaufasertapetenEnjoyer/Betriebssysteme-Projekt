@@ -138,6 +138,7 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
         attributes->dateOfCreation = time(nullptr);
         attributes->dateOfLastEdit = time(nullptr);
         attributes->size = size;
+        attributes->attributes = new char[1];
 
         auto *file = new BSFatFile(name, attributes, size);
 
@@ -551,16 +552,41 @@ void BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, boo
             if(isSystem != file->isSystem()){
                 file->tstBit(file->getAttributes()->attributes, 1) ? file->clrBit(file->getAttributes()->attributes, 1) : file->setBit(file->getAttributes()->attributes, 1);
             }
-            int numberOfBlocks = ceil((double) size / (double) m_blockSize);
-            if(numberOfBlocks <= getFreeDiskSpace() && size != file->getSize()){
-                BSFatFile* bsFatFile = dynamic_cast<BSFatFile*>(file);
-                freeFileMemory(file);
-                bsFatFile->setFirstBlock(initBSCluster(numberOfBlocks));
+            int numberOfNewBlocks = ceil((double) size / (double) m_blockSize);
+            int numberOfCurrBlocks = ceil((double) file->getSize() / (double) m_blockSize);
+
+            auto fatFile = dynamic_cast<BSFatFile*>(file);
+
+            if (numberOfCurrBlocks < numberOfNewBlocks) {
+                if ((numberOfNewBlocks - numberOfCurrBlocks) < getFreeDiskSpace()) {
+                    BSCluster* clusterToAdd = initBSCluster(numberOfNewBlocks - numberOfCurrBlocks);
+                    BSCluster *lastCluster = fatFile->getLastBlock();
+
+                    lastCluster->setNextElement(clusterToAdd);
+                    clusterToAdd->setPrevElement(lastCluster);
+                }
+            } else if (numberOfCurrBlocks > numberOfNewBlocks) {
+                int counter = numberOfCurrBlocks - numberOfNewBlocks;
+                BSCluster* cluster = fatFile->getLastBlock();
+
+                while (counter != 0) {
+                    BSCluster* currCluster = cluster;
+                    cluster = cluster->getPrevBlock();
+
+                    currCluster->setPrevElement(nullptr);
+                    currCluster->setNextElement(nullptr);
+
+                    m_statusArray[currCluster->getIndex()] = FREE;
+
+                    delete currCluster;
+                    counter--;
+                }
             }
+            file->setSize(size);
         }
         //nur attribute können gesetzt werden
-        if(isEditable){
-            file->clrBit(file->getAttributes()->attributes, 0);
+        if(isEditable != file->isEditable()){
+            file->tstBit(file->getAttributes()->attributes, 0) ? file->clrBit(file->getAttributes()->attributes, 0) : file->setBit(file->getAttributes()->attributes, 0);
         }
         if(isAscii != file->isAscii()){
             file->tstBit(file->getAttributes()->attributes, 2) ? file->clrBit(file->getAttributes()->attributes, 2) : file->setBit(file->getAttributes()->attributes, 2);

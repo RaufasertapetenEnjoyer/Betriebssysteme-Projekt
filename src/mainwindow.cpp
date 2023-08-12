@@ -57,7 +57,7 @@ void MainWindow::reload(){
         std::cout << std::endl;
     AbstractFile * file = d->getFileList();
     while(file != nullptr){
-        std::cout<<file->getName()<<std::endl;
+
         QListWidgetItem *item = new QListWidgetItem(file->getName());
         item->setIcon(QIcon(":/Icons/fileIcon.png"));
         QString type("File");
@@ -136,7 +136,11 @@ void MainWindow::deleteFile(){
 void MainWindow::fileProperties(){
     FileProperties *prop = new FileProperties(this, selectedFile, getPath());
     if(prop->exec() == QDialog::Accepted){
-        std::cout<<"save File: "<<selectedFile->getName()<<std::endl;
+        std::string name = prop->getName().toStdString();
+        char* nameP = new char[name.length()];
+        strcpy(nameP,name.c_str());
+        std::cout<<"Update Values: "<<nameP<<" "<<prop->getSize()<<" "<<prop->getEditable()<<" "<<prop->getSystem()<<" "<<prop->getAscii()<<" "<<prop->getRandomAccess()<<std::endl;
+        sim->updateFile(nameP,prop->getEditable(),prop->getSystem(),prop->getAscii(),prop->getRandomAccess(),selectedFile,prop->getSize());
         reload();
     }
 }
