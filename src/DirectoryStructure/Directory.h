@@ -47,6 +47,11 @@ public:
     unsigned int getNumberOfFiles();
     void setNumberOfFiles(unsigned int numberOfFiles);
 
+    bool checkIfParentsAreEditable();
+
+    bool isEditable();
+    void setEditable(bool editable);
+
 private:
     /**
      * List of all directories, which are under the current.

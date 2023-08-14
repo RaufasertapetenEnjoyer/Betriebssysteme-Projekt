@@ -32,7 +32,7 @@ public:
     void
     updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    void updateDirectory();
+    void updateDirectory(char* name, bool isEditable, Directory* directory);
 
     const char* getPath();
 

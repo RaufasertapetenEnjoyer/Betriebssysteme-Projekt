@@ -191,5 +191,21 @@ void Directory::setNumberOfFiles(unsigned int numberOfFiles){
     m_numberOfFiles = numberOfFiles;
 }
 
+bool Directory::checkIfParentsAreEditable() {
+    Directory* directory = this;
+    while (directory != nullptr){
+        if(!directory->isEditable()){
+            return false;
+        }
+        directory = directory->getParentDirectory();
+    }
+    return true;
+}
 
+bool Directory::isEditable() {
+    return tstBit(getAttributes()->attributes,0);
+}
 
+void Directory::setEditable(bool editable) {
+    editable ? setBit(getAttributes()->attributes, 0) : clrBit(getAttributes()->attributes, 0);
+}

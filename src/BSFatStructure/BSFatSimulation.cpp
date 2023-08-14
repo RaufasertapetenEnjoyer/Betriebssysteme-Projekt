@@ -599,8 +599,15 @@ void BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, boo
     //keine Bearbeitung möglich
 }
 
-void BSFatSimulation::updateDirectory() {
-
+void BSFatSimulation::updateDirectory(char* name, bool isEditable, Directory* directory) {
+    if(directory->isEditable()){
+        if(strcmp(name, directory->getName()) != 0){
+            directory->setName(name);
+        }
+        if(isEditable != directory->isEditable()){
+            directory->setEditable(isEditable);
+        }
+    }
 }
 
 /**
