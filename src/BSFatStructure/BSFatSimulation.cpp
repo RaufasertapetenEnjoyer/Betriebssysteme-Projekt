@@ -184,7 +184,7 @@ BSFatSimulation::BSFatSimulation(unsigned int blockSize, unsigned int fatSize) {
  */
 void BSFatSimulation::createFilesForSim(char** names, unsigned int length) {
     for (int i = 0; i < length; i++) {
-        createFile(names[i], true, false, false, true, (int) (rand() % 2100 + 1));
+        createFile(names[i], true, false, true, false, (int) (rand() % 2100 + 1));
     }
 }
 
