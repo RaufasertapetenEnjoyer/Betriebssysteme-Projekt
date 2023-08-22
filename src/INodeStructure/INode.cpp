@@ -20,7 +20,7 @@ INode::INode(int numberOfBlocksForFile, int numberOfBlocksPerINode) {
             }
         }
     } else {
-        return;
+        return; //todo
     }
 }
 
@@ -65,7 +65,7 @@ void INode::addAddress(int address, int numberOfBlocksPerINode) {
                 currentTable = *firstIndirectPointers;
             } else {
                 // bei Fehler log?
-                break;
+                break;//todo
             }
         }
         if(index >= 24) {

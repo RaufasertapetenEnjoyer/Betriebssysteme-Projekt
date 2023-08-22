@@ -18,6 +18,24 @@ INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize)
 }
 
 void INodeSimulation::simulate() {
+    for (int i = 0; i < 40; i++) {
+        if((rand() % 2) + 1 == 1){
+            m_statusArray[rand() % getNumberOfFilesThatCanBeSaved()] = CORRUPTED;
+        }else{
+            m_statusArray[rand() % getNumberOfFilesThatCanBeSaved()] = RESERVED;
+        }
+    }
+
+    char* root =  {"root"};
+    auto* directory = new Directory(root, new Attributes());
+    std::cout << directory->getName() << '\n' << std::endl;
+    directory->setParentDirectory(nullptr);
+    m_currentDirectory = directory;
+
+    //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+    char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+    createFilesForSim(fileNamesForRoot, 10);
+    createDirectoriesForSim();
 //todo
 }
 
@@ -186,18 +204,128 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
 }
 
 void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
-
+    for (int i = 0; i < length; i++) {
+        createFile(names[i], true, false, true, false, (int) (rand() % 2100 + 1));
+    }
 
 //todo
-    Directory* directory = m_currentDirectory;
-    while (directory->getParentDirectory() != nullptr){
-        directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
-        directory = directory->getParentDirectory();
-    }
+
+//    Directory* directory = m_currentDirectory;
+//    while (directory->getParentDirectory() != nullptr){
+//        directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
+//        directory = directory->getParentDirectory();
+//    }
 }
 
 void INodeSimulation::createDirectoriesForSim() {
-//todo
+    m_currentDirectory = getRootDirectory();
+
+    char* directoryNames[] = {"Michael", "Jan", "Simon", "Digitale Systeme", "Physik", "Algorithmen", "Datenstrukturen", "Elektrotechnik", "Praktikumsabgaben","Projekt BS", "Links"};
+
+    //user-directory Michael
+    //      with four files in it (main.c, test.txt and Dokumentation.docx, log.txt)
+    //      with two subdirectories (Digitale Systeme and Physik)
+    //Subdirectory Digitale Systeme
+    //      with two files
+    //Subdirectory Projekt is empty
+    //Subdirectory Physik
+    //      with one file in it
+    char* fileNamesMichael[] =  {"main.c", "test.txt", "Dokumentation.docx", "log.txt"};
+    char* fileNameDigitaleSysteme[] = {"Arduino.c", "LineFollower.c"};
+    char* fileNamesPhysik[] = {"Diagramme.csv"};
+
+    m_currentDirectory->createChildDirectory(directoryNames[0], new Attributes());
+    std::cout<<m_currentDirectory->getSubDirectoryList()->getName()<<std::endl;
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+
+
+    //Michael/
+    m_currentDirectory->createChildDirectory(directoryNames[3], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[4], new Attributes());
+
+    createFilesForSim(fileNamesMichael, 4);
+
+    //Michael/Digitale Systeme
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    createFilesForSim(fileNameDigitaleSysteme, 2);
+    m_currentDirectory->createChildDirectory(directoryNames[10], new Attributes());
+
+    //Michael/Physik
+    m_currentDirectory = m_currentDirectory->getNextDirectory()->getNextDirectory();
+    createFilesForSim(fileNamesPhysik, 1);
+
+    m_currentDirectory = getRootDirectory();
+
+    //user-directory Jan
+    //      with two subdirectories (Algorithmen und Datenstrukturen)
+    //Subdirectory Algortihmen
+    //      with one file in it
+    //Subdirectory Datenstruktuen
+    //      with two files
+    char* fileNamesAlgorithmen[] = {"Skript.docx"};
+    char* fileNamesDatenstrukturen[] = {"VerketteteListe.pdf", "Schaubild.png"};
+    m_currentDirectory->createChildDirectory(directoryNames[1], new Attributes());
+
+    //Jan/
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList()
+            ->getNextDirectory();
+    m_currentDirectory->createChildDirectory(directoryNames[5], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[6], new Attributes());
+
+    //Jan/Algorithmen
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList()->getNextDirectory();
+    createFilesForSim(fileNamesAlgorithmen, 1);
+
+    //Jan/Datenstrukturen
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList()->getNextDirectory();
+    createFilesForSim(fileNamesDatenstrukturen, 2);
+
+    m_currentDirectory = getRootDirectory();
+
+
+    //user-directory Simon
+    //      with two subdirectory (com, bsProjekt)
+    //Subdirectory com
+    //      with one subdirectory (de)
+    //Subdirectory de
+    //      with one subdirectory (bs)
+    //Subdirectory bs
+    //      with one subdirectory (BsProjekt)
+    //Subdirectory BsProjekt
+    //      with three files
+    char* fileNamesPraktikum[] = {"Abgabe1.docx", "Abgabe2.docx", "Abgabe3.docx", "Abgabe4.docx", "Abgabe5.docx", };
+    char* fileNamesBsProjekt[] = {"main.cpp", "icon1.png", "mainWindow.qt"};
+    char* directoryNamesSimon[] = {"com", "de", "bs", "bsProjekt"};
+    m_currentDirectory->createChildDirectory(directoryNames[2], new Attributes());
+
+    //Simon/
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList()
+            ->getNextDirectory()
+            ->getNextDirectory();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[0], new Attributes());
+
+    //Simon/Praktikumsabgaben
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    createFilesForSim(fileNamesPraktikum,5);
+
+    //Simon/com
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[1], new Attributes());
+
+    //Simon/com/de
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[2], new Attributes());
+
+    //Simon/com/de/bs
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[3], new Attributes());
+
+    //Simon/com/de/bs/bsProjekt
+    m_currentDirectory = m_currentDirectory->getSubDirectoryList();
+    createFilesForSim(fileNamesBsProjekt,3);
+
+
+    m_currentDirectory = getRootDirectory();
 }
 
 void INodeSimulation::createDirectory(char *name, Attributes *attributes) {

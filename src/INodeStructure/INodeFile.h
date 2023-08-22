@@ -17,6 +17,8 @@ public:
 
     void setINode(INode *iNode);
 
+    void traverseINode();
+
 private:
         INode* iNode;
 
