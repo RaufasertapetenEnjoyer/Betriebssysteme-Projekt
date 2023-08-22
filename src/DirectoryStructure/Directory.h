@@ -17,7 +17,7 @@ public:
     Directory* getLastDirectoryOfTheList();
     void setLastDirectoryOfTheList(Directory* directoryToSet);
 
-    AbstractFile* getLastFileOfTheList(AbstractFile* fileToSet);
+    AbstractFile* getLastFileOfTheList(); // can be deleteted
     void setLastFileOfTheList(AbstractFile* fileToSet);
 
     Directory* getParentDirectory();
@@ -44,7 +44,7 @@ public:
     void setFileList(AbstractFile* file);
     void setDirectoryList(Directory* directory);
 
-    unsigned int getNumberOfFiles();
+    unsigned int getNumberOfFiles(); // can be deleted
     void setNumberOfFiles(unsigned int numberOfFiles);
 
     bool checkIfParentsAreEditable();

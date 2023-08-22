@@ -21,7 +21,7 @@ struct Attributes{
     time_t dateOfCreation;
     time_t dateOfLastEdit;
     char* attributes;
-    int size;
+    //int size;
 };
 
 
@@ -48,8 +48,17 @@ public:
     int tstBit(char *array, int bitToTest);
 
 private:
+    /**
+     * Name of the element.
+     */
     char* m_name;
+    /**
+     * Attributes of the element. Contains an char array with certain space for flags, the date of creation and the date of the last edit.
+     */
     Attributes* m_attributes;
+    /**
+     * Size of the element
+     */
     int m_size;
 };
 

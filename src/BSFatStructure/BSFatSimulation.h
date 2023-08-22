@@ -58,12 +58,32 @@ public:
 
     unsigned int getNumberOfCurrentlySavedFiles();
 
+    void updateEditableOnContent(Directory* directory);
+
+    bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
+
 private:
+    /**
+     * Current directory you are working on.
+     */
     Directory* m_currentDirectory;
+    /**
+     * Memory representation.
+     */
     unsigned char* m_statusArray;
+    /**
+     * Size of the blocks the system is working with.
+     */
     unsigned int m_blockSize;
+    /**
+     * Size of the whole system memory.
+     */
     unsigned int m_fatSize;
+    /**
+     * Number of all files that are saved in the current system.
+     */
     unsigned int m_numberOfFiles;
+
     BSCluster *searchClusterByIndex(Directory *directory, unsigned int index);
     void simulate();
 };

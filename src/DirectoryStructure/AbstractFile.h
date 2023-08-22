@@ -36,7 +36,13 @@ public:
     void setRandAccFile(bool isRandAccFile);
 
 private:
+    /**
+     * A pointer on the next file of the list.
+     */
     AbstractFile* m_nextFile;
+    /**
+     * A pointer on the previous file of the list.
+     */
     AbstractFile* m_prevFile;
 };
 

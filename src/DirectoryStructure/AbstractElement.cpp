@@ -1,13 +1,21 @@
 #include "AbstractElement.h"
 #include <cstring>
 
-
+/**
+ * Create the object and initialize the name, attributes and the size.
+ * @param name
+ * @param attributes
+ * @param size
+ */
 AbstractElement::AbstractElement(char *name, Attributes* attributes, int size) {
     m_name = name;
     m_attributes = attributes;
     this->m_size = size;
 }
 
+/**
+ * Deletes the object.
+ */
 AbstractElement::~AbstractElement() {
     if(m_name != nullptr){
         //delete m_name;

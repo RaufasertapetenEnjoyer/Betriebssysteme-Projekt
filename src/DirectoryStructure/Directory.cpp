@@ -74,7 +74,7 @@ void Directory::createChildDirectory(char *name,Attributes *attributes) {
 
 /**
  * Adds an AbstractFile and adds it to the double-linked list.
- * @param File*
+ * @param AbstractFile* fileToAdd
  */
 void Directory::createChildFile(AbstractFile *file) {
     setLastFileOfTheList(file);
@@ -82,7 +82,7 @@ void Directory::createChildFile(AbstractFile *file) {
 
 /**
  * Get the last element of the directory list.
- * @return Directory* last directory
+ * @return Directory* lastDirectory
  */
 Directory *Directory::getLastDirectoryOfTheList() {
     if(m_directoryList != nullptr){
@@ -96,6 +96,10 @@ Directory *Directory::getLastDirectoryOfTheList() {
     }
 }
 
+/**
+ * Adds a directory to the end of the double linked list of directories.
+ * @param Directory* directoryToSet
+ */
 void Directory::setLastDirectoryOfTheList(Directory* directoryToSet) {
     Directory* directory = m_directoryList;
     while (directory->m_nextDirectory != nullptr){
@@ -106,7 +110,11 @@ void Directory::setLastDirectoryOfTheList(Directory* directoryToSet) {
     directoryToSet->setNextDirectory(nullptr);
 }
 
-AbstractFile *Directory::getLastFileOfTheList(AbstractFile *fileToSet) {
+/**
+ * Returns the last file of the double linked list of list.
+ * @return Abstractfile* lastFile
+ */
+AbstractFile *Directory::getLastFileOfTheList() {
     AbstractFile* file = m_fileList;
     while (file->getNextFile() != nullptr){
         file = file->getNextFile();
@@ -114,6 +122,10 @@ AbstractFile *Directory::getLastFileOfTheList(AbstractFile *fileToSet) {
     return file;
 }
 
+/**
+ * Adds a file to the end of the double linked list of files.
+ * @param AbstractFile* fileToSet
+ */
 void Directory::setLastFileOfTheList(AbstractFile* fileToSet) {
     if(m_fileList != nullptr){
         AbstractFile* file = m_fileList;
@@ -129,6 +141,11 @@ void Directory::setLastFileOfTheList(AbstractFile* fileToSet) {
     }
 }
 
+/**
+ * Checks whether a given name matches any name of directories under the current directory.
+ * @param char* name
+ * @return true if the name exists, else false
+ */
 bool Directory::checkIfDirectoryNameExists(char *name) {
     Directory* directory = m_directoryList;
     while (directory != nullptr){
@@ -140,6 +157,11 @@ bool Directory::checkIfDirectoryNameExists(char *name) {
     return false;
 }
 
+/**
+ * Checks whether a given name matches any name of files under the current directory.
+ * @param char* name
+ * @return true if the nam exists, else false
+ */
 bool Directory::checkIfFileNameExists(char *name) {
     AbstractFile* file = m_fileList;
     while (file != nullptr){
@@ -151,46 +173,90 @@ bool Directory::checkIfFileNameExists(char *name) {
     return false;
 }
 
+/**
+ * Get the first file of the file list.
+ * @return AbstractFile* firstFile
+ */
 AbstractFile *Directory::getFileList() {
     return m_fileList;
 }
 
+/**
+ * Get the first directory of the subdirectory list.
+ * @return Directory* firstDirectory
+ */
 Directory *Directory::getSubDirectoryList() {
     return m_directoryList;
 }
 
+/**
+ * Return the next directory of the subdirectory list.
+ * @return Directory* nextDirectory
+ */
 Directory *Directory::getNextDirectory() {
     return m_nextDirectory;
 }
 
+/**
+ * Set the next directory of the subdirectory list.
+ * @param Directory* directoryToSet
+ */
 void Directory::setNextDirectory(Directory *directoryToSet) {
     this->m_nextDirectory = directoryToSet;
 }
 
+/**
+ * Return the previous directory of the list.
+ * @return Director* previousDirectory
+ */
 Directory *Directory::getPrevDirectory() {
     return m_prevDirectory;
 }
 
+/**
+ * Set the previous directory of the subdirectory list.
+ * @param Directory* directoryToSet
+ */
 void Directory::setPreviousDirectory(Directory *directoryToSet) {
     this->m_prevDirectory = directoryToSet;
 }
 
+/**
+ * Set the first element of the file list.
+ * @param AbstractFile* file
+ */
 void Directory::setFileList(AbstractFile *file) {
     this->m_fileList = file;
 }
 
+/**
+ * Set the first element of the subdirectory list.
+ * @param directory
+ */
 void Directory::setDirectoryList(Directory *directory) {
     this->m_directoryList = directory;
 }
 
+/**
+ * Return the number of files currently saved in the directory.
+ * @return unsigned int numberOfFiles
+ */
 unsigned int Directory::getNumberOfFiles(){
     return m_numberOfFiles;
 }
 
+/**
+ * Set the number of files currently saved in the directory.
+ * @param numberOfFiles
+ */
 void Directory::setNumberOfFiles(unsigned int numberOfFiles){
     m_numberOfFiles = numberOfFiles;
 }
 
+/**
+ * Checks whether the parent directories are editable.
+ * @return true if all parents are editable, else false
+ */
 bool Directory::checkIfParentsAreEditable() {
     Directory* directory = this;
     while (directory != nullptr){
@@ -202,10 +268,18 @@ bool Directory::checkIfParentsAreEditable() {
     return true;
 }
 
+/**
+ * Checks whether the directory is editable or not.
+ * @return true if its editable, else false
+ */
 bool Directory::isEditable() {
     return tstBit(getAttributes()->attributes,0);
 }
 
+/**
+ * Initialize a file as editable or not.
+ * @param bool editable
+ */
 void Directory::setEditable(bool editable) {
     editable ? setBit(getAttributes()->attributes, 0) : clrBit(getAttributes()->attributes, 0);
 }

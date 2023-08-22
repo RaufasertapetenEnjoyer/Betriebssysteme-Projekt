@@ -5,7 +5,7 @@
 #include "iostream"
 #include <cmath>
 #include <cstring>
-#include <time.h>
+#include <ctime>
 
 
 /**
@@ -137,10 +137,10 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
         auto *attributes = new Attributes();
         attributes->dateOfCreation = time(nullptr);
         attributes->dateOfLastEdit = time(nullptr);
-        attributes->size = size;
         attributes->attributes = new char[1];
 
         auto *file = new BSFatFile(name, attributes, size);
+        file->setSize(size);
 
         file->setEditable(editable);
         file->setSystem(system);
@@ -690,4 +690,52 @@ const char *BSFatSimulation::getPath() {
     const char* pathAsChar = path.c_str();
 
     return pathAsChar;
+}
+
+/**
+ * Changes all files and directories beneath the given directory from editable to not-editable.
+ * @param Directory* directory
+ */
+void BSFatSimulation::updateEditableOnContent(Directory *directory) {
+    if(directory == nullptr){
+        return;
+    }
+
+    directory->clrBit(directory->getAttributes()->attributes, 0);
+
+    AbstractFile* file = directory->getFileList();
+    while (file != nullptr){
+        file->clrBit(file->getAttributes()->attributes, 0);
+        file = file->getNextFile();
+    }
+
+    Directory* subDirectory = directory->getSubDirectoryList();
+    while(subDirectory != nullptr){
+        updateEditableOnContent(subDirectory);
+        subDirectory = subDirectory->getNextDirectory();
+    }
+}
+
+bool BSFatSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
+                                         AbstractFile *file, int size) {
+    auto* bsFatFile = dynamic_cast<BSFatFile*>(file);
+
+    if(file->getSize() < size){
+        int numberOfNeededBlocks = ceil((double) (size - file->getSize()) / (double ) m_blockSize);
+        if(numberOfNeededBlocks > getFreeDiskSpace()){
+            return false;
+        }
+    }
+    if(!bsFatFile->testConvention(name)){
+        return false;
+    }
+    if(!bsFatFile->isEditable()){
+        return false;
+    }
+    if (bsFatFile->isSystem()){
+        if(strcmp(bsFatFile->getName(), name) != 0 || bsFatFile->getSize() != size || isSystem != bsFatFile->isSystem()){
+            return false;
+        }
+    }
+    return true;
 }
