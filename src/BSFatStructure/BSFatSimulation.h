@@ -3,6 +3,7 @@
 #define BS_PROJEKT_BSFATSIMULATION_H
 #include "../DirectoryStructure/Directory.h"
 #include "BSCluster.h"
+#include "../CDRomStructure/CDRomDirectory.h"
 
 #define RESERVED 'R'
 #define CORRUPTED 'D'
@@ -61,6 +62,10 @@ public:
     void updateEditableOnContent(Directory* directory);
 
     bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
+
+    void copyCDRomFile(CDRomFile* cdRomFile);
+
+    void copyCDRomDirectory(CDRomDirectory* directoryToCopy);
 
 private:
     /**

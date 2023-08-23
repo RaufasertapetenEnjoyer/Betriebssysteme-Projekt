@@ -9,7 +9,7 @@
 class CDRomFile: public AbstractElementCDRom{
 public:
     CDRomFile(char *name, Attributes *attributes, int size, int pos);
-
+    int getFirstBlock();
 private:
 
     int m_firstBlockStatusArray;

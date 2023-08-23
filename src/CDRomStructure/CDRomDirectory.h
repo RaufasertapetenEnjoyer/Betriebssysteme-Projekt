@@ -15,14 +15,13 @@ public:
 
     void setParentDirectory(CDRomDirectory* newParent);
 
-    CDRomDirectory* getParentDirectory();
-
     AbstractElementCDRom* getLastElementOfTheList();
 
     void setLastElementOfTheList(AbstractElementCDRom* element);
 
     void createChildElement(AbstractElementCDRom* element);
 
+    AbstractElementCDRom* getList();
 
 
 private:

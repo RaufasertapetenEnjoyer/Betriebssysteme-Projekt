@@ -716,6 +716,17 @@ void BSFatSimulation::updateEditableOnContent(Directory *directory) {
     }
 }
 
+/**
+ * Checks whether the update is valid.
+ * @param char* name
+ * @param bool isEditable
+ * @param bool isSystem
+ * @param bool isAscii
+ * @param bool isRamFile
+ * @param AbstractFile* file
+ * @param int size
+ * @return true if edit is valid
+ */
 bool BSFatSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
                                          AbstractFile *file, int size) {
     auto* bsFatFile = dynamic_cast<BSFatFile*>(file);
@@ -739,3 +750,6 @@ bool BSFatSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSys
     }
     return true;
 }
+
+
+

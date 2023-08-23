@@ -26,6 +26,7 @@ public:
     int getBlockSize();
     void setBlockSize(int blockSize);
     VolumeDescriptor* getVolumeDescriptor();
+    CDRomDirectory* getRootDirectory();
 
 private:
     int m_blockSize;
@@ -38,6 +39,8 @@ private:
     void createChildDirectory(char* name);
     int getIndexOfNextFreeBlock();
     void simulate();
+    void createFilesForSim(char **fileNames, int length);
+    void createDirectoriesForSim(char** directoryNames, int length);
 };
 
 

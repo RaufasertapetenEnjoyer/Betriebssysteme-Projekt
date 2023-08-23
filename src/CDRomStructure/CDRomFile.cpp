@@ -7,3 +7,7 @@
 CDRomFile::CDRomFile(char *name, Attributes *attributes, int size, int pos) : AbstractElementCDRom(name, attributes, size) {
     m_firstBlockStatusArray = pos;
 }
+
+int CDRomFile::getFirstBlock() {
+    return m_firstBlockStatusArray;
+}

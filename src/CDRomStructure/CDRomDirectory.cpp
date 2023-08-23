@@ -42,4 +42,8 @@ void CDRomDirectory::createChildElement(AbstractElementCDRom *element) {
     setLastElementOfTheList(element);
 }
 
+AbstractElementCDRom *CDRomDirectory::getList() {
+    return m_list;
+}
+
 
