@@ -5,6 +5,7 @@
 #include "iostream"
 #include <cmath>
 #include <cstring>
+#include <QString>
 #include <ctime>
 
 
@@ -802,21 +803,23 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
 
     if(numberOfBlocksForFat <= getFreeDiskSpace()){
         //Copy name
-        char *nameOfFile = nullptr;
+        QString name(cdRomFile->getName());
+        char *nameOfFile = new char[name.length()];
         strcpy(nameOfFile, cdRomFile->getName());
         //Copy attributes
-        Attributes* attributesOfFile = nullptr;
+        Attributes* attributesOfFile = new Attributes();
         memccpy(attributesOfFile, cdRomFile->getAttributes(),1, sizeof(Attributes));
 
         BSCluster* list = nullptr;
         BSCluster* next = nullptr;
         BSCluster* prev = nullptr;
 
-        int stagedBlocksOfCDRom = 1;
+        int stagedBlocksOfCDRom = 0;
         int counter = 0;
+        int length = numberOfBlocksForFat + cdRomFile->getFirstBlock();
 
-        for (int i = cdRomFile->getFirstBlock(); i <= numberOfBlocksForFat + cdRomFile->getFirstBlock(); i++) {
-            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize){
+        for (int i = cdRomFile->getFirstBlock(); i <= length; i++) {
+            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize || (i == length && stagedBlocksOfCDRom == 1)){
                 next = new BSCluster();
 
                 unsigned int pos;
@@ -837,7 +840,7 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
                 prev = next;
                 counter++;
                 stagedBlocksOfCDRom = 1;
-            }else if (stagedBlocksOfCDRom * cdRomBlockSize < m_blockSize){
+            }else{
                 stagedBlocksOfCDRom++;
             }
         }

@@ -3,6 +3,7 @@
 //
 
 #include "CDRomSimulation.h"
+#include <iostream>
 
 /**
  * Returns the size of one block in the current CD-ROM.
@@ -151,15 +152,16 @@ void CDRomSimulation::simulate() {
     createFilesForSim(fileNamesCommon,3);
 
     //root/Steam/images
-    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getParentDirectory()->getList()->getNextElement()->getNextElement());
+    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getParentDirectory()->getList()->getNextElement()->getNextElement()->getNextElement());
     char* fileNamesImages[] = {"t,png", "ct,png"};
     createFilesForSim(fileNamesImages,2);
 
     //root/Steam
     m_currentDirectory = m_currentDirectory->getParentDirectory();
+    std::cout<<m_currentDirectory->getName()<<std::endl;
 
     //root/Battlenet
-    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getNextElement()->getNextElement());
+    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getNextElement());
     char* fileNamesBattlenet[] = {"Overwatch.exe", "Hearthstone.exe"};
     createFilesForSim(fileNamesBattlenet, 2);
 
