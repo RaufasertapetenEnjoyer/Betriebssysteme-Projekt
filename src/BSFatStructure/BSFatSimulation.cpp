@@ -205,9 +205,9 @@ void BSFatSimulation::createFilesForSim(char** names, unsigned int length) {
  * @param float fragmentation (start with 0.0)
  * @return
  */
-float BSFatSimulation::getFragmentation(Directory *directory, float &fragmentation) {
+void BSFatSimulation::getFragmentation(Directory *directory, float &fragmentation) {
     if(directory == nullptr){
-        return 0.0;
+        return;
     }
 
 
@@ -241,11 +241,11 @@ float BSFatSimulation::getFragmentation(Directory *directory, float &fragmentati
     Directory* subDirectory = directory->getSubDirectoryList();
     while(subDirectory != nullptr){
 
-        fragmentation += getFragmentation(subDirectory, fragmentation);
+        getFragmentation(subDirectory, fragmentation);
         subDirectory = subDirectory->getNextDirectory();
     }
 
-    return (fragmentation / (float) m_numberOfFiles);
+
 }
 
 /**

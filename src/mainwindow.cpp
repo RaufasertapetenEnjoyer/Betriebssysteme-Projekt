@@ -66,17 +66,21 @@ void MainWindow::reload(){
         ui->treeWidget_2->sortItems(0,Qt::AscendingOrder);
         return;
     }
+    float fragmentation = 0.0f;
     if(platte==1){
-        f = bsSim->getFragmentation(bsSim->getRootDirectory())*100;
+
+        bsSim->getFragmentation(bsSim->getRootDirectory(), fragmentation);
         d = bsSim->getCurrentDirectory();
+        fragmentation = (fragmentation / (float) bsSim->getNumberOfCurrentlySavedFiles())*100;
     }else if(platte==2){
         f = inSim->getFragmentation(inSim->getRootDirectory(),0.0)*100;
         d = inSim->getCurrentDirectory();
     }
 
 
-    std::cout<<"Fragmentierung:" << f<<std::endl;
-    ui->progressBar->setValue(f);
+    std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
+    std::cout<<"savedFiles:" << bsSim->getNumberOfCurrentlySavedFiles()<<std::endl;
+    ui->progressBar->setValue(fragmentation);
 
 
 
@@ -489,21 +493,24 @@ void MainWindow::on_pushButton_clicked()
     }
     int currPos = 0;
     float f;
+    float fragmentation = 0.0f;
     if(platte==1){
         bsSim->defragmentDisk(bsSim->getRootDirectory(), currPos);
-        f = bsSim->getFragmentation(bsSim->getRootDirectory()) * 100;
+
+        bsSim->getFragmentation(bsSim->getRootDirectory(),fragmentation);
+        fragmentation = (fragmentation / (float) bsSim->getNumberOfCurrentlySavedFiles())*100;
     }else{
         inSim->defragmentDisk(inSim->getRootDirectory(), currPos);
         f = inSim->getFragmentation(inSim->getRootDirectory(),0.0) * 100;
     }
 
-    std::cout<<"Fragmentierung:" << f<<std::endl;
-    ui->progressBar->setValue(f);
+    std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
+    ui->progressBar->setValue(fragmentation);
 
-    for (int i = 0; i < inSim->getNumberOfFilesThatCanBeSaved(); i++) {
+    /*for (int i = 0; i < inSim->getNumberOfFilesThatCanBeSaved(); i++) {
             std::cout << inSim->getStatusArray()[i] << ", ";
         }
-        std::cout << std::endl;
+        std::cout << std::endl;*/
 }
 
 
