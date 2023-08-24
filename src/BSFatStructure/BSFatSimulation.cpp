@@ -205,7 +205,7 @@ void BSFatSimulation::createFilesForSim(char** names, unsigned int length) {
  * @param float fragmentation (start with 0.0)
  * @return
  */
-float BSFatSimulation::getFragmentation(Directory* directory) {
+float BSFatSimulation::getFragmentation(Directory *directory, float &fragmentation) {
     if(directory == nullptr){
         return 0.0;
     }
@@ -236,14 +236,16 @@ float BSFatSimulation::getFragmentation(Directory* directory) {
         file = dynamic_cast<BSFatFile*>(file->getNextFile());
     }
 
+    fragmentation += sumOfFrag;
+
     Directory* subDirectory = directory->getSubDirectoryList();
     while(subDirectory != nullptr){
 
-        sumOfFrag += getFragmentation(subDirectory);
+        fragmentation += getFragmentation(subDirectory, fragmentation);
         subDirectory = subDirectory->getNextDirectory();
     }
 
-    return (sumOfFrag / (float) m_numberOfFiles);
+    return (fragmentation / (float) m_numberOfFiles);
 }
 
 /**
@@ -819,7 +821,7 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
         int length = numberOfBlocksForFat + cdRomFile->getFirstBlock();
 
         for (int i = cdRomFile->getFirstBlock(); i <= length; i++) {
-            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize || (i == length && stagedBlocksOfCDRom == 1)){
+            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize || (i == length && stagedBlocksOfCDRom >= 1)){
                 next = new BSCluster();
 
                 unsigned int pos;
@@ -839,7 +841,8 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
                 }
                 prev = next;
                 counter++;
-                stagedBlocksOfCDRom = 1;
+                i--;
+                stagedBlocksOfCDRom = 0;
             }else{
                 stagedBlocksOfCDRom++;
             }
