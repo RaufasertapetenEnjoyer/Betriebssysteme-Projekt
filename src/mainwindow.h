@@ -30,7 +30,10 @@ private slots:
     void createFile();
     void createDir();
     void deleteDir();
+    void copyDir();
     void dirProperties();
+    void insert();
+    void copyFile();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
     void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
     void on_pushButton_2_clicked();

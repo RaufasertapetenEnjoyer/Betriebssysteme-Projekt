@@ -781,10 +781,10 @@ bool BSFatSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSys
  * Returns name of current BsFatSimulation.
  * @return char* name
  */
-<<<<<<< HEAD
 char* BSFatSimulation::getName(){
     return m_name;
-=======
+}
+
 void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize) {
     int numberOfBlocksForFat = ceil((double) cdRomFile->getSize() / (double) m_blockSize);
     int numberOfBlocksForCDRom = ceil((double) cdRomFile->getSize() / (double) cdRomBlockSize);
@@ -835,6 +835,5 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
         auto* file = dynamic_cast<AbstractFile*>(bsFatFile);
         m_currentDirectory->createChildFile(file);
     }
->>>>>>> 7c2bad7 (Doku und kleine ändeung zu create und delete file muss getestet werden)
 }
 

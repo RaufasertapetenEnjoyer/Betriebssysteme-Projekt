@@ -21,6 +21,7 @@ BSFatSimulation * bsSim = new BSFatSimulation(512, 16384*4,"BsFat-Platte");
 INodeSimulation * inSim = new INodeSimulation(512, 16384*4);
 CDRomSimulation * cdSim = new CDRomSimulation(256, 8192, "Meine CD-Rom", "Songs");
 
+AbstractElementCDRom * copyElement = nullptr;
 AbstractFile * selectedFile;
 Directory * selectedDir;
 CDRomFile * selectedCDFile;
@@ -293,6 +294,39 @@ void MainWindow::deleteDir(){
     }
 }
 
+void MainWindow::copyDir(){
+    if(cd){
+     copyElement = cdSim->getCurrentDirectory();
+    }
+}
+
+void MainWindow::copyFile(){
+    if(cd){
+     copyElement = selectedCDFile;
+    }
+}
+
+void MainWindow::insert(){
+    if(!cd){
+        if(platte==1){
+            if(instanceof<CDRomFile>(copyElement)){
+                CDRomFile* file = dynamic_cast<CDRomFile*>(copyElement);
+                bsSim->copyCDRomFile(file, cdSim->getBlockSize());
+            }else{
+                bsSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement));
+            }
+
+        }else{
+            if(instanceof<CDRomFile>(copyElement)){
+                //inSim->copyCDRomFile(dynamic_cast<CDRomFile*>(copyElement));
+            }else{
+                //inSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement));
+            }
+        }
+    }
+}
+
+
 void MainWindow::dirProperties(){
     Directory* current ;
     if(platte==1){
@@ -341,6 +375,10 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
             QAction *fileProp = new QAction("Eigenschaften/Bearbeiten", this);
             connect(fileProp, SIGNAL(triggered()), this, SLOT(fileProperties()));
             myMenu.addAction(fileProp);
+            QAction *copy = new QAction("Eigenschaften/Bearbeiten", this);
+            connect(copy, SIGNAL(triggered()), this, SLOT(copyFile()));
+            myMenu.addAction(copy);
+
 
             myMenu.exec(QCursor::pos());
         }else{
@@ -422,8 +460,16 @@ void MainWindow::on_pushButton_2_clicked()
         QAction *deleteDir = new QAction("Verzeichnis löschen", this);
         connect(deleteDir, SIGNAL(triggered()), this, SLOT(deleteDir()));
         myMenu.addAction(deleteDir);
+        QAction *insert = new QAction("Einfügen",this);
+        connect(insert, SIGNAL(triggered()), this, SLOT(insert()));
+        insert->setEnabled(copyElement != nullptr);
+        myMenu.addAction(insert);
+    }else{
+        QAction *copyThisDir = new QAction("Dieses Verzeichnis kopieren",this);
+        connect(copyThisDir,SIGNAL(triggered()), this, SLOT(copyDir()));
+        myMenu.addAction(copyThisDir);
     }
-    QAction *dirProp = new QAction("Eigenschaften", this);
+    QAction *dirProp = new QAction("Verzeichnis-Eigenschaften", this);
     connect(dirProp, SIGNAL(triggered()), this, SLOT(dirProperties()));
     myMenu.addAction(dirProp);
 

@@ -80,6 +80,6 @@ bool CDRomFile::isRandAccFile() {
 void CDRomFile::setRandAccFile(bool isRandAccFile) {
     isRandAccFile ? setBit(getAttributes()->attributes, 3) : clrBit(getAttributes()->attributes, 3);
 }
-=======
+
 }
->>>>>>> 7c2bad7 (Doku und kleine ändeung zu create und delete file muss getestet werden)
+
