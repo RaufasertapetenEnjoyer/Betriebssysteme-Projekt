@@ -63,9 +63,9 @@ public:
 
     bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    void copyCDRomFile(CDRomFile* cdRomFile);
+    void copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize);
 
-    void copyCDRomDirectory(CDRomDirectory* directoryToCopy);
+    void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
 
     char* getName();
 
