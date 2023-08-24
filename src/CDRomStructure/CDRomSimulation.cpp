@@ -142,8 +142,24 @@ void CDRomSimulation::simulate() {
     char* fileNamesSteam[] = {"csgo.exe", "gta5.exe"};
     createFilesForSim(fileNamesSteam, 2);
 
+    char* directoryNamesSteam[] = {"common", "images", "cheats"};
+    createDirectoriesForSim(directoryNamesSteam,3);
+
+    //root/Steam/common
+    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getList()->getNextElement()->getNextElement());
+    char* fileNamesCommon[] = {"ct.c", "t.c", "hostage.c"};
+    createFilesForSim(fileNamesCommon,3);
+
+    //root/Steam/images
+    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getParentDirectory()->getList()->getNextElement()->getNextElement());
+    char* fileNamesImages[] = {"t,png", "ct,png"};
+    createFilesForSim(fileNamesImages,2);
+
+    //root/Steam
+    m_currentDirectory = m_currentDirectory->getParentDirectory();
+
     //root/Battlenet
-    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getNextElement());
+    m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getNextElement()->getNextElement());
     char* fileNamesBattlenet[] = {"Overwatch.exe", "Hearthstone.exe"};
     createFilesForSim(fileNamesBattlenet, 2);
 
@@ -155,9 +171,9 @@ void CDRomSimulation::simulate() {
 }
 
 /**
- *
- * @param fileNames
- * @param length
+ * Creates files for the simulation.
+ * @param char** fileNames
+ * @param int length
  */
 void CDRomSimulation::createFilesForSim(char **fileNames, int length) {
     for (int i = 0; i < length; i++) {
@@ -183,6 +199,11 @@ void CDRomSimulation::createFilesForSim(char **fileNames, int length) {
     }
 }
 
+/**
+ * Creates directories for the simulation.
+ * @param char** directoryNames
+ * @param int length
+ */
 void CDRomSimulation::createDirectoriesForSim(char **directoryNames, int length) {
     for (int i = 0; i < length; i++) {
         auto* attributes = new Attributes;
@@ -201,6 +222,10 @@ void CDRomSimulation::createDirectoriesForSim(char **directoryNames, int length)
     }
 }
 
+/**
+ * Returns the root directory of the CD-ROM.
+ * @return CDRomDirectory* root
+ */
 CDRomDirectory *CDRomSimulation::getRootDirectory() {
     CDRomDirectory* directory = m_currentDirectory;
     while (directory->getParentDirectory() != nullptr){
@@ -209,10 +234,18 @@ CDRomDirectory *CDRomSimulation::getRootDirectory() {
     return directory;
 }
 
+/**
+ * Returns the current directory.
+ * @return CDRomDirectory* current
+ */
 CDRomDirectory* CDRomSimulation::getCurrentDirectory(){
     return m_currentDirectory;
 }
 
-void CDRomSimulation::setCurrentDirectory(CDRomDirectory* dir){
-   m_currentDirectory = dir;
+/**
+ * Set the current directory to the given.
+ * @param CDRomDirectory* directoryToSet
+ */
+void CDRomSimulation::setCurrentDirectory(CDRomDirectory* directoryToSet){
+   m_currentDirectory = directoryToSet;
 }

@@ -4,9 +4,13 @@
 #include <string>
 #include <cstring>
 
-
+/**
+ * Creates an directory object and initializes all parameters
+ * @param char* name
+ * @param Attributes* attributes
+ */
 Directory::Directory(char* name, Attributes* attributes) : AbstractElement(testConvention(name) ? name : new char[12] {'N', 'e','u','e','r','O','r','d','n', 'e', 'r', '\0'}, attributes, 0) {
-    this->m_numberOfFiles = 0;//Konstruktor nochmal genauer anschauen
+    this->m_numberOfFiles = 0;
     m_fileList = nullptr;
     m_directoryList = nullptr;
     this->m_numberOfFiles = 0;

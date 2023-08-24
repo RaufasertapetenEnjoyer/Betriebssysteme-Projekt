@@ -6,7 +6,7 @@
 
 /**
  * First bit of attributes is the editable flag
- *
+ * Directories don't occupy any memory itself to hold the simulation simple.
  */
 
 class Directory: public AbstractElement {

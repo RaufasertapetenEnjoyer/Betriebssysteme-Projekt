@@ -40,8 +40,6 @@ void BSFatSimulation::simulate() {
     char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     createFilesForSim(fileNamesForRoot, 10);
     createDirectoriesForSim();
-    //TODO
-
 }
 
 /**
@@ -167,6 +165,12 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
     }
 }
 
+/**
+ * Creates a BSFat simulation, initializes all parameters and creates some directories and files.
+ * @param unsigned int blockSize
+ * @param unsigned fatSize
+ * @param char* name
+ */
 BSFatSimulation::BSFatSimulation(unsigned int blockSize, unsigned int fatSize, char* name) {
     m_name = name;
     m_statusArray = new unsigned char[fatSize / blockSize];

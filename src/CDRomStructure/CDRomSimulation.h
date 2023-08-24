@@ -28,15 +28,34 @@ public:
     VolumeDescriptor* getVolumeDescriptor();
     CDRomDirectory* getRootDirectory();
     CDRomDirectory* getCurrentDirectory();
-    void setCurrentDirectory(CDRomDirectory* dir);
+    void setCurrentDirectory(CDRomDirectory* directoryToSet);
 
 private:
+    /**
+     * Size of one block of the CD-ROM in kilobyte.
+     */
     int m_blockSize;
+    /**
+     * Size of the whole memory of the CD-ROM in kilobyte.
+     */
     int m_romSize;
+    /**
+     * Number of block that can be saved on the CD-Rom.
+     */
     int m_numberOfBlocks;
+    /**
+     * Volume descriptor of the CD-ROM. Containing the name, a description of the CD-ROM, the time of creation and the time it was last written on.
+     */
     VolumeDescriptor* m_volumeDescriptor;
+    /**
+     * Representation of the memory.
+     */
     char* m_statusArray;
+    /**
+     * Pointer on the current directory.
+     */
     CDRomDirectory* m_currentDirectory;
+
     void createChildFile(char* name, bool editable, bool system, bool ascii, bool randAccFile, int size);
     void createChildDirectory(char* name);
     int getIndexOfNextFreeBlock();
