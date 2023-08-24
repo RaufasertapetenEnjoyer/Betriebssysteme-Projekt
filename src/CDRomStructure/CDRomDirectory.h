@@ -27,7 +27,13 @@ public:
 
 
 private:
+    /**
+     * A pointer on the first element of the list.
+     */
     AbstractElementCDRom* m_list;
+    /**
+     * A pointer to the parent directory.
+     */
     CDRomDirectory* m_parentDirectory;
 };
 

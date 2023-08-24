@@ -508,6 +508,11 @@ void BSFatSimulation::deleteFile(AbstractFile *file) {
 
         delete file;
     }
+    Directory* directory = m_currentDirectory;
+    while(directory != nullptr){
+        directory->setNumberOfFiles(directory->getNumberOfFiles() - 1);
+        directory = directory->getParentDirectory();
+    }
     m_numberOfFiles--;
 }
 
@@ -776,7 +781,60 @@ bool BSFatSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSys
  * Returns name of current BsFatSimulation.
  * @return char* name
  */
+<<<<<<< HEAD
 char* BSFatSimulation::getName(){
     return m_name;
+=======
+void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize) {
+    int numberOfBlocksForFat = ceil((double) cdRomFile->getSize() / (double) m_blockSize);
+    int numberOfBlocksForCDRom = ceil((double) cdRomFile->getSize() / (double) cdRomBlockSize);
+
+    if(numberOfBlocksForFat <= getFreeDiskSpace()){
+        //Copy name
+        char *nameOfFile = nullptr;
+        strcpy(nameOfFile, cdRomFile->getName());
+        //Copy attributes
+        Attributes* attributesOfFile = nullptr;
+        memccpy(attributesOfFile, cdRomFile->getAttributes(),1, sizeof(Attributes));
+
+        BSCluster* list = nullptr;
+        BSCluster* next = nullptr;
+        BSCluster* prev = nullptr;
+
+        int stagedBlocksOfCDRom = 1;
+        int counter = 0;
+
+        for (int i = cdRomFile->getFirstBlock(); i <= numberOfBlocksForFat + cdRomFile->getFirstBlock(); i++) {
+            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize){
+                next = new BSCluster();
+
+                unsigned int pos;
+                pos = (rand() % (m_fatSize / m_blockSize));
+                while (m_statusArray[pos] != FREE) {
+                    pos = (rand() % (m_fatSize / m_blockSize));
+                }
+                next->setIndex((int) pos);
+
+                next->setNextElement(nullptr);
+                next->setPrevElement(prev);
+
+                if(counter == 0){
+                    list = next;
+                }else{
+                    prev->setNextElement(next);
+                }
+                prev = next;
+                counter++;
+                stagedBlocksOfCDRom = 1;
+            }else if (stagedBlocksOfCDRom * cdRomBlockSize < m_blockSize){
+                stagedBlocksOfCDRom++;
+            }
+        }
+        auto* bsFatFile = new BSFatFile(nameOfFile, attributesOfFile, cdRomFile->getSize());
+        bsFatFile->setFirstBlock(list);
+        auto* file = dynamic_cast<AbstractFile*>(bsFatFile);
+        m_currentDirectory->createChildFile(file);
+    }
+>>>>>>> 7c2bad7 (Doku und kleine ändeung zu create und delete file muss getestet werden)
 }
 

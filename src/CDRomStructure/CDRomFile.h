@@ -24,7 +24,9 @@ public:
     bool isRandAccFile();
     void setRandAccFile(bool isRandAccFile);
 private:
-
+    /**
+     * Marks the first block of the file.
+     */
     int m_firstBlockStatusArray;
 
 };

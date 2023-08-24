@@ -11,10 +11,13 @@
 class AbstractElementCDRom: public AbstractElement{
 public:
     AbstractElementCDRom(char *name, Attributes *attributes, int size);
-    bool testConvention(char *name) override;
+    bool testConvention(char *name) override = 0;
     AbstractElementCDRom* getNextElement();
     void setNextElement(AbstractElementCDRom* nextElement);
 private:
+    /**
+     * Pointer on the next element of the list.
+     */
     AbstractElementCDRom* m_nextElement;
 };
 

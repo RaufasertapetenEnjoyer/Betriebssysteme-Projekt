@@ -4,6 +4,10 @@
 
 #include "CDRomDirectory.h"
 
+/**
+ * Returns the last element of the list.
+ * @return AbstractElementCDRom* lastElement
+ */
 AbstractElementCDRom *CDRomDirectory::getLastElementOfTheList() {
     if(m_list == nullptr){
         return nullptr;
@@ -16,18 +20,37 @@ AbstractElementCDRom *CDRomDirectory::getLastElementOfTheList() {
     return elementCdRom;
 }
 
+/**
+ * Creates the object and initializes all parameters.
+ * @param char* name
+ * @param Attributes* attributes
+ * @param int size
+ */
 CDRomDirectory::CDRomDirectory(char *name, Attributes *attributes, int size) : AbstractElementCDRom(name, attributes, size) {
     m_list = nullptr;
+    m_parentDirectory = nullptr;
 }
 
+/**
+ * Returns the parent directory of the current directory.
+ * @return CDRomDirectory* parent
+ */
 CDRomDirectory *CDRomDirectory::getParentDirectory() {
     return m_parentDirectory;
 }
 
+/**
+ * Sets the current parent to the new parent.
+ * @param CDRomDirectory* newParent
+ */
 void CDRomDirectory::setParentDirectory(CDRomDirectory *newParent) {
     m_parentDirectory = newParent;
 }
 
+/**
+ * Sets the last element of the list to the given (add).
+ * @param AbstractElementCDRom* elementToAdd
+ */
 void CDRomDirectory::setLastElementOfTheList(AbstractElementCDRom *element) {
     AbstractElementCDRom* lastElement = getLastElementOfTheList();
     if(lastElement == nullptr){
@@ -38,15 +61,27 @@ void CDRomDirectory::setLastElementOfTheList(AbstractElementCDRom *element) {
     element->setNextElement(nullptr);
 }
 
+/**
+ * Creates an child file beneath the current directory.
+ * @param AbstractElementCDRom* element
+ */
 void CDRomDirectory::createChildElement(AbstractElementCDRom *element) {
     setLastElementOfTheList(element);
 }
 
+/**
+ * Returns the first element of the list of files and directories.
+ * @return AbstractElementCDRom* firstElement
+ */
 AbstractElementCDRom *CDRomDirectory::getList() {
     return m_list;
+<<<<<<< HEAD
 }
 
 bool CDRomDirectory::isEditable() {
     return tstBit(getAttributes()->attributes, 0);
 }
 
+=======
+}
+>>>>>>> 7c2bad7 (Doku und kleine ändeung zu create und delete file muss getestet werden)

@@ -8,8 +8,13 @@ CDRomFile::CDRomFile(char *name, Attributes *attributes, int size, int pos) : Ab
     m_firstBlockStatusArray = pos;
 }
 
+/**
+ * Returns the index of the first block.
+ * @return int firstBlock
+ */
 int CDRomFile::getFirstBlock() {
     return m_firstBlockStatusArray;
+<<<<<<< HEAD
 }
 
 /**
@@ -75,3 +80,6 @@ bool CDRomFile::isRandAccFile() {
 void CDRomFile::setRandAccFile(bool isRandAccFile) {
     isRandAccFile ? setBit(getAttributes()->attributes, 3) : clrBit(getAttributes()->attributes, 3);
 }
+=======
+}
+>>>>>>> 7c2bad7 (Doku und kleine ändeung zu create und delete file muss getestet werden)
