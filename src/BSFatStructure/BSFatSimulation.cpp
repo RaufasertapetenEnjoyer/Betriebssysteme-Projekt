@@ -785,6 +785,13 @@ char* BSFatSimulation::getName(){
     return m_name;
 }
 
+
+
+/**
+ * Copy an given directory with all its content to the current directory of the BSFat.
+ * @param CDRomDirectory* directoryToCopy
+ * @param const int cdRomBlockSize
+ */
 void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize) {
     int numberOfBlocksForFat = ceil((double) cdRomFile->getSize() / (double) m_blockSize);
     int numberOfBlocksForCDRom = ceil((double) cdRomFile->getSize() / (double) cdRomBlockSize);
@@ -835,5 +842,39 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
         auto* file = dynamic_cast<AbstractFile*>(bsFatFile);
         m_currentDirectory->createChildFile(file);
     }
+}
+
+/**
+* Copy an given directory with all its content to the current directory of the BSFat.
+* @param CDRomDirectory* directoryToCopy
+* @param const int cdRomBlockSize
+*/
+void BSFatSimulation::copyCDRomDirectory(CDRomDirectory *directoryToCopy, const int cdRomBlockSize) {
+    if(directoryToCopy != nullptr){
+        return;
+    }
+
+    char* nameOfDirectory = nullptr;
+    strcpy(nameOfDirectory, directoryToCopy->getName());
+
+    Attributes* attributesOfDirectory = nullptr;
+    memccpy(attributesOfDirectory, directoryToCopy->getAttributes(), 1, sizeof(Attributes));
+
+    createDirectory(nameOfDirectory, attributesOfDirectory);
+
+    m_currentDirectory = m_currentDirectory->getLastDirectoryOfTheList();
+
+    AbstractElementCDRom* element = directoryToCopy->getList();
+    while(element != nullptr){
+        if(dynamic_cast<CDRomDirectory*>(element)){
+            auto* directory = dynamic_cast<CDRomDirectory*>(element);
+            copyCDRomDirectory(directory, cdRomBlockSize);
+        } else{
+            auto* file = dynamic_cast<CDRomFile*>(element);
+            copyCDRomFile(file, cdRomBlockSize);
+        }
+        element = element->getNextElement();
+    }
+    m_currentDirectory = m_currentDirectory->getParentDirectory();
 }
 

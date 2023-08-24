@@ -65,7 +65,7 @@ public:
 
     void copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize);
 
-    void copyCDRomDirectory(CDRomDirectory* directoryToCopy);
+    void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
 
     char* getName();
 

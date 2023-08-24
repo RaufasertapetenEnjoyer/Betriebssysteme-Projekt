@@ -23,6 +23,8 @@ public:
 
     bool isRandAccFile();
     void setRandAccFile(bool isRandAccFile);
+
+    bool testConvention(char* name);
 private:
     /**
      * Marks the first block of the file.

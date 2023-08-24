@@ -75,13 +75,15 @@ void CDRomDirectory::createChildElement(AbstractElementCDRom *element) {
  */
 AbstractElementCDRom *CDRomDirectory::getList() {
     return m_list;
-<<<<<<< HEAD
+
 }
 
 bool CDRomDirectory::isEditable() {
     return tstBit(getAttributes()->attributes, 0);
 }
 
-=======
+bool CDRomDirectory::testConvention(char *name){
+    return true;
 }
->>>>>>> 7c2bad7 (Doku und kleine ändeung zu create und delete file muss getestet werden)
+
+

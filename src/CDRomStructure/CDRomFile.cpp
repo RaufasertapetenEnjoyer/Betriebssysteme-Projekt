@@ -14,7 +14,7 @@ CDRomFile::CDRomFile(char *name, Attributes *attributes, int size, int pos) : Ab
  */
 int CDRomFile::getFirstBlock() {
     return m_firstBlockStatusArray;
-<<<<<<< HEAD
+
 }
 
 /**
@@ -81,5 +81,9 @@ void CDRomFile::setRandAccFile(bool isRandAccFile) {
     isRandAccFile ? setBit(getAttributes()->attributes, 3) : clrBit(getAttributes()->attributes, 3);
 }
 
+bool CDRomFile::testConvention(char* name){
+    return true;
 }
+
+
 

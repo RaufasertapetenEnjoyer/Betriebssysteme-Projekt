@@ -313,7 +313,7 @@ void MainWindow::insert(){
                 CDRomFile* file = dynamic_cast<CDRomFile*>(copyElement);
                 bsSim->copyCDRomFile(file, cdSim->getBlockSize());
             }else{
-                bsSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement));
+                bsSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement),cdSim->getBlockSize());
             }
 
         }else{
@@ -323,6 +323,7 @@ void MainWindow::insert(){
                 //inSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement));
             }
         }
+        reload();
     }
 }
 
@@ -375,7 +376,7 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
             QAction *fileProp = new QAction("Eigenschaften/Bearbeiten", this);
             connect(fileProp, SIGNAL(triggered()), this, SLOT(fileProperties()));
             myMenu.addAction(fileProp);
-            QAction *copy = new QAction("Eigenschaften/Bearbeiten", this);
+            QAction *copy = new QAction("Kopieren", this);
             connect(copy, SIGNAL(triggered()), this, SLOT(copyFile()));
             myMenu.addAction(copy);
 

@@ -25,6 +25,7 @@ public:
 
     bool isEditable();
 
+    bool testConvention(char* name);
 
 private:
     /**
