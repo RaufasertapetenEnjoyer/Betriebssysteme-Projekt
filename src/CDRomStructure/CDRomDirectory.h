@@ -23,6 +23,8 @@ public:
 
     AbstractElementCDRom* getList();
 
+    bool isEditable();
+
 
 private:
     AbstractElementCDRom* m_list;

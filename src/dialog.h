@@ -2,6 +2,7 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include "BSFatStructure/BSFatSimulation.h"
 
 namespace Ui {
 class Dialog;
@@ -12,8 +13,9 @@ class Dialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit Dialog(QWidget *parent = nullptr);
+    explicit Dialog(QWidget *parent = nullptr, BSFatSimulation* bsFat = nullptr);
     ~Dialog();
+    int getPlatte();
 
 private slots:
 

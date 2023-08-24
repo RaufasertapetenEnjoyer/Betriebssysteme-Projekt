@@ -67,7 +67,7 @@ CDRomSimulation::CDRomSimulation(int blockSize, int romSize, char* name, char* d
         m_statusArray[i] = FREE;
     }
 
-    char* root =  {"root"};
+    char* root =  {"cd"};
     auto* attributes = new Attributes;
     attributes->attributes = new char[1];
     attributes->dateOfCreation = time(nullptr);
@@ -81,6 +81,7 @@ CDRomSimulation::CDRomSimulation(int blockSize, int romSize, char* name, char* d
 
     char* fileNamesForRoot[] = {"test.txt", "hallo.cpp", "gruppe.java"};
     createFilesForSim(fileNamesForRoot, 3);
+    simulate();
 }
 
 /**
@@ -150,6 +151,7 @@ void CDRomSimulation::simulate() {
     m_currentDirectory = dynamic_cast<CDRomDirectory*>(m_currentDirectory->getNextElement());
     char* fileNamesUbisoft[] = {"RainbowS.exe"};
     createFilesForSim(fileNamesUbisoft, 1);
+    m_currentDirectory = m_currentDirectory->getParentDirectory();
 }
 
 /**
@@ -205,4 +207,12 @@ CDRomDirectory *CDRomSimulation::getRootDirectory() {
         directory = directory->getParentDirectory();
     }
     return directory;
+}
+
+CDRomDirectory* CDRomSimulation::getCurrentDirectory(){
+    return m_currentDirectory;
+}
+
+void CDRomSimulation::setCurrentDirectory(CDRomDirectory* dir){
+   m_currentDirectory = dir;
 }

@@ -1,11 +1,17 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-Dialog::Dialog(QWidget *parent) :
+Dialog::Dialog(QWidget *parent, BSFatSimulation * bsFat) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    QString bsFatText("");
+    bsFatText.append(bsFat->getName());
+    bsFatText.append(", verfügbarer Speicherplatz: ");
+    bsFatText.append(QString::number(bsFat->getFreeDiskSpace() * bsFat->getBlockSize()));
+    bsFatText.append(" Kilobyte");
+    ui->toolButton->setText(bsFatText);
     setWindowFlags(Qt::Window
         | Qt::WindowMinimizeButtonHint
         | Qt::WindowMaximizeButtonHint);
@@ -39,5 +45,13 @@ void Dialog::on_toolButton_2_clicked()
     op2=true;
     op1=false;
     ui->buttonBox->setDisabled(false);
+}
+
+int Dialog::getPlatte(){
+    if(op1){
+        return 1;
+    }else{
+        return 2;
+    }
 }
 

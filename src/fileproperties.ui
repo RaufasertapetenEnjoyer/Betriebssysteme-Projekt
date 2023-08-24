@@ -72,7 +72,7 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>210</y>
+     <y>180</y>
      <width>47</width>
      <height>13</height>
     </rect>
@@ -120,26 +120,11 @@
     <string/>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>130</y>
-     <width>72</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Kilobyte</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QCheckBox" name="checkBox">
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>210</y>
+     <y>180</y>
      <width>72</width>
      <height>19</height>
     </rect>
@@ -152,7 +137,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>240</y>
+     <y>200</y>
      <width>72</width>
      <height>19</height>
     </rect>
@@ -165,7 +150,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>270</y>
+     <y>220</y>
      <width>72</width>
      <height>19</height>
     </rect>
@@ -178,13 +163,104 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>300</y>
+     <y>240</y>
      <width>131</width>
      <height>19</height>
     </rect>
    </property>
    <property name="text">
     <string>Random Access File</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>310</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Zuletzt bearbeitet:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="editedL">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>310</y>
+     <width>341</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>280</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>erstellt:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="createdL">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>280</y>
+     <width>321</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>130</y>
+     <width>47</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kilobyte</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>160</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Indexe:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="indexL">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>160</y>
+     <width>401</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
    </property>
   </widget>
  </widget>

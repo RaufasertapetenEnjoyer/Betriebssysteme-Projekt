@@ -14,9 +14,14 @@ class CreateDirectory : public QDialog
 public:
     explicit CreateDirectory(QWidget *parent = nullptr);
     ~CreateDirectory();
+    QString getName();
+
+private slots:
+    void on_lineEdit_textChanged(const QString &arg1);
 
 private:
     Ui::CreateDirectory *ui;
+    bool nameIsNotEmpty();
 };
 
 #endif // CREATEDIRECTORY_H

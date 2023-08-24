@@ -7,7 +7,7 @@
 
 
 #include "../DirectoryStructure/Directory.h"
-#include "../DirectoryStructure/AbstractSimulation.h"
+//#include "../DirectoryStructure/AbstractSimulation.h"
 #include "../BSFatStructure/BSFatFile.h"
 #include "../BSFatStructure/BSCluster.h"
 #include "INodeFile.h"
@@ -65,7 +65,8 @@ public:
 
     unsigned int getNumberOfCurrentlySavedFiles();
 
-    static unsigned int getINodeSize();
+    //static?
+    unsigned int getINodeSize();
 
     unsigned int getNumberOfINodes();
 
@@ -80,7 +81,8 @@ private:
     unsigned char* m_statusArray;
     unsigned int m_numberOfFiles;
     unsigned int m_numberOfBlocksPerINode;
-    static unsigned int m_iNodeSize;
+    //static?
+    unsigned int m_iNodeSize;
     void simulate();
 
 };

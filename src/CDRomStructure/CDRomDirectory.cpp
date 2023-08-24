@@ -46,4 +46,7 @@ AbstractElementCDRom *CDRomDirectory::getList() {
     return m_list;
 }
 
+bool CDRomDirectory::isEditable() {
+    return tstBit(getAttributes()->attributes, 0);
+}
 

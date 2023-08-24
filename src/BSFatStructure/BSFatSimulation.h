@@ -12,7 +12,7 @@
 
 class BSFatSimulation {
 public:
-    BSFatSimulation(unsigned int blockSize, unsigned int fatSize);
+    BSFatSimulation(unsigned int blockSize, unsigned int fatSize, char* name);
 
     Directory* getRootDirectory();
 
@@ -63,9 +63,11 @@ public:
 
     bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    void copyCDRomFile(CDRomFile* cdRomFile, int cdRomBlockSize);
+    void copyCDRomFile(CDRomFile* cdRomFile);
 
-    void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
+    void copyCDRomDirectory(CDRomDirectory* directoryToCopy);
+
+    char* getName();
 
 private:
     /**
@@ -88,6 +90,10 @@ private:
      * Number of all files that are saved in the current system.
      */
     unsigned int m_numberOfFiles;
+    /**
+     * Name of this BsFatSimulation.
+     */
+    char* m_name;
 
     BSCluster *searchClusterByIndex(Directory *directory, unsigned int index);
     void simulate();

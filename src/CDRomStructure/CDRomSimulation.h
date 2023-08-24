@@ -27,6 +27,8 @@ public:
     void setBlockSize(int blockSize);
     VolumeDescriptor* getVolumeDescriptor();
     CDRomDirectory* getRootDirectory();
+    CDRomDirectory* getCurrentDirectory();
+    void setCurrentDirectory(CDRomDirectory* dir);
 
 private:
     int m_blockSize;

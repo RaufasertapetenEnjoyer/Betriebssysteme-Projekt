@@ -15,9 +15,11 @@ INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize)
     m_blockSize = blockSize;
     m_totalSize = totalSize;
     m_iNodeSize = 16;
+    //simulate();
 }
 
 void INodeSimulation::simulate() {
+
     for (int i = 0; i < 40; i++) {
         if((rand() % 2) + 1 == 1){
             m_statusArray[rand() % getNumberOfFilesThatCanBeSaved()] = CORRUPTED;
@@ -26,6 +28,7 @@ void INodeSimulation::simulate() {
         }
     }
 
+
     char* root =  {"root"};
     auto* directory = new Directory(root, new Attributes());
     std::cout << directory->getName() << '\n' << std::endl;
@@ -33,8 +36,9 @@ void INodeSimulation::simulate() {
     m_currentDirectory = directory;
 
     //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
-    char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
-    createFilesForSim(fileNamesForRoot, 10);
+
+    char* fileNamesForRoot[] = { "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
+    createFilesForSim(fileNamesForRoot, 6);
     createDirectoriesForSim();
 //todo
 }
@@ -174,7 +178,7 @@ float INodeSimulation::getFragmentation(Directory *directory, float fragmentatio
 
 void INodeSimulation::createFile(char *name, bool editable, bool system, bool ascii, bool randAccFile, int size) {
     Attributes* attributes = new Attributes;
-    attributes->size = size;
+    //attributes->size = size;
     attributes->dateOfCreation = time(nullptr);
     attributes->dateOfLastEdit = time(nullptr);
     char attributesByte[1];

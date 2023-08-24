@@ -54,8 +54,9 @@ bool Directory::testConvention(char *nameToTest) {
  * @param char* name, name of the directory
  * @param char* attributes, attributes of the directory
  */
-void Directory::createChildDirectory(char *name,Attributes *attributes) {
+void Directory::createChildDirectory(char *name, Attributes *attributes) {
     Directory* directoryToAdd = new Directory(name, attributes);
+    directoryToAdd->setBit(directoryToAdd->getAttributes()->attributes,0);
 
     Directory* directory = m_directoryList;
     if(directory == nullptr){

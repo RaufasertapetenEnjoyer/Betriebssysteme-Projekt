@@ -1,5 +1,9 @@
 #include "fileproperties.h"
 #include "ui_fileproperties.h"
+#include "BSFatStructure/BSFatFile.h"
+#include <string>
+#include <sstream>
+#include <iostream>
 
 QString name;
 int sizeInt;
@@ -31,6 +35,86 @@ FileProperties::FileProperties(QWidget *parent, AbstractFile *file, std::string 
     ascii=file->isAscii();
     randAcc=file->isRandAccFile();
 
+
+    std::tm * ptm = std::localtime(&file->getAttributes()->dateOfCreation);
+    char buffer[32];
+    // Format: Mo, 15.06.2009 20:20:00
+    std::strftime(buffer, 32, "%a, %d.%m.%Y %H:%M:%S", ptm);
+    QString string(buffer);
+    ui->createdL->setText(string);
+
+    ptm = std::localtime(&file->getAttributes()->dateOfLastEdit);
+    char buff[32];
+    // Format: Mo, 15.06.2009 20:20:00
+    std::strftime(buff, 32, "%a, %d.%m.%Y %H:%M:%S", ptm);
+    QString string2(buff);
+    ui->editedL->setText(string2);
+
+    QString indices("");
+    auto* bsfat = dynamic_cast<BSFatFile*>(file);
+    BSCluster* cluster = bsfat->getFirstBlock();
+    while(cluster->getNextBlock() != nullptr){
+        indices.append(QString::number(cluster->getIndex()));
+        indices.append(", ");
+        cluster = cluster->getNextBlock();
+    }
+    indices.append(QString::number(cluster->getIndex()));
+    ui->indexL->setText(indices);
+}
+
+FileProperties::FileProperties(QWidget *parent, CDRomFile *file, std::string path, CDRomSimulation * cd) :
+    QDialog(parent),
+    ui(new Ui::FileProperties)
+{
+    ui->setupUi(this);
+    ui->fileName->setText( file->getName());
+    ui->fileName->setEnabled(false);
+    name=file->getName();
+    ui->fileSize->setText(QString::number(file->getSize()));
+    ui->fileSize->setEnabled(false);
+    sizeInt = file->getSize();
+    path = path + file->getName();
+    ui->path->setText(QString::fromStdString(path));
+
+    ui->checkBox->setChecked(file->isEditable());
+    ui->checkBox->setEnabled(false);
+    ui->checkBox_2->setChecked(file->isSystem());
+    ui->checkBox_2->setEnabled(false);
+    ui->checkBox_3->setChecked(file->isAscii());
+    ui->checkBox_3->setEnabled(false);
+    ui->checkBox_4->setChecked(file->isRandAccFile());
+    ui->checkBox_4->setEnabled(false);
+
+    editable=file->isEditable();
+    syst=file->isSystem();
+    ascii=file->isAscii();
+    randAcc=file->isRandAccFile();
+
+
+    std::tm * ptm = std::localtime(&file->getAttributes()->dateOfCreation);
+    char buffer[32];
+    // Format: Mo, 15.06.2009 20:20:00
+    std::strftime(buffer, 32, "%a, %d.%m.%Y %H:%M:%S", ptm);
+    QString string(buffer);
+    ui->createdL->setText(string);
+
+    ptm = std::localtime(&file->getAttributes()->dateOfLastEdit);
+    char buff[32];
+    // Format: Mo, 15.06.2009 20:20:00
+    std::strftime(buff, 32, "%a, %d.%m.%Y %H:%M:%S", ptm);
+    QString string2(buff);
+    ui->editedL->setText(string2);
+    ui->buttonBox->buttons().at(0)->setText("Ok");
+
+    QString indeces("");
+    int length = ceil((double) file->getSize()/cd->getBlockSize()) + file->getFirstBlock();
+    for(int i = file->getFirstBlock(); i < length - 1; i++){
+        indeces.append(QString::number(i));
+        indeces.append(", ");
+    }
+    indeces.append(QString::number(length - 1));
+    std::cout<<indeces.toStdString()<<std::endl;
+    ui->indexL->setText(indeces);
 }
 
 FileProperties::~FileProperties()
@@ -125,5 +209,11 @@ bool FileProperties::getAscii(){
 }
 bool FileProperties::getRandomAccess(){
     return randAcc;
+}
+
+
+void FileProperties::on_buttonBox_accepted()
+{
+    //
 }
 

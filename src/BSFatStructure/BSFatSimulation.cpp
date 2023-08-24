@@ -7,11 +7,10 @@
 #include <cstring>
 #include <ctime>
 
+
 /**
- * General info:
- * On Files there are 4 flags to set, on index 0 is the editable flag, on index 1 is the system flag,
- * on index 2 is the ascii flag and on index 3 is the random-access-file flag.
- *
+ * Bei File gibt es 4 verscheidene Flags die gesetzt werden können, das sind die Flags editable (Index 0),
+ * Systemfile (Index 1), Asccii-File (index 2) und  Random-Accsses-File (Index 3)
  */
 
 /**
@@ -27,7 +26,12 @@ void BSFatSimulation::simulate() {
     }
 
     char* root =  {"root"};
-    auto* directory = new Directory(root, new Attributes());
+    Attributes * attributes = new Attributes();
+    attributes->dateOfCreation = time(nullptr);
+    attributes->dateOfLastEdit = time(nullptr);
+    attributes->attributes = new char[1];
+    auto* directory = new Directory(root, attributes);
+    directory->setBit(directory->getAttributes()->attributes,0);
     std::cout << directory->getName() << '\n' << std::endl;
     directory->setParentDirectory(nullptr);
     m_currentDirectory = directory;
@@ -152,7 +156,7 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
 
         m_numberOfFiles++;
 
-        auto* file1 = dynamic_cast<AbstractFile*>(file);
+        AbstractFile* file1 = dynamic_cast<AbstractFile*>(file);
         m_currentDirectory->createChildFile( file1);
 
         Directory* directory = m_currentDirectory;
@@ -163,7 +167,8 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
     }
 }
 
-BSFatSimulation::BSFatSimulation(unsigned int blockSize, unsigned int fatSize) {
+BSFatSimulation::BSFatSimulation(unsigned int blockSize, unsigned int fatSize, char* name) {
+    m_name = name;
     m_statusArray = new unsigned char[fatSize / blockSize];
     m_blockSize = blockSize;
     m_fatSize = fatSize;
@@ -222,7 +227,7 @@ float BSFatSimulation::getFragmentation(Directory* directory) {
             numberOfBlocks++;
         }
         int length = maxIndex - minIndex + 1;
-        sumOfFrag += (float)(length - numberOfBlocks) / (float) length;
+        sumOfFrag += (float)(length - numberOfBlocks) / length;
         file = dynamic_cast<BSFatFile*>(file->getNextFile());
     }
 
@@ -319,26 +324,35 @@ void BSFatSimulation::createDirectoriesForSim() {
         //Subdirectory Algo is empty
         //Subdirectory SWT
         //      with two files in it (
+    Attributes** attributes = new Attributes*[13];
+
+    for(int i=0; i<13; i++){
+        attributes[i] = new Attributes();
+        attributes[i]->dateOfCreation = time(nullptr);
+        attributes[i]->dateOfLastEdit = time(nullptr);
+        attributes[i]->attributes = new char[1];
+    }
+
     char* fileNamesMichael[] =  {"main.c", "hallo.txt", "Presentation.docx"};
     char* fileNameBetriebssysteme[] = {"BSSimulation.h"};
     char* fileNamesSWT[] = {"AbstractAnimal.java", "Dog.java"};
 
-    m_currentDirectory->createChildDirectory(directoryNames[0], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[0], attributes[0]);
     std::cout<<m_currentDirectory->getSubDirectoryList()->getName()<<std::endl;
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
 
 
     //Michael/
-    m_currentDirectory->createChildDirectory(directoryNames[3], new Attributes());
-    m_currentDirectory->createChildDirectory(directoryNames[4], new Attributes());
-    m_currentDirectory->createChildDirectory(directoryNames[5], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[3],attributes[1]);
+    m_currentDirectory->createChildDirectory(directoryNames[4], attributes[2]);
+    m_currentDirectory->createChildDirectory(directoryNames[5], attributes[3]);
 
     createFilesForSim(fileNamesMichael, 3);
 
     //Michael/Betriebssysteme
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
     createFilesForSim(fileNameBetriebssysteme, 1);
-    m_currentDirectory->createChildDirectory(directoryNames[9], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[9],attributes[4]);
 
     //Michael/SWT
     m_currentDirectory = m_currentDirectory->getNextDirectory()->getNextDirectory();
@@ -354,13 +368,13 @@ void BSFatSimulation::createDirectoriesForSim() {
         //Subdirectory Mateh2
         //      with two files
     char* fileNamesMathe2[] = {"dgl.docx", "Mathe_abgabe.pdf"};
-    m_currentDirectory->createChildDirectory(directoryNames[1], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[1], attributes[5]);
 
     //Jan/
     m_currentDirectory = m_currentDirectory->getSubDirectoryList()
             ->getNextDirectory();
-    m_currentDirectory->createChildDirectory(directoryNames[6], new Attributes());
-    m_currentDirectory->createChildDirectory(directoryNames[7], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[6], attributes[6]);
+    m_currentDirectory->createChildDirectory(directoryNames[7], attributes[7]);
 
     //Jan/Mathe2
     m_currentDirectory = m_currentDirectory->getSubDirectoryList()->getNextDirectory();
@@ -382,25 +396,25 @@ void BSFatSimulation::createDirectoriesForSim() {
                     //      with three files
     char* fileNamesBsProjekt[] = {"main.cpp", "icon1.png", "mainWindow.qt"};
     char* directoryNamesSimon[] = {"comic", "de", "bs", "bsProjekt"};
-    m_currentDirectory->createChildDirectory(directoryNames[2], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNames[2], attributes[8]);
 
     //Simon/
     m_currentDirectory = m_currentDirectory->getSubDirectoryList()
             ->getNextDirectory()
             ->getNextDirectory();
-    m_currentDirectory->createChildDirectory(directoryNamesSimon[0], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[0], attributes[9]);
 
     //Simon/com
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-    m_currentDirectory->createChildDirectory(directoryNamesSimon[1], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[1], attributes[10]);
 
     //Simon/com/de
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-    m_currentDirectory->createChildDirectory(directoryNamesSimon[2], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[2], attributes[11]);
 
     //Simon/com/de/bs
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-    m_currentDirectory->createChildDirectory(directoryNamesSimon[3], new Attributes());
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[3], attributes[12]);
 
     //Simon/com/de/bs/bsProjekt
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
@@ -510,6 +524,7 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
             directory->setPreviousDirectory(nullptr);
 
             delete directory;
+            return;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() == nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             nextDirectory->setPreviousDirectory(nullptr);
@@ -519,6 +534,7 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
             directory->setNextDirectory(nullptr);
 
             delete directory;
+            return;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() != nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             Directory* prevDirectory = directory->getPrevDirectory();
@@ -527,6 +543,10 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
 
             directory->setPreviousDirectory(nullptr);
             directory->setNextDirectory(nullptr);
+
+            delete directory;
+        }else if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() == nullptr){
+            m_currentDirectory->setDirectoryList(nullptr);
 
             delete directory;
         }
@@ -753,92 +773,10 @@ bool BSFatSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSys
 }
 
 /**
- * Copies a given CD-Rom file to the current directory of the bsFat.
- * @param CDRomFile* cdRomFile
- * @param const int cdRomBlockSize
+ * Returns name of current BsFatSimulation.
+ * @return char* name
  */
-void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize) {
-    int numberOfBlocksForFat = ceil((double) cdRomFile->getSize() / (double) m_blockSize);
-    int numberOfBlocksForCDRom = ceil((double) cdRomFile->getSize() / (double) cdRomBlockSize);
-
-    if(numberOfBlocksForFat <= getFreeDiskSpace()){
-        //Copy name
-        char *nameOfFile = nullptr;
-        strcpy(nameOfFile, cdRomFile->getName());
-        //Copy attributes
-        Attributes* attributesOfFile = nullptr;
-        memccpy(attributesOfFile, cdRomFile->getAttributes(),1, sizeof(Attributes));
-
-        BSCluster* list = nullptr;
-        BSCluster* next = nullptr;
-        BSCluster* prev = nullptr;
-
-        int stagedBlocksOfCDRom = 1;
-        int counter = 0;
-
-        for (int i = cdRomFile->getFirstBlock(); i <= numberOfBlocksForFat + cdRomFile->getFirstBlock(); i++) {
-            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize){
-                next = new BSCluster();
-
-                unsigned int pos;
-                pos = (rand() % (m_fatSize / m_blockSize));
-                while (m_statusArray[pos] != FREE) {
-                    pos = (rand() % (m_fatSize / m_blockSize));
-                }
-                next->setIndex(pos);
-
-                next->setNextElement(nullptr);
-                next->setPrevElement(prev);
-
-                if(counter == 0){
-                    list = next;
-                }else{
-                    prev->setNextElement(next);
-                }
-                prev = next;
-                counter++;
-                stagedBlocksOfCDRom = 1;
-            }else if (stagedBlocksOfCDRom * cdRomBlockSize < m_blockSize){
-                stagedBlocksOfCDRom++;
-            }
-        }
-        auto* bsFatFile = new BSFatFile(nameOfFile, attributesOfFile, cdRomFile->getSize());
-        bsFatFile->setFirstBlock(list);
-        auto* file = dynamic_cast<AbstractFile*>(bsFatFile);
-        m_currentDirectory->createChildFile(file);
-    }
+char* BSFatSimulation::getName(){
+    return m_name;
 }
 
-/**
- * Copy an given directory with all its content to the current directory of the BSFat.
- * @param CDRomDirectory* directoryToCopy
- * @param const int cdRomBlockSize
- */
-void BSFatSimulation::copyCDRomDirectory(CDRomDirectory *directoryToCopy, const int cdRomBlockSize) {
-    if(directoryToCopy != nullptr){
-        return;
-    }
-
-    char* nameOfDirectory = nullptr;
-    strcpy(nameOfDirectory, directoryToCopy->getName());
-
-    Attributes* attributesOfDirectory = nullptr;
-    memccpy(attributesOfDirectory, directoryToCopy->getAttributes(), 1, sizeof(Attributes));
-
-    createDirectory(nameOfDirectory, attributesOfDirectory);
-
-    m_currentDirectory = m_currentDirectory->getLastDirectoryOfTheList();
-
-    AbstractElementCDRom* element = directoryToCopy->getList();
-    while(element != nullptr){
-        if(dynamic_cast<CDRomDirectory*>(element)){
-            auto* directory = dynamic_cast<CDRomDirectory*>(element);
-            copyCDRomDirectory(directory, cdRomBlockSize);
-        } else{
-            auto* file = dynamic_cast<CDRomFile*>(element);
-            copyCDRomFile(file, cdRomBlockSize);
-        }
-        element = element->getNextElement();
-    }
-    m_currentDirectory = m_currentDirectory->getParentDirectory();
-}

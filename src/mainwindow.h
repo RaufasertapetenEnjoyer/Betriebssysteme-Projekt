@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QTreeWidgetItem>
 #include "DirectoryStructure/Directory.h"
+#include "CDRomStructure/CDRomDirectory.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,7 +20,9 @@ public:
     ~MainWindow();
     void reload();
     void buildTree(Directory * dir, QTreeWidgetItem *parent);
+    void buildCDTree(CDRomDirectory * dir, QTreeWidgetItem *parent);
     void openPath(QString path);
+    void openCDPath(QString path);
     std::string getPath();
 private slots:
     void deleteFile();
@@ -40,7 +43,10 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_treeWidget_2_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
 private:
     Ui::MainWindow *ui;
+    void loadCD();
 };
 #endif // MAINWINDOW_H

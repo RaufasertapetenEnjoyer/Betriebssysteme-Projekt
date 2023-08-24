@@ -11,10 +11,17 @@ CONFIG += c++11
 SOURCES += \
     BSFatStructure/BSCluster.cpp \
     BSFatStructure/BSFatFile.cpp \
+    CDRomStructure/AbstractElementCDRom.cpp \
+    CDRomStructure/CDRomDirectory.cpp \
+    CDRomStructure/CDRomFile.cpp \
+    CDRomStructure/CDRomSimulation.cpp \
     DirectProperties.cpp \
     DirectoryStructure/AbstractElement.cpp \
     DirectoryStructure/AbstractFile.cpp \
     DirectoryStructure/Directory.cpp \
+    INodeStructure/INode.cpp \
+    INodeStructure/INodeFile.cpp \
+    INodeStructure/INodeSimulation.cpp \
     createdirectory.cpp \
     createfile.cpp \
     deletedirectory.cpp \
@@ -25,7 +32,13 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    CDRomStructure/AbstractElementCDRom.h \
+    CDRomStructure/CDRomDirectory.h \
+    CDRomStructure/CDRomFile.h \
     DirectProperties.h \
+    INodeStructure/INode.h \
+    INodeStructure/INodeFile.h \
+    INodeStructure/INodeSimulation.h \
     createdirectory.h \
     createfile.h \
     deletedirectory.h \
