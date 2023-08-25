@@ -39,7 +39,7 @@ void BSFatSimulation::simulate() {
 
     //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
-    createFilesForSim(fileNamesForRoot, 10);
+    //createFilesForSim(fileNamesForRoot, 10);
     createDirectoriesForSim();
 }
 
@@ -231,8 +231,11 @@ void BSFatSimulation::getFragmentation(Directory *directory, float &fragmentatio
             currentCluster = currentCluster->getNextBlock();
             numberOfBlocks++;
         }
+
         int length = maxIndex - minIndex + 1;
+
         sumOfFrag += (float)(length - numberOfBlocks) / length;
+
         file = dynamic_cast<BSFatFile*>(file->getNextFile());
     }
 
@@ -821,7 +824,8 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
         int length = numberOfBlocksForFat + cdRomFile->getFirstBlock();
 
         for (int i = cdRomFile->getFirstBlock(); i <= length; i++) {
-            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize || (i == length && stagedBlocksOfCDRom >= 1)){
+            stagedBlocksOfCDRom++;
+            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize || (i == length)){
                 next = new BSCluster();
 
                 unsigned int pos;
@@ -830,7 +834,7 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
                     pos = (rand() % (m_fatSize / m_blockSize));
                 }
                 next->setIndex((int) pos);
-
+                m_statusArray[pos] = OCCUPIED;
                 next->setNextElement(nullptr);
                 next->setPrevElement(prev);
 
@@ -841,16 +845,14 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
                 }
                 prev = next;
                 counter++;
-                i--;
                 stagedBlocksOfCDRom = 0;
-            }else{
-                stagedBlocksOfCDRom++;
             }
         }
         auto* bsFatFile = new BSFatFile(nameOfFile, attributesOfFile, cdRomFile->getSize());
         bsFatFile->setFirstBlock(list);
         auto* file = dynamic_cast<AbstractFile*>(bsFatFile);
         m_currentDirectory->createChildFile(file);
+        m_numberOfFiles++;
     }
 }
 
@@ -860,19 +862,20 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
 * @param const int cdRomBlockSize
 */
 void BSFatSimulation::copyCDRomDirectory(CDRomDirectory *directoryToCopy, const int cdRomBlockSize) {
-    if(directoryToCopy != nullptr){
+    if(directoryToCopy == nullptr){
         return;
     }
-
-    char* nameOfDirectory = nullptr;
+    QString name(directoryToCopy->getName());
+    char* nameOfDirectory = new char[name.length()];
     strcpy(nameOfDirectory, directoryToCopy->getName());
 
-    Attributes* attributesOfDirectory = nullptr;
+    Attributes* attributesOfDirectory = new Attributes();
     memccpy(attributesOfDirectory, directoryToCopy->getAttributes(), 1, sizeof(Attributes));
 
     createDirectory(nameOfDirectory, attributesOfDirectory);
 
     m_currentDirectory = m_currentDirectory->getLastDirectoryOfTheList();
+    std::cout<<"curr Dir:"<<m_currentDirectory->getName()<<std::endl;
 
     AbstractElementCDRom* element = directoryToCopy->getList();
     while(element != nullptr){

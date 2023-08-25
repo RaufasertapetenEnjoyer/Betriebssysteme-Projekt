@@ -17,7 +17,7 @@
 
 int platte;
 bool cd = false;
-BSFatSimulation * bsSim = new BSFatSimulation(512, 16384*4,"BsFat-Platte");
+BSFatSimulation * bsSim = new BSFatSimulation(512, 16384*5,"BsFat-Platte");
 INodeSimulation * inSim = new INodeSimulation(512, 16384*4);
 CDRomSimulation * cdSim = new CDRomSimulation(256, 16384, "Meine CD-Rom", "Songs");
 
@@ -77,7 +77,9 @@ void MainWindow::reload(){
         d = inSim->getCurrentDirectory();
     }
 
-
+    if(bsSim->getNumberOfCurrentlySavedFiles()==0){
+        fragmentation = 0;
+    }
     std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
     std::cout<<"savedFiles:" << bsSim->getNumberOfCurrentlySavedFiles()<<std::endl;
     ui->progressBar->setValue(fragmentation);
@@ -507,10 +509,8 @@ void MainWindow::on_pushButton_clicked()
     std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
     ui->progressBar->setValue(fragmentation);
 
-    /*for (int i = 0; i < inSim->getNumberOfFilesThatCanBeSaved(); i++) {
-            std::cout << inSim->getStatusArray()[i] << ", ";
-        }
-        std::cout << std::endl;*/
+    reload();
+
 }
 
 
@@ -555,6 +555,7 @@ void MainWindow::on_pushButton_5_clicked()
 }
 
 void MainWindow::openPath(QString path){
+    std::cout<<"execute open Path"<<std::endl;
     QStringList p = path.split("/");
 
     Directory *dir;
