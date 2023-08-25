@@ -39,7 +39,7 @@ void BSFatSimulation::simulate() {
 
     //char** fileNamesForRoot = new char*[] {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
     char* fileNamesForRoot[] = {"programm1.c", "2programm.c", "prog3.c.cpp", "p4rogramm1.c", "program5m.c", "pr6ogramm.c", "progra7mm.c", "programm8.c", "progr9amm.c", "program.cpp"};
-    //createFilesForSim(fileNamesForRoot, 10);
+    createFilesForSim(fileNamesForRoot, 10);
     createDirectoriesForSim();
 }
 
@@ -463,7 +463,7 @@ BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned
     /*if(subDirectory == nullptr){
         std::cout<<directory->getName()<<"==null"<<std::endl;
     }*/
-    BSCluster* found;
+    BSCluster* found = nullptr;
     while(subDirectory != nullptr || subDirectory != 0x0){
         found = searchClusterByIndex(subDirectory, index);
         if(found != nullptr){
