@@ -159,7 +159,7 @@ void BSFatSimulation::createFile(char* name, bool editable, bool system, bool as
         m_currentDirectory->createChildFile( file1);
 
         Directory* directory = m_currentDirectory;
-        while (directory->getParentDirectory() != nullptr){
+        while (directory != nullptr){
             directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
             directory = directory->getParentDirectory();
         }

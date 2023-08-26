@@ -72,27 +72,30 @@ void MainWindow::reload(){
         bsSim->getFragmentation(bsSim->getRootDirectory(), fragmentation);
         d = bsSim->getCurrentDirectory();
         fragmentation = (fragmentation / (float) bsSim->getNumberOfCurrentlySavedFiles())*100;
+        std::cout<<"savedFiles:" << bsSim->getNumberOfCurrentlySavedFiles()<<std::endl;
+        if(bsSim->getNumberOfCurrentlySavedFiles()==0){
+            fragmentation = 0;
+        }
+        for (int i = 0; i < bsSim->getNumberOfFilesThatCanBeSaved(); i++) {
+            std::cout << bsSim->getStatusArray()[i] << ", ";
+        }
     }else if(platte==2){
-        f = inSim->getFragmentation(inSim->getRootDirectory(),0.0)*100;
+        //fragmentation = inSim->getFragmentation(inSim->getRootDirectory(),0.0)*100;
         d = inSim->getCurrentDirectory();
+        std::cout<<"savedFiles:" << inSim->getNumberOfCurrentlySavedFiles()<<std::endl;
+        if(inSim->getNumberOfCurrentlySavedFiles()==0){
+            fragmentation = 0;
+        }
+        for (int i = 0; i < inSim->getNumberOfFilesThatCanBeSaved(); i++) {
+            std::cout << inSim->getStatusArray()[i] << ", ";
+        }
     }
 
-    if(bsSim->getNumberOfCurrentlySavedFiles()==0){
-        fragmentation = 0;
-    }
+
     std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
-    std::cout<<"savedFiles:" << bsSim->getNumberOfCurrentlySavedFiles()<<std::endl;
+
     ui->progressBar->setValue(fragmentation);
 
-
-
-
-
-    for (int i = 0; i < bsSim->getNumberOfFilesThatCanBeSaved(); i++) {
-
-        std::cout << bsSim->getStatusArray()[i] << ", ";
-        }
-    std::cout << std::endl;
     AbstractFile * file = d->getFileList();
     while(file != nullptr){
 
@@ -104,6 +107,7 @@ void MainWindow::reload(){
         ui->listWidget->addItem(item);
         file=file->getNextFile();
     }
+    std::cout <<"added files"<< std::endl;
     Directory * directory =d->getSubDirectoryList();
     while(directory != nullptr){
         QListWidgetItem *item = new QListWidgetItem(directory->getName());
@@ -111,6 +115,7 @@ void MainWindow::reload(){
         ui->listWidget->addItem(item);
         directory = directory->getNextDirectory();
     }
+    std::cout <<"added dirs"<< std::endl;
     ui->listWidget->sortItems();
 
     ui->treeWidget->clear();
@@ -275,10 +280,14 @@ void MainWindow::createDir(){
         std::string name = dir->getName().toStdString();
         char* nameP = new char[name.length()];
         strcpy(nameP,name.c_str());
+        Attributes * attributes = new Attributes();
+        attributes->dateOfCreation = time(nullptr);
+        attributes->dateOfLastEdit = time(nullptr);
+        attributes->attributes = new char[1];
         if(platte==1){
-            bsSim->createDirectory(nameP, new Attributes());
+            bsSim->createDirectory(nameP, attributes);
         }else{
-            inSim->createDirectory(nameP, new Attributes());
+            inSim->createDirectory(nameP, attributes);
         }
         reload();
     }
@@ -403,13 +412,15 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
         if(platte==1){
             file = bsSim->getCurrentDirectory()->getFileList();
         }else{
-            file = bsSim->getCurrentDirectory()->getFileList();
+            file = inSim->getCurrentDirectory()->getFileList();
         }
-        if(file==nullptr){
-            std::cout<<"Error: File clicked but no files found in Simulation"<<std::endl;
-        }
+
         while(file != nullptr && file->getName()!=name ){
             file= file->getNextFile();
+        }
+        if(file==nullptr){
+            std::cout<<"Error: File clicked but not found in Simulation"<<std::endl;
+            return;
         }
         std::cout<<file->getName()<<std::endl;
         selectedFile=file;
@@ -604,7 +615,7 @@ void MainWindow::openPath(QString path){
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    Dialog *dia = new Dialog(this);
+    Dialog *dia = new Dialog(this,bsSim);
     if(dia->exec() == QDialog::Accepted){
            platte = dia->getPlatte();
            if(platte == 1){

@@ -18,12 +18,7 @@ directProperties::directProperties(QWidget *parent, Directory *dir, std::string 
         d= d->getNextDirectory();
     }
     ui->amountDirs->setText(QString::number(amountDirs));
-    AbstractFile * f = dir->getFileList();
-    int amountFiles = 0;
-    while(f!=nullptr){
-        amountFiles++;
-        f=f->getNextFile();
-    }
+    int amountFiles = dir->getNumberOfFiles();
     ui->amountFiles->setText(QString::number(amountFiles));
     dirEditable = dir->isEditable();
     ui->checkBox->setChecked(dirEditable);

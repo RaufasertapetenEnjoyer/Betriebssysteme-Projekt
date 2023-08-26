@@ -75,7 +75,7 @@ CDRomSimulation::CDRomSimulation(int blockSize, int romSize, char* name, char* d
     attributes->dateOfLastEdit = time(nullptr);
 
     auto* cdRomDirectory = new CDRomDirectory(root, attributes, 0);
-    cdRomDirectory->setBit(cdRomDirectory->getAttributes()->attributes,0);
+    cdRomDirectory->clrBit(cdRomDirectory->getAttributes()->attributes,0);
     cdRomDirectory->setParentDirectory(nullptr);
 
     m_currentDirectory = cdRomDirectory;
@@ -102,7 +102,7 @@ void CDRomSimulation::createChildFile(char *name, bool editable, bool system, bo
 
     attributes->dateOfCreation = time(nullptr);
 
-    editable ? file->setBit(file->getAttributes()->attributes,0) : file->clrBit(file->getAttributes()->attributes,0);
+    file->clrBit(file->getAttributes()->attributes,0);
     system ? file->setBit(file->getAttributes()->attributes,1) : file->clrBit(file->getAttributes()->attributes,1);
     ascii ? file->setBit(file->getAttributes()->attributes,2) : file->clrBit(file->getAttributes()->attributes,2);
     randAccFile ? file->setBit(file->getAttributes()->attributes,3) : file->clrBit(file->getAttributes()->attributes,3);
@@ -185,8 +185,9 @@ void CDRomSimulation::createFilesForSim(char **fileNames, int length) {
         attributes->dateOfLastEdit= time(nullptr);
 
         auto* file = new CDRomFile(fileNames[i], attributes, (rand() % 1000) + 1, getIndexOfNextFreeBlock());
-        file->setBit(file->getAttributes()->attributes, 0);
+        file->clrBit(file->getAttributes()->attributes, 0);
         file->setBit(file->getAttributes()->attributes, 2);
+
 
         int index = getIndexOfNextFreeBlock();
         int numberOfBlocks = ceil((double) file->getSize() / (double) m_blockSize);
@@ -214,7 +215,7 @@ void CDRomSimulation::createDirectoriesForSim(char **directoryNames, int length)
         attributes->dateOfLastEdit= time(nullptr);
 
         auto* directory = new CDRomDirectory(directoryNames[i], attributes, 0);
-        directory->setBit(directory->getAttributes()->attributes, 0);
+        directory->clrBit(directory->getAttributes()->attributes, 0);
 
         directory->setParentDirectory(m_currentDirectory);
 
