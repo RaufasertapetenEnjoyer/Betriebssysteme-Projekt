@@ -27,7 +27,7 @@ class INode {
 
         void detectEmptyTables();
 
-//        void replaceAddressAtIndex(int address, int index);
+        void replaceAddressAtIndex(int address, int index);
 
         int* getIndexes();
 

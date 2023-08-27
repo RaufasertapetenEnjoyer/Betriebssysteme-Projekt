@@ -191,7 +191,8 @@ void INode::detectEmptyTables() {
 
 int *INode::getIndexes() {
     int numberOfBlocks = getNumberOfBlocks();
-    int* statusIndexes = new int[numberOfBlocks];
+    int* statusIndexes = new int[numberOfBlocks + 1];
+    statusIndexes[0] = numberOfBlocks;
     int* currentTable = addressPointers;
 
     int navigationIndex = 0;
@@ -199,7 +200,7 @@ int *INode::getIndexes() {
     int tableNumber = -2;
 
     while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
-        statusIndexes[index] = currentTable[navigationIndex];
+        statusIndexes[index + 1] = currentTable[navigationIndex];
         index++;
         navigationIndex++;
         if(navigationIndex >= 12) {
