@@ -74,7 +74,7 @@ public:
 
     char* getName();
 
-    INode* searchINodesByIndex(Directory directory, unsigned int index);
+    INode* searchINodesByIndex(Directory *directory, unsigned int index);
 
 private:
     Directory* m_currentDirectory;

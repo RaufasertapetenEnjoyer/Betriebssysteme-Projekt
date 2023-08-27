@@ -116,11 +116,14 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
                     file->getINode()->addAddressAtIndex(currentPosition, index);
                     m_statusArray[currentPosition] = OCCUPIED;
                 }else{
-//                    if(currentPosition != currentTable[index]){
-//                        INode secondCurrent = searchTablesByIndex(getRootDirectory(), currentPosition);
-//                        int copyOfAddress = currentTable[index];
-//                        file->getINode()->addAddressAtIndex(currentPosition, index);
-//                    }
+                    if(currentPosition != currentTable[index]){
+                        INode* secondCurrent = searchINodesByIndex(getRootDirectory(), currentPosition);
+                        if(secondCurrent == nullptr) {
+                            break;
+                        }
+                        secondCurrent->findAndReplaceAddress(currentPosition, currentTable[index]);
+                        file->getINode()->addAddressAtIndex(currentPosition, index);
+                    }
                 }
             }
             currentPosition++;
@@ -639,6 +642,24 @@ char *INodeSimulation::getName() {
     return m_name;
 }
 
-INode *INodeSimulation::searchINodesByIndex(Directory directory, unsigned int index) {
-    return nullptr;
+INode *INodeSimulation::searchINodesByIndex(Directory *directory, unsigned int index) {
+    if(directory == nullptr){
+        return nullptr;
+    }
+    auto* current = dynamic_cast<INodeFile*>(directory->getFileList());
+
+    while(current != nullptr) {
+        if(current->getINode()->checkIfAddressExists(index)) {
+            return current->getINode();
+        } else {
+            current = dynamic_cast<INodeFile*>(current->getNextFile());
+        }
+    }
+
+    Directory* subDirectory = directory->getSubDirectoryList();
+    while(subDirectory != nullptr){
+
+        searchINodesByIndex(subDirectory, index);
+        subDirectory = subDirectory->getNextDirectory();
+    }
 }
