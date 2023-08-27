@@ -11,6 +11,7 @@
 #include "../BSFatStructure/BSFatFile.h"
 #include "../BSFatStructure/BSCluster.h"
 #include "INodeFile.h"
+#include "../CDRomStructure/CDRomDirectory.h"
 
 #define RESERVED 'R'
 #define CORRUPTED 'D'
@@ -43,8 +44,6 @@ public:
 
     const char* getPath();
 
-//    BSCluster* initBSCluster(int numberOfBlocks);
-
     void freeFileMemory(AbstractFile* file);
 
     void deleteFile(AbstractFile* file);
@@ -65,14 +64,19 @@ public:
 
     unsigned int getNumberOfCurrentlySavedFiles();
 
-    //static?
-    unsigned int getINodeSize();
+    void updateEditableOnContent(Directory* directory);
 
-    unsigned int getNumberOfINodes();
+    bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    INodeFile* convertFatToINode(BSFatFile* bsFatFile, int bsBlockSize);
+    INodeFile* convertROMToINode(BSFatFile* bsFatFile, int bsBlockSize);
 
-    void copyFileFromROM(BSFatFile* bsFatFile, Directory* directory);
+    void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
+
+    int* getIndexes(INodeFile file);
+
+    char* getName();
+
+    int* searchTablesByIndex(Directory directory, unsigned int index);
 
 private:
     Directory* m_currentDirectory;
@@ -81,9 +85,6 @@ private:
     unsigned int m_totalSize;
     unsigned char* m_statusArray;
     unsigned int m_numberOfFiles;
-    unsigned int m_numberOfBlocksPerINode;
-    //static?
-    unsigned int m_iNodeSize;
     void simulate();
 
 };

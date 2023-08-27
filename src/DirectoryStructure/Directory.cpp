@@ -18,6 +18,13 @@ Directory::Directory(char* name, Attributes* attributes) : AbstractElement(testC
 
 Directory::~Directory(){
     //AbstractElement::~AbstractElement();
+
+    delete m_fileList;
+    delete m_directoryList;
+    delete m_nextDirectory;
+    delete m_prevDirectory;
+    delete m_parentDirectory;
+
 };
 
 /**

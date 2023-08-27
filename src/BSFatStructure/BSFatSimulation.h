@@ -30,8 +30,7 @@ public:
 
     void createDirectory(char* name, Attributes* attributes);
 
-    void
-    updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
+    void updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
     void updateDirectory(char* name, bool isEditable, Directory* directory);
 

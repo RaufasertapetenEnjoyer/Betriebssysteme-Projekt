@@ -7,7 +7,7 @@
 
 class INode {
     public:
-        INode(int numberOfBlocksForFile, int numberOfBlocksPerINode);
+        INode(int numberOfBlocksForFile);
 
         //INode();
 
@@ -27,8 +27,13 @@ class INode {
 
         void addAddressAtIndex(int address, int index);
 
+        void deleteAddressFromIndex(int index);
+
         void initINode();
 
+        void initTable(int* table);
+
+        void detectEmptyTables();
 
 private:
         int* addressPointers;

@@ -9,15 +9,19 @@
 /**
  *  eine Tabelle hat 12 Blöcke, es sind bis zu 14 Tabellen möglich -> ggf. in numberOfBlocksPerINode setzen
  */
-INode::INode(int numberOfBlocksForFile, int numberOfBlocksPerINode) {
+INode::INode(int numberOfBlocksForFile) {
     addressPointers = new int[12];
-    if (numberOfBlocksForFile <= numberOfBlocksPerINode * 14) {
+    if (numberOfBlocksForFile <= 12 * 14) {
         firstIndirectPointers = nullptr;
         doubleIndirectPointers = nullptr;
-        if (numberOfBlocksForFile > numberOfBlocksPerINode) {
+        if (numberOfBlocksForFile > 12) {
             firstIndirectPointers = new int*[12];
-            if (numberOfBlocksForFile > numberOfBlocksPerINode * 2) {
-                doubleIndirectPointers = new int**[12];
+            if (numberOfBlocksForFile > 12 * 2) {
+                int*** emptyArray = new int**[12];
+                for (int i = 0; i < 12; i++) {
+                    emptyArray[i] = new int*[12];
+                }
+                doubleIndirectPointers = emptyArray;
             }
         }
         initINode();
@@ -25,12 +29,6 @@ INode::INode(int numberOfBlocksForFile, int numberOfBlocksPerINode) {
         return; //todo
     }
 }
-
-/*INode::INode() {
-    addressPointers = nullptr;
-    firstIndirectPointers = nullptr;
-    doubleIndirectPointers = nullptr;
-}*/
 
 int *INode::getAddressPointers() const {
     return addressPointers;
@@ -60,18 +58,32 @@ void INode::addAddress(int address) {
     int* currentTable = addressPointers;
     int index = 0;
     int currentTableIndex = 0;
-    while (currentTable[index] != -1) {
+    while (currentTable[index % 12] != -1) {
         index++;
         if(index == 12) {
             if(firstIndirectPointers != nullptr) {
                 currentTable = *firstIndirectPointers;
             } else {
-                // bei Fehler log?
-                break;//todo
+                firstIndirectPointers = new int*[12];
+                initTable(*firstIndirectPointers);
+                currentTable = *firstIndirectPointers;
             }
         }
         if(index >= 24) {
-            currentTable = *doubleIndirectPointers[currentTableIndex];
+            if(index >= 12 * 14) {
+                std::cout << "File cannot be larger." << std::endl;
+                return;
+            } else {
+                if (doubleIndirectPointers == nullptr) {
+                    int ***emptyArray = new int **[12];
+                    for (int i = 0; i < 12; i++) {
+                        emptyArray[i] = new int *[12];
+                    }
+                    doubleIndirectPointers = emptyArray;
+                }
+                currentTable = *doubleIndirectPointers[currentTableIndex];
+                currentTableIndex = floor((index - 24) / 12.0);
+            }
         }
     }
     currentTable[index % 12] = address;
@@ -88,14 +100,42 @@ void INode::addAddressAtIndex(int address, int index) {
         int numberOfTable = (int) floor((index - 24) / 12);
         table = *doubleIndirectPointers[numberOfTable];
         table[index - 12 * (2 + numberOfTable)] = address;
+    } else {
+        std::cout << "File is too large." << std::endl;
     }
-    // bei Fehler log?
+}
+
+void INode::deleteAddressFromIndex(int index) {
+    int* currentTable = addressPointers;
+
+    int navigationIndex = 0;
+    int compareIndex = 0;
+    int tableNumber = -2;
+
+    while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
+        if(compareIndex >= index) {
+            currentTable[navigationIndex] = -1;
+        }
+        navigationIndex++;
+        compareIndex++;
+        if(navigationIndex >= 12) {
+            navigationIndex = 0;
+            if(tableNumber == -2) {
+                tableNumber++;
+                currentTable = *firstIndirectPointers;
+            } else {
+                tableNumber++;
+                currentTable = *doubleIndirectPointers[tableNumber];
+            }
+        }
+    }
+    detectEmptyTables();
 }
 
 void INode::initINode() {
 
     int tableNumber = -2;
-    int* currentTable = getAddressPointers();
+    int* currentTable = addressPointers;
 
     while (currentTable != nullptr) {
         for (int i = 0; i < 12; i++) {
@@ -103,9 +143,26 @@ void INode::initINode() {
         }
         tableNumber++;
         if (tableNumber == -1) {
-            currentTable = *getFirstIndirectPointers();
+            currentTable = *firstIndirectPointers;
         } else {
-            currentTable = *getDoubleIndirectPointers()[tableNumber];
+            currentTable = *doubleIndirectPointers[tableNumber];
         }
     }
 }
+
+void INode::initTable(int *table) {
+    for (int i = 0; i < 12 ; i++) {
+        table[i] = -1;
+    }
+}
+
+void INode::detectEmptyTables() {
+    if (*firstIndirectPointers[0] == -1) {
+        firstIndirectPointers = nullptr;
+    }
+    if (*doubleIndirectPointers[0][0] == -1) {
+        doubleIndirectPointers = nullptr;
+    }
+}
+
+

@@ -8,7 +8,7 @@
 #include "ctime"
 #include <cstring>
 #include "iostream"
-
+#include "../CDRomStructure/CDRomDirectory.h"
 
 
 INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize, char* name) {
@@ -18,7 +18,6 @@ INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize,
     m_blockSize = blockSize;
     m_totalSize = totalSize;
     m_numberOfFiles = 0;
-    m_iNodeSize = 16;
 
     std::cout << "totalSize" << totalSize << std::endl;
     std::cout << "blockSize" << blockSize << std::endl;
@@ -35,16 +34,12 @@ INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize,
 void INodeSimulation::simulate() {
 
     std::cout << getNumberOfFilesThatCanBeSaved() << '\n' << std::endl;
-    //m_statusArray[0] = RESERVED; already throws error
     for (int i = 0; i < 40; i++) {
-
-        /*if((rand() % 2) + 1 == 1){
-             std::cout << rand() << '\n' << std::endl;
+        if((rand() % 2) + 1 == 1){
             m_statusArray[rand() % getNumberOfFilesThatCanBeSaved()] = CORRUPTED;
         }else{
-            std::cout << rand() << '\n' << std::endl;
             m_statusArray[rand() % getNumberOfFilesThatCanBeSaved()] = RESERVED;
-        }*/
+        }
     }
 
 
@@ -54,8 +49,8 @@ void INodeSimulation::simulate() {
     attributes->dateOfLastEdit = time(nullptr);
     attributes->attributes = new char[1];
     auto* directory = new Directory(root, attributes);
-    directory->setEditable(true);
-
+    directory->setBit(directory->getAttributes()->attributes,0);
+    std::cout << directory->getName() << '\n' << std::endl;
     directory->setParentDirectory(nullptr);
     m_currentDirectory = directory;
 
@@ -65,15 +60,19 @@ void INodeSimulation::simulate() {
     std::cout << directory->getName() << '\n' << std::endl;
     createFilesForSim(fileNamesForRoot, 6);
     createDirectoriesForSim();
-//todo
 }
 
 Directory *INodeSimulation::getRootDirectory() {
-    Directory* directory = m_currentDirectory;
-    while(directory->getParentDirectory() != nullptr) {
-        directory = directory->getParentDirectory();
+    if(m_currentDirectory->getParentDirectory() == nullptr){
+        return m_currentDirectory;
+    }else{
+        Directory* directory = m_currentDirectory;
+
+        while (directory->getParentDirectory() != nullptr){
+            directory = directory->getParentDirectory();
+        }
+        return directory;
     }
-    return directory;
 }
 
 int INodeSimulation::getFreeDiskSpace() {
@@ -116,16 +115,13 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
                     m_statusArray[currentTable[index]] = FREE;
                     file->getINode()->addAddressAtIndex(currentPosition, index);
                     m_statusArray[currentPosition] = OCCUPIED;
-                }
-//                else{
+                }else{
 //                    if(currentPosition != currentTable[index]){
-//                        BSCluster* secondCurrent = searchClusterByIndex(getRootDirectory(), currentPosition);
-//                        int saver = current->getIndex();
-//                        current->setIndex(secondCurrent->getIndex());
-//                        secondCurrent->setIndex(saver);
+//                        INode secondCurrent = searchTablesByIndex(getRootDirectory(), currentPosition);
+//                        int copyOfAddress = currentTable[index];
+//                        file->getINode()->addAddressAtIndex(currentPosition, index);
 //                    }
-//                }
-//todo: ggf. Erklärung  nötig, um auf INode umzustellen
+                }
             }
             currentPosition++;
             index++;
@@ -206,28 +202,21 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
     Attributes* attributes = new Attributes;
     attributes->dateOfCreation = time(nullptr);
     attributes->dateOfLastEdit = time(nullptr);
-    char attributesByte[1];
+    attributes->attributes = new char[1];
+
     int numberOfBlocks = ceil((double)size / (double)m_blockSize);
 
-    attributes->attributes = attributesByte;
-    INode* node = new INode(numberOfBlocks,12);
+    INode* node = new INode(numberOfBlocks);
 
-    INodeFile* test = new INodeFile(name, attributes, size, node);
-    if(editable) {
-        test->setBit(attributesByte, 0);
-    }
-    if(system) {
-        test->setBit(attributesByte, 1);
-    }
-    if(ascii) {
-        test->setBit(attributesByte, 2);
-    }
-    if(randAccFile) {
-        test->setBit(attributesByte, 3);
-    }
+    INodeFile* newFile = new INodeFile(name, attributes, size, node);
+    newFile->setEditable(editable);
+    newFile->setSystem(system);
+    newFile->setAscii(ascii);
+    newFile->setRandAccFile(randAccFile);
 
     Directory* directory = m_currentDirectory;
-    directory->setLastFileOfTheList(test);
+    m_currentDirectory->createChildFile(newFile);
+
     while (directory != nullptr){
         directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
         directory = directory->getParentDirectory();
@@ -252,14 +241,6 @@ void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
     for (int i = 0; i < length; i++) {
         createFile(names[i], true, false, true, false, (int) (rand() % 2100 + 1));
     }
-
-//todo
-
-//    Directory* directory = m_currentDirectory;
-//    while (directory->getParentDirectory() != nullptr){
-//        directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
-//        directory = directory->getParentDirectory();
-//    }
 }
 
 void INodeSimulation::createDirectoriesForSim() {
@@ -389,59 +370,48 @@ void INodeSimulation::createDirectory(char *name, Attributes *attributes) {
 }
 
 void INodeSimulation::updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size) {
-//    if(file->tstBit(file->getAttributes()->attributes, 0)){
-//        if(!file->isSystem()){
-//            if(strcmp(file->getName(), name) != 0){
-//                file->setName(name);
-//            }
-//            if(isSystem != file->isSystem()){
-//                file->tstBit(file->getAttributes()->attributes, 1) ? file->clrBit(file->getAttributes()->attributes, 1) : file->setBit(file->getAttributes()->attributes, 1);
-//            }
-//            int numberOfNewBlocks = ceil((double) size / (double) m_blockSize);
-//            int numberOfCurrBlocks = ceil((double) file->getSize() / (double) m_blockSize);
-//
-//            auto fatFile = dynamic_cast<BSFatFile*>(file);
-//
-//            if (numberOfCurrBlocks < numberOfNewBlocks) {
-//                if ((numberOfNewBlocks - numberOfCurrBlocks) < getFreeDiskSpace()) {
-//                    BSCluster* clusterToAdd = initBSCluster(numberOfNewBlocks - numberOfCurrBlocks);
-//                    BSCluster *lastCluster = fatFile->getLastBlock();
-//
-//                    lastCluster->setNextElement(clusterToAdd);
-//                    clusterToAdd->setPrevElement(lastCluster);
-//                }
-//            } else if (numberOfCurrBlocks > numberOfNewBlocks) {
-//                int counter = numberOfCurrBlocks - numberOfNewBlocks;
-//                BSCluster* cluster = fatFile->getLastBlock();
-//
-//                while (counter != 0) {
-//                    BSCluster* currCluster = cluster;
-//                    cluster = cluster->getPrevBlock();
-//
-//                    currCluster->setPrevElement(nullptr);
-//                    currCluster->setNextElement(nullptr);
-//
-//                    m_statusArray[currCluster->getIndex()] = FREE;
-//
-//                    delete currCluster;
-//                    counter--;
-//                }
-//            }
-//            file->setSize(size);
-//        }
-//        //nur attribute können gesetzt werden
-//        if(isEditable != file->isEditable()){
-//            file->tstBit(file->getAttributes()->attributes, 0) ? file->clrBit(file->getAttributes()->attributes, 0) : file->setBit(file->getAttributes()->attributes, 0);
-//        }
-//        if(isAscii != file->isAscii()){
-//            file->tstBit(file->getAttributes()->attributes, 2) ? file->clrBit(file->getAttributes()->attributes, 2) : file->setBit(file->getAttributes()->attributes, 2);
-//        }
-//        if (isRamFile != file->isRandAccFile()){
-//            file->tstBit(file->getAttributes()->attributes, 3) ? file->clrBit(file->getAttributes()->attributes, 3) : file->setBit(file->getAttributes()->attributes, 3);
-//        }
-//        file->getAttributes()->dateOfLastEdit = time(nullptr);
-//    }
-//todo
+    if(file->tstBit(file->getAttributes()->attributes, 0)){
+        if(!file->isSystem()){
+            if(strcmp(file->getName(), name) != 0){
+                file->setName(name);
+            }
+            if(isSystem != file->isSystem()){
+                file->tstBit(file->getAttributes()->attributes, 1) ? file->clrBit(file->getAttributes()->attributes, 1) : file->setBit(file->getAttributes()->attributes, 1);
+            }
+            int numberOfNewBlocks = ceil((double) size / (double) m_blockSize);
+            int numberOfCurrBlocks = ceil((double) file->getSize() / (double) m_blockSize);
+
+            auto iNodeFile = dynamic_cast<INodeFile*>(file);
+
+            if (numberOfCurrBlocks < numberOfNewBlocks) {
+
+                int pos;
+
+                for (int i = 0; i < numberOfNewBlocks - numberOfCurrBlocks; i++) {
+                    pos = (rand() % (m_totalSize / m_blockSize));
+                    while (m_statusArray[pos] != FREE) {
+                        pos = (rand() % (m_totalSize / m_blockSize));
+                    }
+                    iNodeFile->getINode()->addAddress(pos);
+                    m_statusArray[pos] = OCCUPIED;
+                }
+            } else if (numberOfCurrBlocks > numberOfNewBlocks) {
+                iNodeFile->getINode()->deleteAddressFromIndex(numberOfNewBlocks - 1);
+            }
+            file->setSize(size);
+        }
+        //nur attribute können gesetzt werden
+        if(isEditable != file->isEditable()){
+            file->tstBit(file->getAttributes()->attributes, 0) ? file->clrBit(file->getAttributes()->attributes, 0) : file->setBit(file->getAttributes()->attributes, 0);
+        }
+        if(isAscii != file->isAscii()){
+            file->tstBit(file->getAttributes()->attributes, 2) ? file->clrBit(file->getAttributes()->attributes, 2) : file->setBit(file->getAttributes()->attributes, 2);
+        }
+        if (isRamFile != file->isRandAccFile()){
+            file->tstBit(file->getAttributes()->attributes, 3) ? file->clrBit(file->getAttributes()->attributes, 3) : file->setBit(file->getAttributes()->attributes, 3);
+        }
+        file->getAttributes()->dateOfLastEdit = time(nullptr);
+    }
 }
 
 void INodeSimulation::updateDirectory(char* name, bool isEditable, Directory* directory) {
@@ -473,32 +443,36 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
     INodeFile* iNodeFile = dynamic_cast<INodeFile*>(file);
 
     int* currentTable = iNodeFile->getINode()->getAddressPointers();
+    int* prevTable;
 
     int index = 0;
-    int statusIndex = -1;
     int tableNumber = -2;
 
     while(currentTable != nullptr && currentTable[index] != -1) {
         m_statusArray[currentTable[index]] = FREE;
         index++;
-        if(index >= 12) {
+        if(index == 12) {
             index = 0;
             if(tableNumber == -2) {
                 tableNumber++;
-                int* prevTable = currentTable;
                 currentTable = *iNodeFile->getINode()->getFirstIndirectPointers();
-                delete prevTable;
             } else {
                 tableNumber++;
                 currentTable = *iNodeFile->getINode()->getDoubleIndirectPointers()[tableNumber];
             }
         }
     }
-    iNodeFile->getINode()->setAddressPointers(nullptr);
-    iNodeFile->getINode()->setFirstIndirectPointers(nullptr);
-    iNodeFile->getINode()->setDoubleIndirectPointers(nullptr);
+
+    delete iNodeFile->getINode()->getAddressPointers();
+    delete iNodeFile->getINode()->getFirstIndirectPointers();
+
+    for (int i = 0; i < 12; i++) {
+        delete *iNodeFile->getINode()->getDoubleIndirectPointers()[i];
+    }
+    delete iNodeFile->getINode()->getDoubleIndirectPointers();
+
     delete iNodeFile->getINode();
-    iNodeFile->setINode(nullptr); //todo: check, ob alles gelöscht wird
+    iNodeFile->setINode(nullptr);
 }
 
 void INodeSimulation::deleteFile(AbstractFile *file) {
@@ -554,6 +528,7 @@ void INodeSimulation::deleteDirectory(Directory *directory) {
             directory->setPreviousDirectory(nullptr);
 
             delete directory;
+            return;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() == nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             nextDirectory->setPreviousDirectory(nullptr);
@@ -563,6 +538,7 @@ void INodeSimulation::deleteDirectory(Directory *directory) {
             directory->setNextDirectory(nullptr);
 
             delete directory;
+            return;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() != nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             Directory* prevDirectory = directory->getPrevDirectory();
@@ -571,6 +547,10 @@ void INodeSimulation::deleteDirectory(Directory *directory) {
 
             directory->setPreviousDirectory(nullptr);
             directory->setNextDirectory(nullptr);
+
+            delete directory;
+        }else if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() == nullptr){
+            m_currentDirectory->setDirectoryList(nullptr);
 
             delete directory;
         }
@@ -605,43 +585,80 @@ unsigned int INodeSimulation::getNumberOfCurrentlySavedFiles() {
     return m_numberOfFiles;
 }
 
-unsigned int INodeSimulation::getINodeSize() {
-    return m_iNodeSize;
+void INodeSimulation::updateEditableOnContent(Directory *directory) {
+
 }
 
-unsigned int INodeSimulation::getNumberOfINodes() {
-    return m_numberOfBlocksPerINode;
+bool INodeSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
+                                         AbstractFile *file, int size) {
+    return false;
 }
 
-INodeFile* INodeSimulation::convertFatToINode(BSFatFile* bsFatFile, int bsBlockSize) {
-    INode* iNode = new INode(bsFatFile->getSize() / bsBlockSize, 12);
-    int* currentTable = iNode->getAddressPointers();
+//INodeFile* INodeSimulation::convertROMToINode(CDRomDirectory* directoryToCopy, int bsBlockSize) {
+//    INode* iNode = new INode(bsFatFile->getSize() / bsBlockSize);
+//    int* currentTable = iNode->getAddressPointers();
+//
+//    int numberOfBlocks = 0;
+//    int iNodeIndex = 0;
+//    int tableNumber = -2;
+//    BSCluster* currentCluster = bsFatFile->getFirstBlock();
+//
+//    while(currentTable != nullptr && currentCluster != nullptr) {
+//        currentTable[iNodeIndex] = currentCluster->getIndex();
+//        iNodeIndex++;
+//        if(iNodeIndex >= 12) {
+//            iNodeIndex = 0;
+//            if(tableNumber == -2) {
+//                tableNumber++;
+//                currentTable = *iNode->getFirstIndirectPointers();
+//            } else {
+//                tableNumber++;
+//                currentTable = *iNode->getDoubleIndirectPointers()[tableNumber];
+//            }
+//        }
+//        numberOfBlocks++;
+//    }
+//    return new INodeFile(bsFatFile->getName(), bsFatFile->getAttributes(), bsFatFile->getSize(), iNode);
+//}
 
-    int numberOfBlocks = 0;
-    int iNodeIndex = 0;
+void INodeSimulation::copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize){
+//    INodeFile* newFile = convertFatToINode(bsFatFile, 512);
+//    directory->setLastFileOfTheList(newFile);
+    //todo: size etc. in Directories setzen
+}
+
+int *INodeSimulation::getIndexes(INodeFile file) {
+    int numberOfBlocks = ceil((double)file.getSize() / (double)m_blockSize);
+    int* statusIndexes = new int[numberOfBlocks];
+    int* currentTable = file.getINode()->getAddressPointers();
+
+    int navigationIndex = 0;
+    int index = 0;
     int tableNumber = -2;
-    BSCluster* currentCluster = bsFatFile->getFirstBlock();
 
-    while(currentTable != nullptr && currentCluster != nullptr) {
-        currentTable[iNodeIndex] = currentCluster->getIndex();
-        iNodeIndex++;
-        if(iNodeIndex >= 12) {
-            iNodeIndex = 0;
+    while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
+        statusIndexes[index] = currentTable[navigationIndex];
+        index++;
+        navigationIndex++;
+        if(navigationIndex >= 12) {
+            navigationIndex = 0;
             if(tableNumber == -2) {
                 tableNumber++;
-                currentTable = *iNode->getFirstIndirectPointers();
+                currentTable = *file.getINode()->getFirstIndirectPointers();
             } else {
                 tableNumber++;
-                currentTable = *iNode->getDoubleIndirectPointers()[tableNumber];
+                currentTable = *file.getINode()->getDoubleIndirectPointers()[tableNumber];
             }
         }
-        numberOfBlocks++;
     }
-    return new INodeFile(bsFatFile->getName(), bsFatFile->getAttributes(), bsFatFile->getSize(), iNode);
+
+    return statusIndexes;
 }
 
-void INodeSimulation::copyFileFromROM(BSFatFile* bsFatFile, Directory* directory) {
-    INodeFile* newFile = convertFatToINode(bsFatFile, 512);
-    directory->setLastFileOfTheList(newFile);
-    //todo: size etc. in Directories setzen
+char *INodeSimulation::getName() {
+    return m_name;
+}
+
+int *INodeSimulation::searchTablesByIndex(Directory directory, unsigned int index) {
+    return nullptr;
 }
