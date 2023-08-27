@@ -19,7 +19,7 @@
 
 class INodeSimulation{
 public:
-    INodeSimulation(unsigned int blockSize, unsigned int totalSize);
+    INodeSimulation(unsigned int blockSize, unsigned int totalSize, char* name);
 
     Directory* getRootDirectory();
 
@@ -76,6 +76,7 @@ public:
 
 private:
     Directory* m_currentDirectory;
+    char* m_name;
     unsigned int m_blockSize;
     unsigned int m_totalSize;
     unsigned char* m_statusArray;

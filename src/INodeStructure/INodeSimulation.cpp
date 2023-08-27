@@ -11,11 +11,21 @@
 
 
 
-INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize) {
+INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize, char* name) {
+    m_name = name;
+    m_statusArray = new unsigned char[totalSize / blockSize];
     m_blockSize = blockSize;
     m_totalSize = totalSize;
+    m_numberOfFiles = 0;
     m_iNodeSize = 16;
+
+    for (int i = 0; i < (totalSize/blockSize); i++) {
+        m_statusArray[i] = FREE;
+    }
+
     simulate();
+    m_currentDirectory = getRootDirectory();
+    std::cout << m_currentDirectory->getName() << std::endl;
 }
 
 void INodeSimulation::simulate() {
@@ -211,11 +221,24 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
     if(randAccFile) {
         test->setBit(attributesByte, 3);
     }
+
     Directory* directory = m_currentDirectory;
     directory->setLastFileOfTheList(test);
     while (directory->getParentDirectory() != nullptr){
         directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
         directory = directory->getParentDirectory();
+    }
+
+    int numberOfBlocks = size / m_blockSize;
+    unsigned int pos;
+
+    for (int i = 0; i < numberOfBlocks; i++) {
+        pos = (rand() % (m_totalSize / m_blockSize));
+        while (m_statusArray[pos] != FREE) {
+            pos = (rand() % (m_totalSize / m_blockSize));
+        }
+        node->addAddressAtIndex(pos, 12, i);
+        m_statusArray[pos] = OCCUPIED;
     }
 }
 
@@ -282,9 +305,9 @@ void INodeSimulation::createDirectoriesForSim() {
 
     //user-directory Jan
     //      with two subdirectories (Algorithmen und Datenstrukturen)
-    //Subdirectory Algortihmen
+    //Subdirectory Algorithmen
     //      with one file in it
-    //Subdirectory Datenstruktuen
+    //Subdirectory Datenstrukturen
     //      with two files
     char* fileNamesAlgorithmen[] = {"Skript.docx"};
     char* fileNamesDatenstrukturen[] = {"VerketteteListe.pdf", "Schaubild.png"};
@@ -568,7 +591,7 @@ unsigned int INodeSimulation::getTotalSize() {
 }
 
 unsigned int INodeSimulation::getNumberOfFilesThatCanBeSaved() {
-    return m_iNodeSize / m_blockSize;
+    return m_totalSize / m_blockSize;
 }
 
 unsigned int INodeSimulation::getNumberOfCurrentlySavedFiles() {

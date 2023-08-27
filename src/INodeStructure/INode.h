@@ -27,6 +27,8 @@ class INode {
 
         void addAddressAtIndex(int address, int numberOfBlocksPerINode, int index);
 
+        void initINode();
+
 
 private:
         int* addressPointers;

@@ -4,6 +4,7 @@
 
 #include "math.h"
 #include "INode.h"
+#include "iostream"
 
 /**
  *  eine Tabelle hat 12 Blöcke, es sind bis zu 14 Tabellen möglich -> ggf. in numberOfBlocksPerINode setzen
@@ -19,6 +20,7 @@ INode::INode(int numberOfBlocksForFile, int numberOfBlocksPerINode) {
                 doubleIndirectPointers = new int**[12];
             }
         }
+        initINode();
     } else {
         return; //todo
     }
@@ -88,4 +90,22 @@ void INode::addAddressAtIndex(int address, int numberOfBlocksPerINode, int index
         table[index - 12 * (2 + numberOfTable)] = address;
     }
     // bei Fehler log?
+}
+
+void INode::initINode() {
+
+    int tableNumber = -2;
+    int* currentTable = getAddressPointers();
+
+    while (currentTable != nullptr) {
+        for (int i = 0; i < 12; i++) {
+            currentTable[i] = -1;
+        }
+        tableNumber++;
+        if (tableNumber == -1) {
+            currentTable = *getFirstIndirectPointers();
+        } else {
+            currentTable = *getDoubleIndirectPointers()[tableNumber];
+        }
+    }
 }
