@@ -11,7 +11,7 @@ class INode {
 
         //INode();
 
-        int *getAddressPointers() const;
+        int *getAddressPointers();
 
         void setAddressPointers(int *pAddressPointers);
 
@@ -36,7 +36,7 @@ class INode {
         void detectEmptyTables();
 
 private:
-        int* addressPointers;
+        int addressPointers[12];
         int** firstIndirectPointers;
         int*** doubleIndirectPointers;
 };

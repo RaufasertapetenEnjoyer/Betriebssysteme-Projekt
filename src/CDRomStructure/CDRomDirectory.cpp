@@ -3,6 +3,7 @@
 //
 
 #include "CDRomDirectory.h"
+#include <QString>
 
 /**
  * Returns the last element of the list.
@@ -83,7 +84,17 @@ bool CDRomDirectory::isEditable() {
 }
 
 bool CDRomDirectory::testConvention(char *name){
-    return true;
+    QString qName(name);
+    if(qName.contains('.') || qName.contains(',') || qName.contains(':') || qName.contains('!') || qName.contains('?') ||
+       qName.contains('@') || qName.contains('#') || qName.contains('$') || qName.contains('%') || qName.contains('&') ||
+       qName.contains('^') || qName.contains('"') || qName.contains('/') || qName.contains('(') || qName.contains(')')){
+        return false;
+
+    }
+    else{
+        return true;
+    }
 }
+
 
 
