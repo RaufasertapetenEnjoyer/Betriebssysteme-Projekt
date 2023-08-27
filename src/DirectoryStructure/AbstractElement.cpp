@@ -42,6 +42,8 @@ char *AbstractElement::getName() {
 int AbstractElement::setName(char *name) {
 
     if(testConvention(name)){
+        QString qname(name);
+        m_name = new char[qname.length()];
         strcpy(this->m_name, name);
         return 0;
     } else{
