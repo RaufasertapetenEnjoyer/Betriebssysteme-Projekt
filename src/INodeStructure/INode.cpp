@@ -10,8 +10,8 @@
  *  eine Tabelle hat 12 Blöcke, es sind bis zu 14 Tabellen möglich -> ggf. in numberOfBlocksPerINode setzen
  */
 INode::INode(int numberOfBlocksForFile, int numberOfBlocksPerINode) {
+    addressPointers = new int[12];
     if (numberOfBlocksForFile <= numberOfBlocksPerINode * 14) {
-        addressPointers = new int[12];
         firstIndirectPointers = nullptr;
         doubleIndirectPointers = nullptr;
         if (numberOfBlocksForFile > numberOfBlocksPerINode) {
@@ -26,11 +26,11 @@ INode::INode(int numberOfBlocksForFile, int numberOfBlocksPerINode) {
     }
 }
 
-INode::INode() {
+/*INode::INode() {
     addressPointers = nullptr;
     firstIndirectPointers = nullptr;
     doubleIndirectPointers = nullptr;
-}
+}*/
 
 int *INode::getAddressPointers() const {
     return addressPointers;
@@ -56,7 +56,7 @@ void INode::setDoubleIndirectPointers(int ***pDoubleIndirectPointers) {
     INode::doubleIndirectPointers = pDoubleIndirectPointers;
 }
 
-void INode::addAddress(int address, int numberOfBlocksPerINode) {
+void INode::addAddress(int address) {
     int* currentTable = addressPointers;
     int index = 0;
     int currentTableIndex = 0;
@@ -77,7 +77,7 @@ void INode::addAddress(int address, int numberOfBlocksPerINode) {
     currentTable[index % 12] = address;
 }
 
-void INode::addAddressAtIndex(int address, int numberOfBlocksPerINode, int index) {
+void INode::addAddressAtIndex(int address, int index) {
     int* table = addressPointers;
     if(index < 12) {
         table[index] = address;

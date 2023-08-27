@@ -15,7 +15,7 @@ class FileProperties : public QDialog
     Q_OBJECT
 
 public:
-    explicit FileProperties(QWidget *parent = nullptr, AbstractFile *file = nullptr, std::string path = NULL);
+    explicit FileProperties(QWidget *parent = nullptr, AbstractFile *file = nullptr, std::string path = NULL, int platte = 0);
     explicit FileProperties(QWidget *parent = nullptr, CDRomFile *file = nullptr, std::string path = NULL, CDRomSimulation * cd = nullptr);
     ~FileProperties();
     QString getName();

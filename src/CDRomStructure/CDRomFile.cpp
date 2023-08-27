@@ -3,6 +3,8 @@
 //
 
 #include "CDRomFile.h"
+#include "QString"
+#include "QList"
 
 CDRomFile::CDRomFile(char *name, Attributes *attributes, int size, int pos) : AbstractElementCDRom(name, attributes, size) {
     m_firstBlockStatusArray = pos;
@@ -82,6 +84,19 @@ void CDRomFile::setRandAccFile(bool isRandAccFile) {
 }
 
 bool CDRomFile::testConvention(char* name){
+    QString qName(name);
+    QStringList list = qName.split('.');
+    if(list.size()!=2){
+        return false;
+    }
+    int lengthName = list.at(0).length();
+    if(lengthName < 1 || lengthName > 8){
+        return false;
+    }
+    int lengthEnding = list.at(1).length();
+    if(lengthEnding < 1 || lengthEnding > 3){
+        return false;
+    }
     return true;
 }
 

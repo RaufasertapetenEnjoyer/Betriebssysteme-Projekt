@@ -14,12 +14,16 @@
 INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize, char* name) {
     m_name = name;
     m_statusArray = new unsigned char[totalSize / blockSize];
+    std::cout << "create INodeSim" << '\n' << std::endl;
     m_blockSize = blockSize;
     m_totalSize = totalSize;
     m_numberOfFiles = 0;
     m_iNodeSize = 16;
 
+    std::cout << "totalSize" << totalSize << std::endl;
+    std::cout << "blockSize" << blockSize << std::endl;
     for (int i = 0; i < (totalSize/blockSize); i++) {
+        std::cout << "assign to index " << i << std::endl;
         m_statusArray[i] = FREE;
     }
 
@@ -100,7 +104,7 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
             if(m_statusArray[currentPosition] == FREE){
                 m_statusArray[currentPosition] = RESERVED;
                 m_statusArray[currentTable[index]] = FREE;
-                file->getINode()->addAddressAtIndex(currentPosition, 12, index);
+                file->getINode()->addAddressAtIndex(currentPosition, index);
                 m_statusArray[currentPosition] = OCCUPIED;
             }else{
                 while(m_statusArray[currentPosition] == CORRUPTED || m_statusArray[currentPosition] == RESERVED){
@@ -110,7 +114,7 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
                 if(m_statusArray[currentPosition] == FREE){
                     m_statusArray[currentPosition] = RESERVED;
                     m_statusArray[currentTable[index]] = FREE;
-                    file->getINode()->addAddressAtIndex(currentPosition, 12, index);
+                    file->getINode()->addAddressAtIndex(currentPosition, index);
                     m_statusArray[currentPosition] = OCCUPIED;
                 }
 //                else{
@@ -146,9 +150,9 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
     }
 }
 
-float INodeSimulation::getFragmentation(Directory *directory, float fragmentation) {
+void INodeSimulation::getFragmentation(Directory *directory, float& fragmentation) {
     if(directory == nullptr){
-        return 0.0;
+        return;
     }
 
     auto* file = dynamic_cast<INodeFile*>(directory->getFileList());
@@ -187,26 +191,26 @@ float INodeSimulation::getFragmentation(Directory *directory, float fragmentatio
         file = dynamic_cast<INodeFile*>(file->getNextFile());
     }
 
+    fragmentation += sumOfFrag;
     Directory* subDirectory = directory->getSubDirectoryList();
     while(subDirectory != nullptr){
 
-        sumOfFrag += getFragmentation(subDirectory, sumOfFrag);
+        getFragmentation(subDirectory, fragmentation);
         subDirectory = subDirectory->getNextDirectory();
     }
 
-    return (sumOfFrag / (float) m_numberOfFiles);
 }
 
 
 void INodeSimulation::createFile(char *name, bool editable, bool system, bool ascii, bool randAccFile, int size) {
     Attributes* attributes = new Attributes;
-    //attributes->size = size;
     attributes->dateOfCreation = time(nullptr);
     attributes->dateOfLastEdit = time(nullptr);
     char attributesByte[1];
+    int numberOfBlocks = ceil((double)size / (double)m_blockSize);
 
     attributes->attributes = attributesByte;
-    INode* node = new INode;
+    INode* node = new INode(numberOfBlocks,12);
 
     INodeFile* test = new INodeFile(name, attributes, size, node);
     if(editable) {
@@ -224,12 +228,11 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
 
     Directory* directory = m_currentDirectory;
     directory->setLastFileOfTheList(test);
-    while (directory->getParentDirectory() != nullptr){
+    while (directory != nullptr){
         directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
         directory = directory->getParentDirectory();
     }
 
-    int numberOfBlocks = size / m_blockSize;
     unsigned int pos;
 
     for (int i = 0; i < numberOfBlocks; i++) {
@@ -237,9 +240,12 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
         while (m_statusArray[pos] != FREE) {
             pos = (rand() % (m_totalSize / m_blockSize));
         }
-        node->addAddressAtIndex(pos, 12, i);
+        node->addAddress(pos);
         m_statusArray[pos] = OCCUPIED;
     }
+
+    m_numberOfFiles++;
+
 }
 
 void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
@@ -459,7 +465,8 @@ const char *INodeSimulation::getPath() {
     }
     const char* pathAsChar = path.c_str();
 
-    return pathAsChar;}
+    return pathAsChar;
+}
 
 
 void INodeSimulation::freeFileMemory(AbstractFile *file) {

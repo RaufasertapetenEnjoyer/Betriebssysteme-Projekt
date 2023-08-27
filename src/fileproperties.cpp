@@ -14,7 +14,7 @@ bool randAcc;
 bool validName=true;
 bool validSize=true;
 
-FileProperties::FileProperties(QWidget *parent, AbstractFile *file, std::string path) :
+FileProperties::FileProperties(QWidget *parent, AbstractFile *file, std::string path, int platte) :
     QDialog(parent),
     ui(new Ui::FileProperties)
 {
@@ -25,6 +25,7 @@ FileProperties::FileProperties(QWidget *parent, AbstractFile *file, std::string 
     sizeInt = file->getSize();
     path = path + file->getName();
     ui->path->setText(QString::fromStdString(path));
+
 
     ui->checkBox->setChecked(file->isEditable());
     ui->checkBox_2->setChecked(file->isSystem());
@@ -51,14 +52,16 @@ FileProperties::FileProperties(QWidget *parent, AbstractFile *file, std::string 
     ui->editedL->setText(string2);
 
     QString indices("");
-    auto* bsfat = dynamic_cast<BSFatFile*>(file);
-    BSCluster* cluster = bsfat->getFirstBlock();
-    while(cluster->getNextBlock() != nullptr){
+    if(platte == 1){
+        auto* bsfat = dynamic_cast<BSFatFile*>(file);
+        BSCluster* cluster = bsfat->getFirstBlock();
+        while(cluster->getNextBlock() != nullptr){
+            indices.append(QString::number(cluster->getIndex()));
+            indices.append(", ");
+            cluster = cluster->getNextBlock();
+        }
         indices.append(QString::number(cluster->getIndex()));
-        indices.append(", ");
-        cluster = cluster->getNextBlock();
     }
-    indices.append(QString::number(cluster->getIndex()));
     ui->indexL->setText(indices);
 }
 

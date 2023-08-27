@@ -9,7 +9,7 @@ class INode {
     public:
         INode(int numberOfBlocksForFile, int numberOfBlocksPerINode);
 
-        INode();
+        //INode();
 
         int *getAddressPointers() const;
 
@@ -23,9 +23,9 @@ class INode {
 
         void setDoubleIndirectPointers(int ***pDoubleIndirectPointers);
 
-        void addAddress(int address, int numberOfBlocksPerINode);
+        void addAddress(int address);
 
-        void addAddressAtIndex(int address, int numberOfBlocksPerINode, int index);
+        void addAddressAtIndex(int address, int index);
 
         void initINode();
 

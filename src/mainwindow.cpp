@@ -18,7 +18,7 @@
 int platte;
 bool cd = false;
 BSFatSimulation * bsSim = new BSFatSimulation(512, 16384*5,"BsFat-Platte");
-INodeSimulation * inSim = new INodeSimulation(512, 16384*4);
+INodeSimulation * inSim = new INodeSimulation(512, 16384*4,"INode-Platte");
 CDRomSimulation * cdSim = new CDRomSimulation(256, 16384, "Meine CD-Rom", "Songs");
 
 AbstractElementCDRom * copyElement = nullptr;
@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     Dialog *dia = new Dialog(this,bsSim);
     if(dia->exec() == QDialog::Accepted){
         platte = dia->getPlatte();
+        std::cout<<"num of saved files:" <<inSim->getNumberOfCurrentlySavedFiles()<<std::endl;
         reload();
     }
 
@@ -67,7 +68,7 @@ void MainWindow::reload(){
         return;
     }
     float fragmentation = 0.0f;
-    if(platte==1){
+    if(platte == 1){
 
         bsSim->getFragmentation(bsSim->getRootDirectory(), fragmentation);
         d = bsSim->getCurrentDirectory();
@@ -79,16 +80,17 @@ void MainWindow::reload(){
         for (int i = 0; i < bsSim->getNumberOfFilesThatCanBeSaved(); i++) {
             std::cout << bsSim->getStatusArray()[i] << ", ";
         }
-    }else if(platte==2){
-        //fragmentation = inSim->getFragmentation(inSim->getRootDirectory(),0.0)*100;
+    }else if(platte == 2){
+        //inSim->getFragmentation(inSim->getRootDirectory(),fragmentation);
         d = inSim->getCurrentDirectory();
+        /*fragmentation = (fragmentation / (float) inSim->getNumberOfCurrentlySavedFiles())*100;
         std::cout<<"savedFiles:" << inSim->getNumberOfCurrentlySavedFiles()<<std::endl;
         if(inSim->getNumberOfCurrentlySavedFiles()==0){
             fragmentation = 0;
         }
         for (int i = 0; i < inSim->getNumberOfFilesThatCanBeSaved(); i++) {
             std::cout << inSim->getStatusArray()[i] << ", ";
-        }
+        }*/
     }
 
 
@@ -136,6 +138,7 @@ void MainWindow::reload(){
 
 std::string MainWindow::getPath(){
     std::string path = "";
+    Directory* directoryCur;
     if(cd){
         CDRomDirectory * dir = cdSim->getCurrentDirectory();
         while(dir!=nullptr){
@@ -143,15 +146,22 @@ std::string MainWindow::getPath(){
             path = preName + "/" + path;
             dir = dir->getParentDirectory();
         }
-    }else{
-        Directory* directoryCur = bsSim->getCurrentDirectory();
-
+    }else if(platte == 1){
+        directoryCur = bsSim->getCurrentDirectory();
+        while (directoryCur != nullptr){
+            std::string preName = directoryCur->getName();
+            path = preName + "/" + path;
+            directoryCur = directoryCur->getParentDirectory();
+        }
+    }else if(platte == 2){
+        directoryCur = inSim->getCurrentDirectory();
         while (directoryCur != nullptr){
             std::string preName = directoryCur->getName();
             path = preName + "/" + path;
             directoryCur = directoryCur->getParentDirectory();
         }
     }
+
     return path;
 }
 
@@ -234,7 +244,7 @@ void MainWindow::fileProperties(){
     if(cd){
         prop = new FileProperties(this, selectedCDFile, getPath(), cdSim);
     }else{
-        prop = new FileProperties(this, selectedFile, getPath());
+        prop = new FileProperties(this, selectedFile, getPath(), platte);
     }
     if(prop->exec() == QDialog::Accepted){
         std::string name = prop->getName().toStdString();
@@ -514,7 +524,7 @@ void MainWindow::on_pushButton_clicked()
         fragmentation = (fragmentation / (float) bsSim->getNumberOfCurrentlySavedFiles())*100;
     }else{
         inSim->defragmentDisk(inSim->getRootDirectory(), currPos);
-        f = inSim->getFragmentation(inSim->getRootDirectory(),0.0) * 100;
+        /*f = inSim->getFragmentation(inSim->getRootDirectory(),0.0) * 100;*/
     }
 
     std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
@@ -622,7 +632,7 @@ void MainWindow::on_pushButton_3_clicked()
                 bsSim = new BSFatSimulation(512,16384*4,"BsFat-Platte");
            }
            else{
-                inSim = new INodeSimulation(512,16384*4);
+                inSim = new INodeSimulation(512,16384*4,"INode-Platte");
             }
            reload();
     }

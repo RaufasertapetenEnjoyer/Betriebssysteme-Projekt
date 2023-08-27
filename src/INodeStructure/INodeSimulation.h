@@ -27,7 +27,7 @@ public:
 
     void defragmentDisk(Directory *directory, int currentPosition);
 
-    float getFragmentation(Directory* directory, float fragmentation);
+    void getFragmentation(Directory* directory, float& fragmentation);
 
     void createFile(char* name, bool editable, bool system, bool ascii, bool randAccFile, int size);
 
