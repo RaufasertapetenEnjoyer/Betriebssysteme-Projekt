@@ -99,7 +99,7 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
         int index = 0;
         int tableNumber = -2;
 
-        while(currentTable != nullptr && currentTable[index] != -1){
+        while(currentTable != nullptr && currentTable[index] != -1) {
             if(m_statusArray[currentPosition] == FREE){
                 m_statusArray[currentPosition] = RESERVED;
                 m_statusArray[currentTable[index]] = FREE;
@@ -127,12 +127,14 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
             index++;
             if(index >= 12) {
                 index = 0;
-                if(tableNumber == -2) {
+                if(tableNumber == -2 && file->getINode()->getFirstIndirectPointers() != nullptr) {
                     tableNumber++;
                     currentTable = *file->getINode()->getFirstIndirectPointers();
-                } else {
+                } else if (file->getINode()->getDoubleIndirectPointers() != nullptr){
                     tableNumber++;
                     currentTable = *file->getINode()->getDoubleIndirectPointers()[tableNumber];
+                } else {
+                    currentTable = nullptr;
                 }
             }
         }
@@ -172,12 +174,14 @@ void INodeSimulation::getFragmentation(Directory *directory, float& fragmentatio
             index++;
             if(index >= 12) {
                 index = 0;
-                if(tableNumber == -2) {
+                if(tableNumber == -2 && file->getINode()->getFirstIndirectPointers() != nullptr) {
                     tableNumber++;
                     currentTable = *file->getINode()->getFirstIndirectPointers();
-                } else {
+                } else if (file->getINode()->getDoubleIndirectPointers() != nullptr){
                     tableNumber++;
                     currentTable = *file->getINode()->getDoubleIndirectPointers()[tableNumber];
+                } else {
+                    currentTable = nullptr;
                 }
             }
             numberOfBlocks++;
@@ -453,12 +457,14 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
         index++;
         if(index == 12) {
             index = 0;
-            if(tableNumber == -2) {
+            if(tableNumber == -2 && iNodeFile->getINode()->getFirstIndirectPointers() != nullptr) {
                 tableNumber++;
                 currentTable = *iNodeFile->getINode()->getFirstIndirectPointers();
-            } else {
+            } else if (iNodeFile->getINode()->getDoubleIndirectPointers() != nullptr){
                 tableNumber++;
                 currentTable = *iNodeFile->getINode()->getDoubleIndirectPointers()[tableNumber];
+            } else {
+                currentTable = nullptr;
             }
         }
     }
@@ -594,7 +600,7 @@ bool INodeSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSys
     return false;
 }
 
-//INodeFile* INodeSimulation::convertROMToINode(CDRomDirectory* directoryToCopy, int bsBlockSize) {
+INodeFile* INodeSimulation::convertROMToINode(CDRomDirectory* directoryToCopy, int bsBlockSize) {
 //    INode* iNode = new INode(bsFatFile->getSize() / bsBlockSize);
 //    int* currentTable = iNode->getAddressPointers();
 //
@@ -608,18 +614,20 @@ bool INodeSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSys
 //        iNodeIndex++;
 //        if(iNodeIndex >= 12) {
 //            iNodeIndex = 0;
-//            if(tableNumber == -2) {
+//            if(tableNumber == -2 && iNodeFile->getINode()->getFirstIndirectPointers() != nullptr) {
 //                tableNumber++;
 //                currentTable = *iNode->getFirstIndirectPointers();
-//            } else {
+//            } else (iNodeFile->getINode()->getDoubleIndirectPointers() != nullptr){
 //                tableNumber++;
 //                currentTable = *iNode->getDoubleIndirectPointers()[tableNumber];
-//            }
+//            } else {
+//                currentTable = nullptr;
+//            {
 //        }
 //        numberOfBlocks++;
 //    }
 //    return new INodeFile(bsFatFile->getName(), bsFatFile->getAttributes(), bsFatFile->getSize(), iNode);
-//}
+}
 
 void INodeSimulation::copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize){
 //    INodeFile* newFile = convertFatToINode(bsFatFile, 512);
@@ -642,12 +650,14 @@ int *INodeSimulation::getIndexes(INodeFile file) {
         navigationIndex++;
         if(navigationIndex >= 12) {
             navigationIndex = 0;
-            if(tableNumber == -2) {
+            if(tableNumber == -2 && file.getINode()->getFirstIndirectPointers()) {
                 tableNumber++;
                 currentTable = *file.getINode()->getFirstIndirectPointers();
-            } else {
+            } else if (file.getINode()->getDoubleIndirectPointers() != nullptr){
                 tableNumber++;
                 currentTable = *file.getINode()->getDoubleIndirectPointers()[tableNumber];
+            } else {
+                currentTable = nullptr;
             }
         }
     }

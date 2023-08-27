@@ -11,8 +11,9 @@
  */
 INode::INode(int numberOfBlocksForFile) {
     if (numberOfBlocksForFile <= 12 * 14) {
-        firstIndirectPointers = nullptr;
-        doubleIndirectPointers = nullptr;
+        addressPointers = new int[12];
+        *firstIndirectPointers = nullptr;
+        **doubleIndirectPointers = nullptr;
         if (numberOfBlocksForFile > 12) {
             firstIndirectPointers = new int*[12];
             if (numberOfBlocksForFile > 12 * 2) {
@@ -33,24 +34,12 @@ int* INode::getAddressPointers() {
     return addressPointers;
 }
 
-/*void INode::setAddressPointers(int* pAddressPointers) {
-    addressPointers = pAddressPointers;
-}*/
-
 int **INode::getFirstIndirectPointers() const {
     return firstIndirectPointers;
 }
 
-void INode::setFirstIndirectPointers(int **pFirstIndirectPointers) {
-    INode::firstIndirectPointers = pFirstIndirectPointers;
-}
-
 int ***INode::getDoubleIndirectPointers() const {
     return doubleIndirectPointers;
-}
-
-void INode::setDoubleIndirectPointers(int ***pDoubleIndirectPointers) {
-    INode::doubleIndirectPointers = pDoubleIndirectPointers;
 }
 
 void INode::addAddress(int address) {
@@ -92,14 +81,14 @@ void INode::addAddressAtIndex(int address, int index) {
     int* table = addressPointers;
     if(index < 12) {
         table[index] = address;
-    } else if (index < 24) {
+    } else if (index < 24 && firstIndirectPointers != nullptr) {
         table = *firstIndirectPointers;
         table[index-12] = address;
-    } else if (index < 168) {
+    } else if (index < 168 && doubleIndirectPointers != nullptr) {
         int numberOfTable = (int) floor((index - 24) / 12);
         table = *doubleIndirectPointers[numberOfTable];
         table[index - 12 * (2 + numberOfTable)] = address;
-    } else {
+    } else if (index >= 168){
         std::cout << "File is too large." << std::endl;
     }
 }
@@ -119,12 +108,14 @@ void INode::deleteAddressFromIndex(int index) {
         compareIndex++;
         if(navigationIndex >= 12) {
             navigationIndex = 0;
-            if(tableNumber == -2) {
+            if(tableNumber == -2 && firstIndirectPointers != nullptr) {
                 tableNumber++;
                 currentTable = *firstIndirectPointers;
-            } else {
+            } else if(doubleIndirectPointers != nullptr){
                 tableNumber++;
                 currentTable = *doubleIndirectPointers[tableNumber];
+            } else {
+                currentTable = nullptr;
             }
         }
     }

@@ -68,7 +68,7 @@ public:
 
     bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    INodeFile* convertROMToINode(BSFatFile* bsFatFile, int bsBlockSize);
+    INodeFile* convertROMToINode(CDRomDirectory* directoryToCopy, int bsBlockSize);
 
     void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
 
