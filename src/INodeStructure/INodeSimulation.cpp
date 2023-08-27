@@ -97,6 +97,7 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
 
         int numberOfBlocks = 0;
         int index = 0;
+        int navigationIndex = 0;
         int tableNumber = -2;
 
         while(currentTable != nullptr && currentTable[index] != -1) {
@@ -113,7 +114,7 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
                 if(m_statusArray[currentPosition] == FREE){
                     m_statusArray[currentPosition] = RESERVED;
                     m_statusArray[currentTable[index]] = FREE;
-                    file->getINode()->addAddressAtIndex(currentPosition, index);
+                    file->getINode()->addAddressAtIndex(currentPosition, navigationIndex);
                     m_statusArray[currentPosition] = OCCUPIED;
                 }else{
                     if(currentPosition != currentTable[index]){
@@ -122,12 +123,13 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
                             break;
                         }
                         secondCurrent->findAndReplaceAddress(currentPosition, currentTable[index]);
-                        file->getINode()->addAddressAtIndex(currentPosition, index);
+                        file->getINode()->addAddressAtIndex(currentPosition, navigationIndex);
                     }
                 }
             }
             currentPosition++;
             index++;
+            navigationIndex++;
             if(index >= 12) {
                 index = 0;
                 if(tableNumber == -2 && file->getINode()->getFirstIndirectPointers() != nullptr) {
@@ -646,6 +648,7 @@ INode *INodeSimulation::searchINodesByIndex(Directory *directory, unsigned int i
     if(directory == nullptr){
         return nullptr;
     }
+
     auto* current = dynamic_cast<INodeFile*>(directory->getFileList());
 
     while(current != nullptr) {
@@ -656,10 +659,11 @@ INode *INodeSimulation::searchINodesByIndex(Directory *directory, unsigned int i
         }
     }
 
+    INode* target = nullptr;
     Directory* subDirectory = directory->getSubDirectoryList();
-    while(subDirectory != nullptr){
-
-        searchINodesByIndex(subDirectory, index);
+    while(subDirectory != nullptr && target == nullptr){
+        target = searchINodesByIndex(subDirectory, index);
         subDirectory = subDirectory->getNextDirectory();
     }
+    return target;
 }
