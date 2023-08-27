@@ -157,4 +157,92 @@ void INode::detectEmptyTables() {
     }
 }
 
+//void INode::replaceAddressAtIndex(int address, int index) {
+//    int* currentTable = addressPointers;
+//
+//    int navigationIndex = 0;
+//    int compareIndex = 0;
+//    int tableNumber = -2;
+//
+//    if (index < 12) {
+//
+//    }
+//
+//    while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
+//        if(compareIndex >= index) {
+//            currentTable[navigationIndex] = -1;
+//        }
+//        navigationIndex++;
+//        compareIndex++;
+//        if(navigationIndex >= 12) {
+//            navigationIndex = 0;
+//            if(tableNumber == -2 && firstIndirectPointers != nullptr) {
+//                tableNumber++;
+//                currentTable = *firstIndirectPointers;
+//            } else if(doubleIndirectPointers != nullptr){
+//                tableNumber++;
+//                currentTable = *doubleIndirectPointers[tableNumber];
+//            } else {
+//                currentTable = nullptr;
+//            }
+//        }
+//    }
+//}
+
+int *INode::getIndexes() {
+    int numberOfBlocks = getNumberOfBlocks();
+    int* statusIndexes = new int[numberOfBlocks];
+    int* currentTable = addressPointers;
+
+    int navigationIndex = 0;
+    int index = 0;
+    int tableNumber = -2;
+
+    while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
+        statusIndexes[index] = currentTable[navigationIndex];
+        index++;
+        navigationIndex++;
+        if(navigationIndex >= 12) {
+            navigationIndex = 0;
+            if(tableNumber == -2 && firstIndirectPointers != nullptr) {
+                tableNumber++;
+                currentTable = *firstIndirectPointers;
+            } else if (doubleIndirectPointers != nullptr){
+                tableNumber++;
+                currentTable = *doubleIndirectPointers[tableNumber];
+            } else {
+                currentTable = nullptr;
+            }
+        }
+    }
+
+    return statusIndexes;
+}
+
+int INode::getNumberOfBlocks() {
+    int counter = 0;
+    int* currentTable = addressPointers;
+
+    int navigationIndex = 0;
+    int tableNumber = -2;
+
+    while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
+        counter++;
+        navigationIndex++;
+        if(navigationIndex >= 12) {
+            navigationIndex = 0;
+            if(tableNumber == -2 && firstIndirectPointers != nullptr) {
+                tableNumber++;
+                currentTable = *firstIndirectPointers;
+            } else if (doubleIndirectPointers != nullptr){
+                tableNumber++;
+                currentTable = *doubleIndirectPointers[tableNumber];
+            } else {
+                currentTable = nullptr;
+            }
+        }
+    }
+    return counter;
+}
+
 

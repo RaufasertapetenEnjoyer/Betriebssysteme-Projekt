@@ -635,40 +635,10 @@ void INodeSimulation::copyCDRomDirectory(CDRomDirectory* directoryToCopy, const 
     //todo: size etc. in Directories setzen
 }
 
-int *INodeSimulation::getIndexes(INodeFile file) {
-    int numberOfBlocks = ceil((double)file.getSize() / (double)m_blockSize);
-    int* statusIndexes = new int[numberOfBlocks];
-    int* currentTable = file.getINode()->getAddressPointers();
-
-    int navigationIndex = 0;
-    int index = 0;
-    int tableNumber = -2;
-
-    while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
-        statusIndexes[index] = currentTable[navigationIndex];
-        index++;
-        navigationIndex++;
-        if(navigationIndex >= 12) {
-            navigationIndex = 0;
-            if(tableNumber == -2 && file.getINode()->getFirstIndirectPointers()) {
-                tableNumber++;
-                currentTable = *file.getINode()->getFirstIndirectPointers();
-            } else if (file.getINode()->getDoubleIndirectPointers() != nullptr){
-                tableNumber++;
-                currentTable = *file.getINode()->getDoubleIndirectPointers()[tableNumber];
-            } else {
-                currentTable = nullptr;
-            }
-        }
-    }
-
-    return statusIndexes;
-}
-
 char *INodeSimulation::getName() {
     return m_name;
 }
 
-int *INodeSimulation::searchTablesByIndex(Directory directory, unsigned int index) {
+INode *INodeSimulation::searchINodesByIndex(Directory directory, unsigned int index) {
     return nullptr;
 }

@@ -9,8 +9,6 @@ class INode {
     public:
         INode(int numberOfBlocksForFile);
 
-        //INode();
-
         int *getAddressPointers();
 
         int **getFirstIndirectPointers() const;
@@ -28,6 +26,12 @@ class INode {
         void initTable(int* table);
 
         void detectEmptyTables();
+
+//        void replaceAddressAtIndex(int address, int index);
+
+        int* getIndexes();
+
+        int getNumberOfBlocks();
 
 private:
         int* addressPointers;

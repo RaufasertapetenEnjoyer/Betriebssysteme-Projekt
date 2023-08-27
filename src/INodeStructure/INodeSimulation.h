@@ -72,11 +72,9 @@ public:
 
     void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
 
-    int* getIndexes(INodeFile file);
-
     char* getName();
 
-    int* searchTablesByIndex(Directory directory, unsigned int index);
+    INode* searchINodesByIndex(Directory directory, unsigned int index);
 
 private:
     Directory* m_currentDirectory;
