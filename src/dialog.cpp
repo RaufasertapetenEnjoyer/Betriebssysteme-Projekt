@@ -1,7 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-Dialog::Dialog(QWidget *parent, BSFatSimulation * bsFat) :
+Dialog::Dialog(QWidget *parent, BSFatSimulation * bsFat, INodeSimulation * inSim) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
@@ -12,6 +12,13 @@ Dialog::Dialog(QWidget *parent, BSFatSimulation * bsFat) :
     bsFatText.append(QString::number(bsFat->getFreeDiskSpace() * bsFat->getBlockSize()));
     bsFatText.append(" Kilobyte");
     ui->toolButton->setText(bsFatText);
+
+    QString inText("");
+    inText.append(inSim->getName());
+    inText.append(", verfügbarer Speicherplatz: ");
+    inText.append(QString::number(inSim->getFreeDiskSpace() * inSim->getBlockSize()));
+    inText.append(" Kilobyte");
+    ui->toolButton_2->setText(inText);
     setWindowFlags(Qt::Window
         | Qt::WindowMinimizeButtonHint
         | Qt::WindowMaximizeButtonHint);

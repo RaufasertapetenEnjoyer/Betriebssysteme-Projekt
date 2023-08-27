@@ -1,6 +1,7 @@
 #include "fileproperties.h"
 #include "ui_fileproperties.h"
 #include "BSFatStructure/BSFatFile.h"
+#include "INodeStructure/INodeFile.h"
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -61,6 +62,15 @@ FileProperties::FileProperties(QWidget *parent, AbstractFile *file, std::string 
             cluster = cluster->getNextBlock();
         }
         indices.append(QString::number(cluster->getIndex()));
+    }else{
+        auto* inode = dynamic_cast<INodeFile*>(file);
+        int* indexes = inode->getINode()->getIndexes();
+        int length = indexes[0];
+        for(int i=1;i<=length;i++){
+            indices.append(QString::number(indexes[i]));
+            indices.append(", ");
+        }
+
     }
     ui->indexL->setText(indices);
 }

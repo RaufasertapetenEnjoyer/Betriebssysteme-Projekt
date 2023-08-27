@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "BSFatStructure/BSFatSimulation.h"
+#include "INodeStructure/INodeSimulation.h"
 
 namespace Ui {
 class Dialog;
@@ -13,7 +14,7 @@ class Dialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit Dialog(QWidget *parent = nullptr, BSFatSimulation* bsFat = nullptr);
+    explicit Dialog(QWidget *parent = nullptr, BSFatSimulation* bsFat = nullptr, INodeSimulation* inSim = nullptr);
     ~Dialog();
     int getPlatte();
 

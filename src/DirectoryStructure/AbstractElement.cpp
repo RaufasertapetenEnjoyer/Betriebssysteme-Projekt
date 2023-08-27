@@ -1,5 +1,6 @@
 #include "AbstractElement.h"
 #include <cstring>
+#include <QString>
 
 /**
  * Create the object and initialize the name, attributes and the size.
@@ -39,6 +40,7 @@ char *AbstractElement::getName() {
  * @return int error, error indicator: 0 = attribute has been set, 1 = name does not follow the convention
  */
 int AbstractElement::setName(char *name) {
+
     if(testConvention(name)){
         strcpy(this->m_name, name);
         return 0;

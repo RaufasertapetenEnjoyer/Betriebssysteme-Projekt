@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    Dialog *dia = new Dialog(this,bsSim);
+    Dialog *dia = new Dialog(this,bsSim,inSim);
     if(dia->exec() == QDialog::Accepted){
         platte = dia->getPlatte();
         std::cout<<"num of saved files:" <<inSim->getNumberOfCurrentlySavedFiles()<<std::endl;
@@ -81,16 +81,16 @@ void MainWindow::reload(){
             std::cout << bsSim->getStatusArray()[i] << ", ";
         }
     }else if(platte == 2){
-        //inSim->getFragmentation(inSim->getRootDirectory(),fragmentation);
+        inSim->getFragmentation(inSim->getRootDirectory(),fragmentation);
         d = inSim->getCurrentDirectory();
-        /*fragmentation = (fragmentation / (float) inSim->getNumberOfCurrentlySavedFiles())*100;
+        fragmentation = (fragmentation / (float) inSim->getNumberOfCurrentlySavedFiles())*100;
         std::cout<<"savedFiles:" << inSim->getNumberOfCurrentlySavedFiles()<<std::endl;
         if(inSim->getNumberOfCurrentlySavedFiles()==0){
             fragmentation = 0;
         }
         for (int i = 0; i < inSim->getNumberOfFilesThatCanBeSaved(); i++) {
             std::cout << inSim->getStatusArray()[i] << ", ";
-        }*/
+        }
     }
 
 
@@ -522,15 +522,24 @@ void MainWindow::on_pushButton_clicked()
 
         bsSim->getFragmentation(bsSim->getRootDirectory(),fragmentation);
         fragmentation = (fragmentation / (float) bsSim->getNumberOfCurrentlySavedFiles())*100;
+        if(bsSim->getNumberOfCurrentlySavedFiles()==0){
+            fragmentation = 0;
+        }
     }else{
         inSim->defragmentDisk(inSim->getRootDirectory(), currPos);
-        /*f = inSim->getFragmentation(inSim->getRootDirectory(),0.0) * 100;*/
+        inSim->getFragmentation(inSim->getRootDirectory(),fragmentation);
+        fragmentation = (fragmentation / (float) inSim->getNumberOfCurrentlySavedFiles())*100;
+        if(inSim->getNumberOfCurrentlySavedFiles()==0){
+            fragmentation = 0;
+        }
+        for (int i = 0; i < inSim->getNumberOfFilesThatCanBeSaved(); i++) {
+            std::cout << inSim->getStatusArray()[i] << ", ";
+        }
     }
 
     std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
     ui->progressBar->setValue(fragmentation);
 
-    reload();
 
 }
 
@@ -561,6 +570,7 @@ void MainWindow::on_pushButton_4_clicked()
 void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     cd=false;
+    ui->pushButton->setEnabled(true);
     QString path = item->data(0,Qt::UserRole).toString();
     openPath(path);
 
@@ -570,6 +580,7 @@ void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int colu
 void MainWindow::on_pushButton_5_clicked()
 {
         cd=false;
+        ui->pushButton->setEnabled(true);
         QString path = ui->lineEdit->text();
         openPath(path);
 
@@ -625,7 +636,7 @@ void MainWindow::openPath(QString path){
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    Dialog *dia = new Dialog(this,bsSim);
+    Dialog *dia = new Dialog(this,bsSim,inSim);
     if(dia->exec() == QDialog::Accepted){
            platte = dia->getPlatte();
            if(platte == 1){
@@ -642,6 +653,7 @@ void MainWindow::on_pushButton_3_clicked()
 void MainWindow::on_treeWidget_2_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     cd=true;
+    ui->pushButton->setEnabled(false);
     QString path = item->data(0,Qt::UserRole).toString();
     openCDPath(path);
 }
@@ -670,12 +682,14 @@ void MainWindow::openCDPath(QString path){
         if(elements!=nullptr){
             cdSim->setCurrentDirectory(dynamic_cast<CDRomDirectory*>(elements));
             cd=true;
+            ui->pushButton->setEnabled(false);
             reload();
         }
     }else{
         if(elements->getName() == p.at(1)){
             cdSim->setCurrentDirectory(dynamic_cast<CDRomDirectory*>(elements));
             cd=true;
+            ui->pushButton->setEnabled(false);
             reload();
         }else{
             std::cout<<"path wrong or nonexistent"<<std::endl;

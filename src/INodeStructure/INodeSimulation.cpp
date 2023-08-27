@@ -477,9 +477,9 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
     delete iNodeFile->getINode()->getAddressPointers();
     delete iNodeFile->getINode()->getFirstIndirectPointers();
 
-    for (int i = 0; i < 12; i++) {
+    /*for (int i = 0; i < 12; i++) {
         delete *iNodeFile->getINode()->getDoubleIndirectPointers()[i];
-    }
+    }*/
     delete iNodeFile->getINode()->getDoubleIndirectPointers();
 
     delete iNodeFile->getINode();
@@ -662,6 +662,7 @@ INode *INodeSimulation::searchINodesByIndex(Directory *directory, unsigned int i
     INode* target = nullptr;
     Directory* subDirectory = directory->getSubDirectoryList();
     while(subDirectory != nullptr && target == nullptr){
+
         target = searchINodesByIndex(subDirectory, index);
         subDirectory = subDirectory->getNextDirectory();
     }
