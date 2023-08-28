@@ -23,7 +23,6 @@ INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize,
     std::cout << "totalSize" << totalSize << std::endl;
     std::cout << "blockSize" << blockSize << std::endl;
     for (int i = 0; i < (totalSize/blockSize); i++) {
-        std::cout << "assign to index " << i << std::endl;
         m_statusArray[i] = FREE;
     }
 
@@ -105,7 +104,7 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
             if(m_statusArray[currentPosition] == FREE){
                 m_statusArray[currentPosition] = RESERVED;
                 m_statusArray[currentTable[index]] = FREE;
-                file->getINode()->addAddressAtIndex(currentPosition, index);
+                file->getINode()->addAddressAtIndex(currentPosition, navigationIndex);
                 m_statusArray[currentPosition] = OCCUPIED;
             }else{
                 while(m_statusArray[currentPosition] == CORRUPTED || m_statusArray[currentPosition] == RESERVED){
@@ -249,7 +248,7 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
 
 void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
     for (int i = 0; i < length; i++) {
-        createFile(names[i], true, false, true, false, (int) (rand() % 9000 + 1));
+        createFile(names[i], true, false, true, false, (int) (rand() % 25600 + 1));
     }
 }
 
