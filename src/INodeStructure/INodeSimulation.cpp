@@ -7,6 +7,7 @@
 #include "INodeFile.h"
 #include "ctime"
 #include <cstring>
+#include <QString>
 #include "iostream"
 #include "../CDRomStructure/CDRomDirectory.h"
 
@@ -255,22 +256,23 @@ void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
 void INodeSimulation::createDirectoriesForSim() {
     m_currentDirectory = getRootDirectory();
 
-    char* directoryNames[] = {"Michael", "Jan", "Simon", "DigitaleSysteme", "Physik", "Algorithmen", "Datenstrukturen", "Elektrotechnik", "Praktikumsabgaben","Projekt BS", "Links"};
+    char* directoryNames[] = {"Michael", "Jan", "Simon", "DigitaleSysteme", "Physik", "Algorithmen", "Datenstrukturen", "Elektrotechnik", "Praktikumsabgaben", "Links"};
 
     //user-directory Michael
     //      with four files in it (main.c, test.txt and Dokumentation.docx, log.txt)
     //      with two subdirectories (Digitale Systeme and Physik)
     //Subdirectory Digitale Systeme
     //      with two files
+    //      with one subdirectory (Links)
     //Subdirectory Projekt is empty
     //Subdirectory Physik
     //      with one file in it
     char* fileNamesMichael[] =  {"main.c", "test.txt", "Dokumentation.docx", "log.txt"};
     char* fileNameDigitaleSysteme[] = {"Arduino.c", "LineFollower.c"};
     char* fileNamesPhysik[] = {"Diagramme.csv"};
-    Attributes** attributes = new Attributes*[12];
+    Attributes** attributes = new Attributes*[14];
 
-    for(int i=0; i<12; i++){
+    for(int i=0; i<14; i++){
         attributes[i] = new Attributes();
         attributes[i]->dateOfCreation = time(nullptr);
         attributes[i]->dateOfLastEdit = time(nullptr);
@@ -292,7 +294,7 @@ void INodeSimulation::createDirectoriesForSim() {
     //Michael/Digitale Systeme
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
     createFilesForSim(fileNameDigitaleSysteme, 2);
-    m_currentDirectory->createChildDirectory(directoryNames[10], attributes[3]);
+    m_currentDirectory->createChildDirectory(directoryNames[9], attributes[3]);
 
     //Michael/Physik
     m_currentDirectory = m_currentDirectory->getNextDirectory();
@@ -330,7 +332,7 @@ void INodeSimulation::createDirectoriesForSim() {
 
 
     //user-directory Simon
-    //      with two subdirectory (com, bsProjekt)
+    //      with three subdirectories (com, Elektrotechnik, Praktikumsabgaben)
     //Subdirectory com
     //      with one subdirectory (de)
     //Subdirectory de
@@ -350,20 +352,21 @@ void INodeSimulation::createDirectoriesForSim() {
             ->getNextDirectory();
     std::cout<<m_currentDirectory->getName()<<std::endl;
     m_currentDirectory->createChildDirectory(directoryNamesSimon[0], attributes[8]);
-
+    m_currentDirectory->createChildDirectory(directoryNames[7], attributes[9]);
+    m_currentDirectory->createChildDirectory(directoryNames[8], attributes[10]);
 
     //Simon/com
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-    m_currentDirectory->createChildDirectory(directoryNamesSimon[1], attributes[9]);
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[1], attributes[11]);
     std::cout<<m_currentDirectory->getName()<<std::endl;
 
     //Simon/com/de
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-    m_currentDirectory->createChildDirectory(directoryNamesSimon[2], attributes[10]);
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[2], attributes[12]);
 
     //Simon/com/de/bs
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
-    m_currentDirectory->createChildDirectory(directoryNamesSimon[3], attributes[11]);
+    m_currentDirectory->createChildDirectory(directoryNamesSimon[3], attributes[13]);
 
     //Simon/com/de/bs/bsProjekt
     m_currentDirectory = m_currentDirectory->getSubDirectoryList();
@@ -605,39 +608,75 @@ bool INodeSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSys
     return false;
 }
 
-INodeFile* INodeSimulation::convertROMToINode(CDRomDirectory* directoryToCopy, int bsBlockSize) {
-//    INode* iNode = new INode(bsFatFile->getSize() / bsBlockSize);
-//    int* currentTable = iNode->getAddressPointers();
-//
-//    int numberOfBlocks = 0;
-//    int iNodeIndex = 0;
-//    int tableNumber = -2;
-//    BSCluster* currentCluster = bsFatFile->getFirstBlock();
-//
-//    while(currentTable != nullptr && currentCluster != nullptr) {
-//        currentTable[iNodeIndex] = currentCluster->getIndex();
-//        iNodeIndex++;
-//        if(iNodeIndex >= 12) {
-//            iNodeIndex = 0;
-//            if(tableNumber == -2 && iNodeFile->getINode()->getFirstIndirectPointers() != nullptr) {
-//                tableNumber++;
-//                currentTable = *iNode->getFirstIndirectPointers();
-//            } else (iNodeFile->getINode()->getDoubleIndirectPointers() != nullptr){
-//                tableNumber++;
-//                currentTable = *iNode->getDoubleIndirectPointers()[tableNumber];
-//            } else {
-//                currentTable = nullptr;
-//            {
-//        }
-//        numberOfBlocks++;
-//    }
-//    return new INodeFile(bsFatFile->getName(), bsFatFile->getAttributes(), bsFatFile->getSize(), iNode);
+void INodeSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize){
+    int numberOfBlocksForINode = ceil((double) cdRomFile->getSize() / (double) m_blockSize);
+    int numberOfBlocksForCDRom = ceil((double) cdRomFile->getSize() / (double) cdRomBlockSize);
+
+    if(numberOfBlocksForINode <= getFreeDiskSpace()){
+        //Copy name
+        QString name(cdRomFile->getName());
+        char *nameOfFile = new char[name.length()];
+        strcpy(nameOfFile, cdRomFile->getName());
+        //Copy attributes
+        Attributes* attributesOfFile = new Attributes();
+        memccpy(attributesOfFile, cdRomFile->getAttributes(),1, sizeof(Attributes));
+
+        INode* newNode= new INode(numberOfBlocksForINode);
+
+        int stagedBlocksOfCDRom = 0;
+        int counter = 0;
+        int length = numberOfBlocksForINode + cdRomFile->getFirstBlock();
+
+        for (int i = cdRomFile->getFirstBlock(); i <= length; i++) {
+            stagedBlocksOfCDRom++;
+            if(stagedBlocksOfCDRom * cdRomBlockSize == m_blockSize || (i == length)){
+
+                unsigned int pos;
+                pos = (rand() % (m_totalSize / m_blockSize));
+                while (m_statusArray[pos] != FREE) {
+                    pos = (rand() % (m_totalSize / m_blockSize));
+                }
+                newNode->addAddressAtIndex(pos, i);
+                m_statusArray[pos] = OCCUPIED;
+
+                stagedBlocksOfCDRom = 0;
+            }
+        }
+        auto* copiedFile = new INodeFile(nameOfFile, attributesOfFile, cdRomFile->getSize(), newNode);
+        auto* file = dynamic_cast<AbstractFile*>(copiedFile);
+        m_currentDirectory->createChildFile(file);
+        m_numberOfFiles++;
+    }
 }
 
 void INodeSimulation::copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize){
-//    INodeFile* newFile = convertFatToINode(bsFatFile, 512);
-//    directory->setLastFileOfTheList(newFile);
-    //todo: size etc. in Directories setzen
+    if(directoryToCopy == nullptr){
+        return;
+    }
+    QString name(directoryToCopy->getName());
+    char* nameOfDirectory = new char[name.length()];
+    strcpy(nameOfDirectory, directoryToCopy->getName());
+
+    Attributes* attributesOfDirectory = new Attributes();
+    memccpy(attributesOfDirectory, directoryToCopy->getAttributes(), 1, sizeof(Attributes));
+
+    createDirectory(nameOfDirectory, attributesOfDirectory);
+
+    m_currentDirectory = m_currentDirectory->getLastDirectoryOfTheList();
+    std::cout<<"curr Dir:"<<m_currentDirectory->getName()<<std::endl;
+
+    AbstractElementCDRom* element = directoryToCopy->getList();
+    while(element != nullptr){
+        if(dynamic_cast<CDRomDirectory*>(element)){
+            auto* directory = dynamic_cast<CDRomDirectory*>(element);
+            copyCDRomDirectory(directory, cdRomBlockSize);
+        } else{
+            auto* file = dynamic_cast<CDRomFile*>(element);
+            copyCDRomFile(file, cdRomBlockSize);
+        }
+        element = element->getNextElement();
+    }
+    m_currentDirectory = m_currentDirectory->getParentDirectory();
 }
 
 char *INodeSimulation::getName() {

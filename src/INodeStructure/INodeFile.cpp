@@ -6,8 +6,9 @@
 #include "INode.h"
 #include "iostream"
 
-INodeFile::INodeFile(char *name, Attributes *attributes, int size, INode *iNode) : AbstractFile(name, attributes, size),
-                                                                                   iNode(iNode) {}
+INodeFile::INodeFile(char *name, Attributes *attributes, int size, INode *iNode) : AbstractFile(name, attributes, size){
+    this->iNode = iNode;
+}
 
 INode *INodeFile::getINode() const {
     return iNode;
@@ -16,4 +17,3 @@ INode *INodeFile::getINode() const {
 void INodeFile::setINode(INode *iNode) {
     INodeFile::iNode = iNode;
 }
-
