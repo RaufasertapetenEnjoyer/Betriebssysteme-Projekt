@@ -11,9 +11,9 @@ class INode {
 
         int *getAddressPointers();
 
-        int **getFirstIndirectPointers() const;
+        int *getFirstIndirectPointers() const;
 
-        int ***getDoubleIndirectPointers() const;
+        int **getDoubleIndirectPointers() const;
 
         void addAddress(int address);
 
@@ -36,9 +36,9 @@ class INode {
         int getNumberOfBlocks();
 
 private:
-        int* addressPointers;
-        int** firstIndirectPointers;
-        int*** doubleIndirectPointers;
+        int m_addressPointers[12];
+        int* m_firstIndirectPointers;
+        int** m_secondIndirectPointers;
 };
 
 

@@ -135,10 +135,10 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
                 index = 0;
                 if(tableNumber == -2 && file->getINode()->getFirstIndirectPointers() != nullptr) {
                     tableNumber++;
-                    currentTable = *file->getINode()->getFirstIndirectPointers();
+                    currentTable = file->getINode()->getFirstIndirectPointers();
                 } else if (file->getINode()->getDoubleIndirectPointers() != nullptr){
                     tableNumber++;
-                    currentTable = *file->getINode()->getDoubleIndirectPointers()[tableNumber];
+                    currentTable = file->getINode()->getDoubleIndirectPointers()[tableNumber];
                 } else {
                     currentTable = nullptr;
                 }
@@ -182,10 +182,10 @@ void INodeSimulation::getFragmentation(Directory *directory, float& fragmentatio
                 index = 0;
                 if(tableNumber == -2 && file->getINode()->getFirstIndirectPointers() != nullptr) {
                     tableNumber++;
-                    currentTable = *file->getINode()->getFirstIndirectPointers();
+                    currentTable = file->getINode()->getFirstIndirectPointers();
                 } else if (file->getINode()->getDoubleIndirectPointers() != nullptr){
                     tableNumber++;
-                    currentTable = *file->getINode()->getDoubleIndirectPointers()[tableNumber];
+                    currentTable = file->getINode()->getDoubleIndirectPointers()[tableNumber];
                 } else {
                     currentTable = nullptr;
                 }
@@ -467,10 +467,10 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
             index = 0;
             if(tableNumber == -2 && iNodeFile->getINode()->getFirstIndirectPointers() != nullptr) {
                 tableNumber++;
-                currentTable = *iNodeFile->getINode()->getFirstIndirectPointers();
+                currentTable = iNodeFile->getINode()->getFirstIndirectPointers();
             } else if (iNodeFile->getINode()->getDoubleIndirectPointers() != nullptr){
                 tableNumber++;
-                currentTable = *iNodeFile->getINode()->getDoubleIndirectPointers()[tableNumber];
+                currentTable = iNodeFile->getINode()->getDoubleIndirectPointers()[tableNumber];
             } else {
                 currentTable = nullptr;
             }
