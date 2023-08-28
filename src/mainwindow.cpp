@@ -18,7 +18,7 @@
 int platte;
 bool cd = false;
 BSFatSimulation * bsSim = new BSFatSimulation(512, 16384*5,"BsFat-Platte");
-INodeSimulation * inSim = new INodeSimulation(512, 16384*4,"INode-Platte");
+INodeSimulation * inSim = new INodeSimulation(512, 16384*50,"INode-Platte");
 CDRomSimulation * cdSim = new CDRomSimulation(256, 16384, "Meine CD-Rom", "Songs");
 
 AbstractElementCDRom * copyElement = nullptr;

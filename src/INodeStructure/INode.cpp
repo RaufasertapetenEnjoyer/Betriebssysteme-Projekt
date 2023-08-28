@@ -15,18 +15,20 @@ INode::INode(int numberOfBlocksForFile) {
         firstIndirectPointers = nullptr;
         doubleIndirectPointers = nullptr;
         if (numberOfBlocksForFile > 12) {
-            firstIndirectPointers = new int*[12];
+            int* newTable = new int[12];
+            firstIndirectPointers = &newTable;
             if (numberOfBlocksForFile > 12 * 2) {
                 int*** emptyArray = new int**[12];
                 for (int i = 0; i < 12; i++) {
-                    emptyArray[i] = new int*[12];
+                    int* anotherNewTable = new int[12];
+                    emptyArray[i] = &anotherNewTable;
                 }
                 doubleIndirectPointers = emptyArray;
             }
         }
         initINode();
     } else {
-        return; //todo
+        return;
     }
 }
 

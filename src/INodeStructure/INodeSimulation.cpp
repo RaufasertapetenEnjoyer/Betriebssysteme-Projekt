@@ -249,7 +249,7 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
 
 void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
     for (int i = 0; i < length; i++) {
-        createFile(names[i], true, false, true, false, (int) (rand() % 2100 + 1));
+        createFile(names[i], true, false, true, false, (int) (rand() % 9000 + 1));
     }
 }
 
@@ -636,7 +636,7 @@ void INodeSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
                 while (m_statusArray[pos] != FREE) {
                     pos = (rand() % (m_totalSize / m_blockSize));
                 }
-                newNode->addAddressAtIndex(pos, i);
+                newNode->addAddress(pos);
                 m_statusArray[pos] = OCCUPIED;
 
                 stagedBlocksOfCDRom = 0;
