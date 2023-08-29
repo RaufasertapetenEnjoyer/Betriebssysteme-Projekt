@@ -227,9 +227,9 @@ void INode::findAndReplaceAddress(int oldAddress, int newAddress) {
 /**
  * traverses the INode looking for the given address
  * @param address
- * @return success if address is found
+ * @return int* pointer on entry of address
  */
-bool INode::checkIfAddressExists(int address) {
+int* INode::checkIfAddressExists(int address) {
     int* currentTable = m_addressPointers;
 
     int navigationIndex = 0;
@@ -237,7 +237,7 @@ bool INode::checkIfAddressExists(int address) {
 
     while(currentTable != nullptr && currentTable[navigationIndex] != -1) {
         if (currentTable[navigationIndex] == address) {
-            return true;
+            return &currentTable[navigationIndex];
         }
         navigationIndex++;
         if(navigationIndex >= 12) {
@@ -253,7 +253,7 @@ bool INode::checkIfAddressExists(int address) {
             }
         }
     }
-    return false;
+    return nullptr;
 }
 
 /**

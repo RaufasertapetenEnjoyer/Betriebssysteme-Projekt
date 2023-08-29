@@ -35,7 +35,7 @@ class INode {
 
         void findAndReplaceAddress(int oldAddress, int newAddress);
 
-        bool checkIfAddressExists(int address);
+        int* checkIfAddressExists(int address);
 
         int* getIndexes();
 
