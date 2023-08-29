@@ -1,8 +1,22 @@
 #include "DirectProperties.h"
 #include "ui_directProperties.h"
 
+/**
+ * @brief dirName
+ */
 QString dirName;
+
+/**
+ * @brief dirEditable
+ */
 bool dirEditable = false;
+
+/**
+ * @brief directProperties::directProperties constructor for direcory
+ * @param QWidget *parent (=mainWindow)
+ * @param Directoy *dir
+ * @param std::string path
+ */
 directProperties::directProperties(QWidget *parent, Directory *dir, std::string path) :
     QDialog(parent),
     ui(new Ui::directProperties)
@@ -37,6 +51,12 @@ directProperties::directProperties(QWidget *parent, Directory *dir, std::string 
     ui->editedL->setText(string2);
 }
 
+/**
+ * @brief directProperties::directProperties Constructor for CDRomDirectory
+ * @param QWidget* parent (=mainWindow)
+ * @param CDRomDirectory *dir
+ * @param std::string path
+ */
 directProperties::directProperties(QWidget *parent, CDRomDirectory *dir, std::string path) :
     QDialog(parent),
     ui(new Ui::directProperties)
@@ -83,21 +103,36 @@ directProperties::~directProperties()
     delete ui;
 }
 
+/**
+ * @brief change name on textchange
+ * @param arg1
+ */
 void directProperties::on_nameEd_textChanged(const QString &arg1)
 {
     dirName= arg1;
 }
 
-
+/**
+ * @brief change edit on checkboxsignal
+ * @param arg1
+ */
 void directProperties::on_checkBox_stateChanged(int arg1)
 {
     dirEditable = arg1;
 }
 
+/**
+ * @brief directProperties::getName
+ * @return QString name
+ */
 QString directProperties::getName(){
     return dirName;
 }
 
+/**
+ * @brief directProperties::getEditable
+ * @return bool editable
+ */
 bool directProperties::getEditable(){
     return dirEditable;
 }

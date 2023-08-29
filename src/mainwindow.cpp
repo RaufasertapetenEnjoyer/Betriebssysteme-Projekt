@@ -142,7 +142,7 @@ void MainWindow::reload(){
 
 
     std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
-
+    fragmentation = round(fragmentation);
     ui->progressBar->setValue(fragmentation);
 
     AbstractFile * file = d->getFileList();
@@ -289,14 +289,20 @@ void MainWindow::buildCDTree(CDRomDirectory * dir, QTreeWidgetItem *parent){
  * @brief opens delete file dialog/deletes file
 */
 void MainWindow::deleteFile(){
+    bool success = false;
     DeleteFile *deleteDia = new DeleteFile(this);
     if(deleteDia->exec() == QDialog::Accepted){
         if(platte==1){
-            bsSim->deleteFile(selectedFile);
+            success = bsSim->deleteFile(selectedFile);
         }else{
-            inSim->deleteFile(selectedFile);
+            success = inSim->deleteFile(selectedFile);
         }
-        ui->terminal->append("File successfully deleted!");
+        if(success){
+           ui->terminal->append("File successfully deleted!");
+        }else{
+            ui->terminal->append("!!File could not be deleted!!");
+        }
+
         reload();
     }
 }
@@ -319,6 +325,7 @@ void MainWindow::fileProperties(){
         if(cd){
 
         }else if(platte==1){
+
             std::cout<<"Update Values: "<<nameP<<" "<<prop->getSize()<<" "<<prop->getEditable()<<" "<<prop->getSystem()<<" "<<prop->getAscii()<<" "<<prop->getRandomAccess()<<std::endl;
             if(bsSim->checkIfEditIsValid(nameP,prop->getEditable(),prop->getSystem(),prop->getAscii(),prop->getRandomAccess(),selectedFile,prop->getSize())){
                 bsSim->updateFile(nameP,prop->getEditable(),prop->getSystem(),prop->getAscii(),prop->getRandomAccess(),selectedFile,prop->getSize());
@@ -655,6 +662,7 @@ void MainWindow::on_pushButton_clicked()
     }
 
     std::cout<<"Fragmentierung post de-:" << fragmentation<<std::endl;
+    fragmentation = round(fragmentation);
     ui->progressBar->setValue(fragmentation);
 
 
@@ -769,6 +777,7 @@ void MainWindow::openPath(QString path){
 void MainWindow::on_pushButton_3_clicked()
 {
     mbr = new MBR();
+    std::cout<<"new mbr"<<std::endl;
     Dialog *dia = new Dialog(this,mbr->getBsFat(),mbr->getINode());
     if(dia->exec() == QDialog::Accepted){
            platte = dia->getPlatte();

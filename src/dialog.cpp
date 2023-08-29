@@ -1,6 +1,12 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
+/**
+ * @brief Dialog::Dialog
+ * @param QWidget * parent (=mainWindow)
+ * @param BSFatSimulation *bsFat
+ * @param INodeSimulation *inSim
+ */
 Dialog::Dialog(QWidget *parent, BSFatSimulation * bsFat, INodeSimulation * inSim) :
     QDialog(parent),
     ui(new Ui::Dialog)
@@ -29,12 +35,20 @@ Dialog::~Dialog()
     delete ui;
 }
 
-
+/**
+ * @brief option 1 is selected
+ */
 bool op1= false;
+
+/**
+ * @brief option 2 is selected
+ */
 bool op2= false;
 
 
-
+/**
+ * @brief change selected on button click
+ */
 void Dialog::on_toolButton_clicked()
 {
     ui->toolButton->setStyleSheet("border: 2px solid green");
@@ -44,7 +58,9 @@ void Dialog::on_toolButton_clicked()
     ui->buttonBox->setDisabled(false);
 }
 
-
+/**
+ * @brief change selected on button click
+ */
 void Dialog::on_toolButton_2_clicked()
 {
     ui->toolButton_2->setStyleSheet("border: 2px solid green");
@@ -54,6 +70,10 @@ void Dialog::on_toolButton_2_clicked()
     ui->buttonBox->setDisabled(false);
 }
 
+/**
+ * @brief Dialog::getPlatte
+ * @return chosenPlatte
+ */
 int Dialog::getPlatte(){
     if(op1){
         return 1;

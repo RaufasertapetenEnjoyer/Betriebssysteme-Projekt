@@ -481,10 +481,11 @@ BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned
 /**
  * Deletes the given file from the current directory.
  * @param AbstractFile* file
+ * @return bool success
  */
-void BSFatSimulation::deleteFile(AbstractFile *file) {
+bool BSFatSimulation::deleteFile(AbstractFile *file) {
     if(file->isSystem()){
-         return;
+         return false;
     }
     if(file->getNextFile() == nullptr && file->getPrevFile() != nullptr){
         AbstractFile* prevFile = file->getPrevFile();
@@ -524,6 +525,8 @@ void BSFatSimulation::deleteFile(AbstractFile *file) {
         freeFileMemory(file);
 
         delete file;
+    }else{
+        return false;
     }
     Directory* directory = m_currentDirectory;
     while(directory != nullptr){
@@ -531,12 +534,7 @@ void BSFatSimulation::deleteFile(AbstractFile *file) {
         directory = directory->getParentDirectory();
     }
     m_numberOfFiles--;
-    AbstractFile *test = m_currentDirectory->getFileList();
-    while(test != nullptr){
-        std::cout<<test->getName()<<", ";
-        test = test->getNextFile();
-    }
-    std::cout<<std::endl;
+    return true;
 }
 
 /**
@@ -597,8 +595,9 @@ bool BSFatSimulation::deleteDirectory(Directory *directory) {
  * @param bool isRamFile
  * @param AbstractFile* file
  * @param int size
+ * @return bool success
  */
-void BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
+bool BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
                                  AbstractFile *file, int size) {//evtl. ausgaben oder ähnliches nötig
     if(file->isEditable()){
         if(!file->isSystem()){
@@ -649,7 +648,12 @@ void BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, boo
                 file->tstBit(file->getAttributes()->attributes, 3) ? file->clrBit(file->getAttributes()->attributes, 3) : file->setBit(file->getAttributes()->attributes, 3);
             }
             file->getAttributes()->dateOfLastEdit = time(nullptr);
-        }      
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
     }
 }
 

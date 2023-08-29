@@ -164,12 +164,9 @@ void INode::initINode() {
             currentTable[i] = -1;
         }
         tableNumber++;
-        if (tableNumber >= 12) {
-            currentTable = nullptr;
-        }
         if (tableNumber == -1 && m_firstIndirectPointers != nullptr) {
             currentTable = m_firstIndirectPointers;
-        } else if(tableNumber > 0 && tableNumber < 12 && m_secondIndirectPointers != nullptr) {
+        } else if(tableNumber >= 0 && tableNumber < 12 && m_secondIndirectPointers != nullptr) {
             currentTable = m_secondIndirectPointers[tableNumber];
         }else {
             currentTable = nullptr;

@@ -292,7 +292,7 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
  */
 void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
     for (int i = 0; i < length; i++) {
-        createFile(names[i], true, false, true, false, (int) (rand() % 25600 + 1));
+        createFile(names[i], true, false, true, false, (int) (rand() % 13000 + 1));
     }
 }
 
@@ -556,13 +556,17 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
         }
     }
 
-    delete iNodeFile->getINode()->getAddressPointers();
-    delete iNodeFile->getINode()->getFirstIndirectPointers();
+    //einzelnes Löschen aller attribute führt zu error
 
-    /*for (int i = 0; i < 12; i++) {
-        delete *iNodeFile->getINode()->getDoubleIndirectPointers()[i];
+    /*delete iNodeFile->getINode()->getAddressPointers();
+    if(iNodeFile->getINode()->getFirstIndirectPointers() != nullptr){
+        delete iNodeFile->getINode()->getFirstIndirectPointers();
+        if(iNodeFile->getINode()->getDoubleIndirectPointers() != nullptr){
+           delete iNodeFile->getINode()->getDoubleIndirectPointers();
+        }
     }*/
-    delete iNodeFile->getINode()->getDoubleIndirectPointers();
+
+
 
     delete iNodeFile->getINode();
     iNodeFile->setINode(nullptr);
@@ -572,8 +576,11 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
  * Deletes the given file from the current directory.
  * @param AbstractFile* file
  */
-void INodeSimulation::deleteFile(AbstractFile *file) {
-    std::cout<<file->getName()<<std::endl;
+
+bool INodeSimulation::deleteFile(AbstractFile *file) {
+    if(file->isSystem()){
+        return false;
+    }
     if(file->getNextFile() == nullptr && file->getPrevFile() != nullptr){
         AbstractFile* prevFile = file->getPrevFile();
         prevFile->setNextFile(nullptr);
@@ -612,8 +619,16 @@ void INodeSimulation::deleteFile(AbstractFile *file) {
         freeFileMemory(file);
 
         delete file;
+    }else{
+        return false;
+    }
+    Directory* directory = m_currentDirectory;
+    while(directory != nullptr){
+        directory->setNumberOfFiles(directory->getNumberOfFiles() - 1);
+        directory = directory->getParentDirectory();
     }
     m_numberOfFiles--;
+    return true;
 }
 
 /**

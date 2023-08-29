@@ -30,7 +30,7 @@ public:
 
     void createDirectory(char* name, Attributes* attributes);
 
-    void updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
+    bool updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
     bool updateDirectory(char* name, bool isEditable, Directory* directory);
 
@@ -40,7 +40,7 @@ public:
 
     void freeFileMemory(AbstractFile* file);
 
-    void deleteFile(AbstractFile* file);
+    bool deleteFile(AbstractFile* file);
 
     bool deleteDirectory(Directory *directory);
 

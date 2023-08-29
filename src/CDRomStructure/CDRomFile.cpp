@@ -83,6 +83,11 @@ void CDRomFile::setRandAccFile(bool isRandAccFile) {
     isRandAccFile ? setBit(getAttributes()->attributes, 3) : clrBit(getAttributes()->attributes, 3);
 }
 
+/**
+ * @brief tests if name fulfills naming convention
+ * @param char* name
+ * @return bool fulfillsConvention
+ */
 bool CDRomFile::testConvention(char* name){
     QString qName(name);
     QStringList list = qName.split('.');

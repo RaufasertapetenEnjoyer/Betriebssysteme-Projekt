@@ -83,6 +83,11 @@ bool CDRomDirectory::isEditable() {
     return tstBit(getAttributes()->attributes, 0);
 }
 
+/**
+ * @brief tests for illegal special characaters
+ * @param char* name
+ * @return bool fulfillsConvention
+ */
 bool CDRomDirectory::testConvention(char *name){
     QString qName(name);
     if(qName.contains('.') || qName.contains(',') || qName.contains(':') || qName.contains('!') || qName.contains('?') ||

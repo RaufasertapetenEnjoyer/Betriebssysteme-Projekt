@@ -49,7 +49,7 @@ public:
 
     void freeFileMemory(AbstractFile* file);
 
-    void deleteFile(AbstractFile* file);
+    bool deleteFile(AbstractFile* file);
 
     bool deleteDirectory(Directory *directory);
 

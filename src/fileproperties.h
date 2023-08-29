@@ -38,8 +38,6 @@ private slots:
 
     void on_checkBox_4_stateChanged(int arg1);
 
-    void on_buttonBox_accepted();
-
 private:
     Ui::FileProperties *ui;
     bool nameIsNotEmpty();
