@@ -6,7 +6,7 @@
 #include "cmath"
 
 /**
- * Profs whether a pointer of type T is also convertable to a pointer of type Base.
+ * Checks whether a pointer of type T is also convertable to a pointer of type Base.
  * @tparam Base typename , the type you want to check whether it is an instance of
  * @tparam T typename , the current type the pointer is in
  * @param T* ptr, the pointer you want to check
@@ -21,7 +21,6 @@ struct Attributes{
     time_t dateOfCreation;
     time_t dateOfLastEdit;
     char* attributes;
-    //int size;
 };
 
 
