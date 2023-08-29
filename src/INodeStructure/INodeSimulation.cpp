@@ -296,7 +296,7 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
  */
 void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
     for (int i = 0; i < length; i++) {
-        createFile(names[i], true, false, true, false, (int) (rand() % 25600 + 1));
+        createFile(names[i], true, false, true, false, (int) (rand() % 13000 + 1));
     }
 }
 
