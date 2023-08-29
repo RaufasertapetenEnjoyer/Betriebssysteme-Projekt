@@ -660,6 +660,7 @@ void MainWindow::on_pushButton_clicked()
             std::cout << inSim->getStatusArray()[i] << ", ";
         }
     }
+    ui->terminal->append("Successfully executed defragmentation");
 
     std::cout<<"Fragmentierung post de-:" << fragmentation<<std::endl;
     fragmentation = round(fragmentation);
