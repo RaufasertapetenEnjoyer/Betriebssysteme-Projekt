@@ -218,7 +218,11 @@ void INodeSimulation::getFragmentation(Directory *directory, float& fragmentatio
                     currentTable = file->getINode()->getFirstIndirectPointers();
                 } else if (file->getINode()->getDoubleIndirectPointers() != nullptr){
                     tableNumber++;
-                    currentTable = file->getINode()->getDoubleIndirectPointers()[tableNumber];
+                    if (tableNumber < 12) {
+                        currentTable = currentTable = file->getINode()->getDoubleIndirectPointers()[tableNumber];
+                    } else {
+                        currentTable = nullptr;
+                    }
                 } else {
                     currentTable = nullptr;
                 }
@@ -534,7 +538,6 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
     INodeFile* iNodeFile = dynamic_cast<INodeFile*>(file);
 
     int* currentTable = iNodeFile->getINode()->getAddressPointers();
-    int* prevTable;
 
     int index = 0;
     int tableNumber = -2;
@@ -549,7 +552,11 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
                 currentTable = iNodeFile->getINode()->getFirstIndirectPointers();
             } else if (iNodeFile->getINode()->getDoubleIndirectPointers() != nullptr){
                 tableNumber++;
-                currentTable = iNodeFile->getINode()->getDoubleIndirectPointers()[tableNumber];
+                if (tableNumber < 12) {
+                    currentTable = currentTable = iNodeFile->getINode()->getDoubleIndirectPointers()[tableNumber];
+                } else {
+                    currentTable = nullptr;
+                }
             } else {
                 currentTable = nullptr;
             }
