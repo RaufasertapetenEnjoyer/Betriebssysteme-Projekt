@@ -17,7 +17,7 @@ public:
     Directory* getLastDirectoryOfTheList();
     void setLastDirectoryOfTheList(Directory* directoryToSet);
 
-    AbstractFile* getLastFileOfTheList(); // can be deleteted
+    AbstractFile* getLastFileOfTheList(); // can be deleted
     void setLastFileOfTheList(AbstractFile* fileToSet);
 
     Directory* getParentDirectory();

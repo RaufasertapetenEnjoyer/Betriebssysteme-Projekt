@@ -21,7 +21,7 @@ private:
     /**
      * The INode belonging to the file
      */
-    INode* iNode;
+    INode* m_INode;
 
 };
 

@@ -13,15 +13,15 @@
  * @param iNode
  */
 INodeFile::INodeFile(char *name, Attributes *attributes, int size, INode *iNode) : AbstractFile(name, attributes, size){
-    this->iNode = iNode;
+    this->m_INode = iNode;
 }
 
 /**
  * Returns the INode that belongs to the file
- * @return INode* iNode
+ * @return INode* m_INode
  */
 INode *INodeFile::getINode() const {
-    return iNode;
+    return m_INode;
 }
 
 /**
@@ -29,5 +29,5 @@ INode *INodeFile::getINode() const {
  * @param iNode
  */
 void INodeFile::setINode(INode *iNode) {
-    INodeFile::iNode = iNode;
+    INodeFile::m_INode = iNode;
 }
