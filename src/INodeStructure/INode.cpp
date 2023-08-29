@@ -74,7 +74,7 @@ void INode::addAddress(int address) {
                 currentTable = m_firstIndirectPointers;
         }
         if(index >= 24) {
-            if(index >= 12 * 14) {
+            if(index >= (12 * 14)) {
                 std::cout << "File cannot be larger." << std::endl;
                 return;
             } else {
@@ -85,8 +85,13 @@ void INode::addAddress(int address) {
                         m_secondIndirectPointers[i] = anotherNewTable;
                     }
                 }
-                currentTable = m_secondIndirectPointers[currentTableIndex];
+                if (currentTableIndex < 12) {
+                    currentTable = m_secondIndirectPointers[currentTableIndex];
+                } else {
+                    std::cout << "File cannot be larger." << std::endl;
+                }
                 currentTableIndex = floor((index - 24) / 12.0);
+                std::cout << currentTableIndex << std::endl;
             }
         }
     }
