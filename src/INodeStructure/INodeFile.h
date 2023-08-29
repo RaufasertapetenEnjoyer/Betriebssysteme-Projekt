@@ -18,7 +18,10 @@ public:
     void setINode(INode *iNode);
 
 private:
-        INode* iNode;
+    /**
+     * The INode belonging to the file
+     */
+    INode* iNode;
 
 };
 

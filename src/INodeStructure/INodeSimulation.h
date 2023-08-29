@@ -13,6 +13,9 @@
 #include "INodeFile.h"
 #include "../CDRomStructure/CDRomDirectory.h"
 
+/**
+ * blocks in the statusArray are always in one of the following four states
+ */
 #define RESERVED 'R'
 #define CORRUPTED 'D'
 #define FREE '0'
@@ -26,7 +29,7 @@ public:
 
     int getFreeDiskSpace();
 
-    void defragmentDisk(Directory *directory, int currentPosition);
+    void defragmentDisk(Directory *directory, int &currentPosition);
 
     void getFragmentation(Directory* directory, float& fragmentation);
 
@@ -68,7 +71,7 @@ public:
 
     bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    void copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize);
+    bool copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize);
 
     void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
 
@@ -77,11 +80,29 @@ public:
     INode* searchINodesByIndex(Directory *directory, unsigned int index);
 
 private:
+    /**
+     * Current directory you are working on.
+     */
     Directory* m_currentDirectory;
+    /**
+     * Name of this INodeSimulation.
+     */
     char* m_name;
+    /**
+     * Size of the blocks the system is working with.
+     */
     unsigned int m_blockSize;
+    /**
+     * Size of the whole system memory.
+     */
     unsigned int m_totalSize;
+    /**
+     * Memory representation.
+     */
     unsigned char* m_statusArray;
+    /**
+     * Number of all files that are currently saved in the system.
+     */
     unsigned int m_numberOfFiles;
     void simulate();
 

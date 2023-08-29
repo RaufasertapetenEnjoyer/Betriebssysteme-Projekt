@@ -7,7 +7,8 @@
 #include "iostream"
 
 /**
- *  eine Tabelle hat 12 Blöcke, es sind bis zu 14 Tabellen möglich -> ggf. in numberOfBlocksPerINode setzen
+ * creates an INode and sets the tables according to the number of blocks that we want to save in it, unused tables are nullptr
+ * @param numberOfBlocksForFile
  */
 INode::INode(int numberOfBlocksForFile) {
     if (numberOfBlocksForFile <= 12 * 14) {
@@ -30,18 +31,34 @@ INode::INode(int numberOfBlocksForFile) {
     }
 }
 
+/**
+ * Returns the attribute m_addressPointers
+ * @return int* array of addresses
+ */
 int* INode::getAddressPointers() {
     return m_addressPointers;
 }
 
+/**
+ * Returns the attribute m_firstIndirectPointers
+ * @return int* array of addresses
+ */
 int *INode::getFirstIndirectPointers() const {
     return m_firstIndirectPointers;
 }
 
+/**
+ * Returns the attribute m_secondIndirectPointers
+ * @return  int** array of arrays of addresses
+ */
 int **INode::getDoubleIndirectPointers() const {
     return m_secondIndirectPointers;
 }
 
+/**
+ * adds the given address at the end of the existing entries, initializes a new table if necessary -> bigger file size
+ * @param address
+ */
 void INode::addAddress(int address) {
     int* currentTable = m_addressPointers;
     int index = 0;
@@ -76,6 +93,11 @@ void INode::addAddress(int address) {
     currentTable[index % 12] = address;
 }
 
+/**
+ * adds the given address at the given index, only used for replacing entries that already have a valid address -> defragmentation
+ * @param address
+ * @param index ongoing index, max 168
+ */
 void INode::addAddressAtIndex(int address, int index) {
     int* table = m_addressPointers;
     if(index < 12) {
@@ -92,6 +114,10 @@ void INode::addAddressAtIndex(int address, int index) {
     }
 }
 
+/**
+ * deletes all addresses after the given index, deletes a table if it is empty -> smaller file size
+ * @param index
+ */
 void INode::deleteAddressFromIndex(int index) {
     int* currentTable = m_addressPointers;
 
@@ -121,6 +147,9 @@ void INode::deleteAddressFromIndex(int index) {
     detectEmptyTables();
 }
 
+/**
+ *  initially sets all entries of the active tables to -1
+ */
 void INode::initINode() {
 
     int tableNumber = -2;
@@ -141,12 +170,19 @@ void INode::initINode() {
     }
 }
 
+/**
+ * sets every entry of the given table to -1
+ * @param table
+ */
 void INode::initTable(int *table) {
     for (int i = 0; i < 12 ; i++) {
         table[i] = -1;
     }
 }
 
+/**
+ * if a m_firstIndirectPointers or m_secondIndirectPointers consist only of entries with -1, which means that they are empty, they get set to nullptr
+ */
 void INode::detectEmptyTables() {
     if (m_firstIndirectPointers[0] == -1) {
         m_firstIndirectPointers = nullptr;
@@ -156,6 +192,11 @@ void INode::detectEmptyTables() {
     }
 }
 
+/**
+ * traverses the INode looking for the given address and replaces ist with the new given address
+ * @param oldAddress
+ * @param newAddress
+ */
 void INode::findAndReplaceAddress(int oldAddress, int newAddress) {
     int* currentTable = m_addressPointers;
 
@@ -183,6 +224,11 @@ void INode::findAndReplaceAddress(int oldAddress, int newAddress) {
     }
 }
 
+/**
+ * traverses the INode looking for the given address
+ * @param address
+ * @return success if address is found
+ */
 bool INode::checkIfAddressExists(int address) {
     int* currentTable = m_addressPointers;
 
@@ -210,6 +256,10 @@ bool INode::checkIfAddressExists(int address) {
     return false;
 }
 
+/**
+ * Returns an array of all the valid entries of the tables
+ * @return int* indexes
+ */
 int *INode::getIndexes() {
     int numberOfBlocks = getNumberOfBlocks();
     int* statusIndexes = new int[numberOfBlocks + 1];
@@ -241,6 +291,10 @@ int *INode::getIndexes() {
     return statusIndexes;
 }
 
+/**
+ * counts how many entries are set to valid addresses
+ * @return int numberOfBlocks
+ */
 int INode::getNumberOfBlocks() {
     int counter = 0;
     int* currentTable = m_addressPointers;

@@ -11,7 +11,17 @@
 #include "iostream"
 #include "../CDRomStructure/CDRomDirectory.h"
 
+/**
+ * A file has four different flags that can be set as attributes. The flags are editable (index 0),
+ * Systemfile (index 1), Asccii-File (index 2) und  Random-Access-File (index 3)
+ */
 
+/**
+ * Creates an INode simulation, initializes all parameters and creates some directories and files.
+ * @param unsigned int, blockSize size of a memory-block
+ * @param unsigned totalSize, total memory for the simulation
+ * @param char* name, name of the drive
+ */
 INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize, char* name) {
     m_name = name;
     m_statusArray = new unsigned char[totalSize / blockSize];
@@ -31,6 +41,9 @@ INodeSimulation::INodeSimulation(unsigned int blockSize, unsigned int totalSize,
     std::cout << m_currentDirectory->getName() << std::endl;
 }
 
+/**
+ * Simulates the file-system with some directories and files.
+ */
 void INodeSimulation::simulate() {
 
     std::cout << getNumberOfFilesThatCanBeSaved() << '\n' << std::endl;
@@ -62,6 +75,10 @@ void INodeSimulation::simulate() {
     createDirectoriesForSim();
 }
 
+/**
+ * Returns a pointer on the root-directory.
+ * @return Directory* root
+ */
 Directory *INodeSimulation::getRootDirectory() {
     if(m_currentDirectory->getParentDirectory() == nullptr){
         return m_currentDirectory;
@@ -75,6 +92,10 @@ Directory *INodeSimulation::getRootDirectory() {
     }
 }
 
+/**
+ * Calculates the free disk space as a number of blocks (marked with the Flag FREE).
+ * @return int diskSpace
+ */
 int INodeSimulation::getFreeDiskSpace() {
     int freeCounter = 0;
     for (int i = 0; i < getNumberOfFilesThatCanBeSaved(); i++) {
@@ -85,7 +106,12 @@ int INodeSimulation::getFreeDiskSpace() {
     return freeCounter;
 }
 
-void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) {
+/**
+ * Defragment the whole file-system (recursive traverse algorithm).
+ * @param Directory* directory
+ * @param currentPosition pointer on the current index in the status-array
+ */
+void INodeSimulation::defragmentDisk(Directory *directory, int &currentPosition) {
     if(directory == nullptr){
         return;
     }
@@ -153,6 +179,12 @@ void INodeSimulation::defragmentDisk(Directory *directory, int currentPosition) 
     }
 }
 
+/**
+ * Calculates the fragmentation of the whole disk (recursive).
+ * @param Directory* directory (start from root)
+ * @param float fragmentation (start with 0.0)
+ * @return
+ */
 void INodeSimulation::getFragmentation(Directory *directory, float& fragmentation) {
     if(directory == nullptr){
         return;
@@ -206,7 +238,12 @@ void INodeSimulation::getFragmentation(Directory *directory, float& fragmentatio
 
 }
 
-
+/**
+ * Creates a file beneath the current directory.
+ * @param char* name
+ * @param Attributes* attributes
+ * @param int size
+ */
 void INodeSimulation::createFile(char *name, bool editable, bool system, bool ascii, bool randAccFile, int size) {
     Attributes* attributes = new Attributes;
     attributes->dateOfCreation = time(nullptr);
@@ -246,12 +283,20 @@ void INodeSimulation::createFile(char *name, bool editable, bool system, bool as
 
 }
 
+/**
+ * Creates some files with random size under the current directory.
+ * @param char** names, name array
+ * @param length, length of the array
+ */
 void INodeSimulation::createFilesForSim(char **names, unsigned int length) {
     for (int i = 0; i < length; i++) {
         createFile(names[i], true, false, true, false, (int) (rand() % 25600 + 1));
     }
 }
 
+/**
+ * Creates some directories for the simulation.
+ */
 void INodeSimulation::createDirectoriesForSim() {
     m_currentDirectory = getRootDirectory();
 
@@ -376,10 +421,25 @@ void INodeSimulation::createDirectoriesForSim() {
     std::cout<<m_currentDirectory->getName()<<std::endl;
 }
 
+/**
+ * Creates an subdirectory under the current directory.
+ * @param char* name, name of the directory
+ * @param Attributes* attributes
+ */
 void INodeSimulation::createDirectory(char *name, Attributes *attributes) {
     m_currentDirectory->createChildDirectory(name, attributes);
 }
 
+/**
+ * Updates the attributes of a given file.
+ * @param char* name
+ * @param bool isEditable
+ * @param bool isSystem
+ * @param bool isAscii
+ * @param bool isRamFile
+ * @param AbstractFile* file, file that gets updated
+ * @param int size
+ */
 void INodeSimulation::updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size) {
     if(file->tstBit(file->getAttributes()->attributes, 0)){
         if(!file->isSystem()){
@@ -425,6 +485,13 @@ void INodeSimulation::updateFile(char *name, bool isEditable, bool isSystem, boo
     }
 }
 
+/**
+ * @brief updates a directory
+ * @param char* name
+ * @param bool isEditable
+ * @param Directory * directory
+ * @return bool success
+ */
 bool INodeSimulation::updateDirectory(char* name, bool isEditable, Directory* directory) {
     if(directory->isEditable()){
         if(strcmp(name, directory->getName()) != 0){
@@ -440,6 +507,10 @@ bool INodeSimulation::updateDirectory(char* name, bool isEditable, Directory* di
     }
 }
 
+/**
+ * Returns the path of the current directory
+ * @return const char* path
+ */
 const char *INodeSimulation::getPath() {
     Directory* directory = m_currentDirectory;
     std::string path = "";
@@ -453,7 +524,10 @@ const char *INodeSimulation::getPath() {
     return pathAsChar;
 }
 
-
+/**
+ * Frees the memory of the given file, so that it can be savely deleted
+ * @param AbstractFile*  file
+ */
 void INodeSimulation::freeFileMemory(AbstractFile *file) {
     INodeFile* iNodeFile = dynamic_cast<INodeFile*>(file);
 
@@ -492,6 +566,10 @@ void INodeSimulation::freeFileMemory(AbstractFile *file) {
     iNodeFile->setINode(nullptr);
 }
 
+/**
+ * Deletes the given file from the current directory.
+ * @param AbstractFile* file
+ */
 void INodeSimulation::deleteFile(AbstractFile *file) {
     std::cout<<file->getName()<<std::endl;
     if(file->getNextFile() == nullptr && file->getPrevFile() != nullptr){
@@ -536,6 +614,11 @@ void INodeSimulation::deleteFile(AbstractFile *file) {
     m_numberOfFiles--;
 }
 
+/**
+ * Deletes the given directory under the current directory, if and only if the directory is empty.
+ * @param directory
+ * @return bool success
+ */
 bool INodeSimulation::deleteDirectory(Directory *directory) {
     if(directory->getSubDirectoryList() == nullptr && directory->getFileList() == nullptr){
         if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() != nullptr){
@@ -580,34 +663,66 @@ bool INodeSimulation::deleteDirectory(Directory *directory) {
     }
 }
 
+/**
+ * Returns the attribute m_currentDirectory
+ * @return Directory* directory
+ */
 Directory *INodeSimulation::getCurrentDirectory() {
     return m_currentDirectory;
 }
 
+/**
+ * Sets the attribute m_currentDirectory.
+ * @param Directory* directoryToSet
+ */
 void INodeSimulation::setCurrentDirectory(Directory *directory) {
     m_currentDirectory = directory;
 }
 
+/**
+ * Returns the attribute m_statusArray
+ * @return unsigned char* statusArray
+ */
 unsigned char *INodeSimulation::getStatusArray() {
     return m_statusArray;
 }
 
+/**
+ * Returns the attribute m_blocksize
+ * @return unsigned int blockSize
+ */
 unsigned int INodeSimulation::getBlockSize() {
     return m_blockSize;
 }
 
+/**
+ * Returns the attribute m_totalSize
+ * @return unsigned int size
+ */
 unsigned int INodeSimulation::getTotalSize() {
     return m_totalSize;
 }
 
+/**
+ * calculates the number of blocks in the simulation
+ * @return unsigned int numberOfBlocks
+ */
 unsigned int INodeSimulation::getNumberOfFilesThatCanBeSaved() {
     return m_totalSize / m_blockSize;
 }
 
+/**
+ * Returns the attribute m_numberOfFiles
+ * @return unsigned int numberOfFiles
+ */
 unsigned int INodeSimulation::getNumberOfCurrentlySavedFiles() {
     return m_numberOfFiles;
 }
 
+/**
+ * Changes all files and directories beneath the given directory from editable to not-editable.
+ * @param Directory* directory
+ */
 void INodeSimulation::updateEditableOnContent(Directory *directory) {
     if(directory == nullptr){
         return;
@@ -628,12 +743,48 @@ void INodeSimulation::updateEditableOnContent(Directory *directory) {
     }
 }
 
+/**
+ * Checks whether the update is valid.
+ * @param char* name
+ * @param bool isEditable
+ * @param bool isSystem
+ * @param bool isAscii
+ * @param bool isRamFile
+ * @param AbstractFile* file
+ * @param int size
+ * @return true if edit is valid
+ */
 bool INodeSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
                                          AbstractFile *file, int size) {
-    return false;
+    auto* bsFatFile = dynamic_cast<BSFatFile*>(file);
+
+    if(file->getSize() < size){
+        int numberOfNeededBlocks = ceil((double) (size - file->getSize()) / (double ) m_blockSize);
+        if(numberOfNeededBlocks > getFreeDiskSpace()){
+            return false;
+        }
+    }
+    if(!bsFatFile->testConvention(name)){
+        return false;
+    }
+    if(!bsFatFile->isEditable()){
+        return false;
+    }
+    if (bsFatFile->isSystem()){
+        if(strcmp(bsFatFile->getName(), name) != 0 || bsFatFile->getSize() != size || isSystem != bsFatFile->isSystem()){
+            return false;
+        }
+    }
+    return true;
 }
 
-void INodeSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize){
+/**
+ * Copy a given file to the current directory of the INode-Simulation.
+ * @param CDRomDirectory* directoryToCopy
+ * @param const int cdRomBlockSize
+ * @return bool success
+ */
+bool INodeSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize){
     int numberOfBlocksForINode = ceil((double) cdRomFile->getSize() / (double) m_blockSize);
     int numberOfBlocksForCDRom = ceil((double) cdRomFile->getSize() / (double) cdRomBlockSize);
 
@@ -676,9 +827,17 @@ void INodeSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
             directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
             directory = directory->getParentDirectory();
         }
+        return true;
+    } else {
+        return false;
     }
 }
 
+/**
+* Copy angiven directory with all its content to the current directory of the INode-Simulation.
+* @param CDRomDirectory* directoryToCopy
+* @param const int cdRomBlockSize
+*/
 void INodeSimulation::copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize){
     if(directoryToCopy == nullptr){
         return;
@@ -709,10 +868,20 @@ void INodeSimulation::copyCDRomDirectory(CDRomDirectory* directoryToCopy, const 
     m_currentDirectory = m_currentDirectory->getParentDirectory();
 }
 
+/**
+ * Returns the attribute m_name
+ * @return char* name
+ */
 char *INodeSimulation::getName() {
     return m_name;
 }
 
+/**
+ * parses through all files and checks every of the INode-Tables until the given index / address is found
+ * @param directory
+ * @param index searched for address
+ * @return INode* INode containing the address
+ */
 INode *INodeSimulation::searchINodesByIndex(Directory *directory, unsigned int index) {
     if(directory == nullptr){
         return nullptr;
