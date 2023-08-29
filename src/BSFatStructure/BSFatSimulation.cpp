@@ -10,8 +10,8 @@
 
 
 /**
- * Bei File gibt es 4 verscheidene Flags die gesetzt werden können, das sind die Flags editable (Index 0),
- * Systemfile (Index 1), Asccii-File (index 2) und  Random-Accsses-File (Index 3)
+ * Bei File gibt es 4 verschiedene Flags die gesetzt werden können, das sind die Flags editable (Index 0),
+ * Systemfile (Index 1), Asccii-File (index 2) und  Random-Access-File (Index 3)
  */
 
 /**
@@ -826,7 +826,7 @@ char* BSFatSimulation::getName(){
 
 
 /**
- * Copy an given directory with all its content to the current directory of the BSFat.
+ * Copy a given file to the current directory of the BSFat.
  * @param CDRomDirectory* directoryToCopy
  * @param const int cdRomBlockSize
  * @return bool success
