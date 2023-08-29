@@ -746,6 +746,7 @@ void MainWindow::openPath(QString path){
                 dir = dir->getNextDirectory();
             }
             if(dir==nullptr){
+                ui->terminal->append("path wrong or nonexistent");
                 std::cout<<"path wrong or nonexistent"<<std::endl;
             }
         }
@@ -766,6 +767,7 @@ void MainWindow::openPath(QString path){
             }
             reload();
         }else{
+            ui->terminal->append("path wrong or nonexistent");
             std::cout<<"path wrong or nonexistent"<<std::endl;
         }
     }
@@ -814,6 +816,7 @@ void MainWindow::openCDPath(QString path){
     AbstractElementCDRom * elements = cdSim->getRootDirectory();
 
     if(p.at(0)!= elements->getName() || p.at(p.size()-1) != ""){
+        ui->terminal->append("path wrong or nonexistent");
         std::cout<<"path wrong or nonexistent"<<std::endl;
         return;
     }
@@ -826,6 +829,7 @@ void MainWindow::openCDPath(QString path){
                 elements = elements->getNextElement();
             }
             if(elements==nullptr){
+                ui->terminal->append("path wrong or nonexistent");
                 std::cout<<"path wrong or nonexistent"<<std::endl;
             }
         }
@@ -842,6 +846,7 @@ void MainWindow::openCDPath(QString path){
             ui->pushButton->setEnabled(false);
             reload();
         }else{
+            ui->terminal->append("path wrong or nonexistent");
             std::cout<<"path wrong or nonexistent"<<std::endl;
         }
     }
