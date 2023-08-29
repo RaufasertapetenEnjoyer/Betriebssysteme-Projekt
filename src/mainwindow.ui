@@ -181,7 +181,7 @@ border-color: rgb(10, 10, 10);</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>-7</x>
+      <x>0</x>
       <y>580</y>
       <width>811</width>
       <height>70</height>

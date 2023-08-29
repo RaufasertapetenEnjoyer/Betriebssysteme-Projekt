@@ -32,7 +32,7 @@ public:
 
     void updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    void updateDirectory(char* name, bool isEditable, Directory* directory);
+    bool updateDirectory(char* name, bool isEditable, Directory* directory);
 
     const char* getPath();
 
@@ -42,7 +42,7 @@ public:
 
     void deleteFile(AbstractFile* file);
 
-    void deleteDirectory(Directory *directory);
+    bool deleteDirectory(Directory *directory);
 
     Directory* getCurrentDirectory();
 
@@ -62,7 +62,7 @@ public:
 
     bool checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile, AbstractFile *file, int size);
 
-    void copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize);
+    bool copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize);
 
     void copyCDRomDirectory(CDRomDirectory* directoryToCopy, const int cdRomBlockSize);
 

@@ -425,14 +425,18 @@ void INodeSimulation::updateFile(char *name, bool isEditable, bool isSystem, boo
     }
 }
 
-void INodeSimulation::updateDirectory(char* name, bool isEditable, Directory* directory) {
+bool INodeSimulation::updateDirectory(char* name, bool isEditable, Directory* directory) {
     if(directory->isEditable()){
         if(strcmp(name, directory->getName()) != 0){
             directory->setName(name);
         }
         if(isEditable != directory->isEditable()){
-            directory->setEditable(isEditable);
+            updateEditableOnContent(directory);
         }
+        return true;
+    }
+    else{
+        return false;
     }
 }
 
@@ -532,7 +536,7 @@ void INodeSimulation::deleteFile(AbstractFile *file) {
     m_numberOfFiles--;
 }
 
-void INodeSimulation::deleteDirectory(Directory *directory) {
+bool INodeSimulation::deleteDirectory(Directory *directory) {
     if(directory->getSubDirectoryList() == nullptr && directory->getFileList() == nullptr){
         if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() != nullptr){
             Directory* preDirectory = directory->getPrevDirectory();
@@ -541,7 +545,7 @@ void INodeSimulation::deleteDirectory(Directory *directory) {
             directory->setPreviousDirectory(nullptr);
 
             delete directory;
-            return;
+            return true;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() == nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             nextDirectory->setPreviousDirectory(nullptr);
@@ -551,7 +555,7 @@ void INodeSimulation::deleteDirectory(Directory *directory) {
             directory->setNextDirectory(nullptr);
 
             delete directory;
-            return;
+            return true;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() != nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             Directory* prevDirectory = directory->getPrevDirectory();
@@ -562,11 +566,17 @@ void INodeSimulation::deleteDirectory(Directory *directory) {
             directory->setNextDirectory(nullptr);
 
             delete directory;
+            return true;
         }else if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() == nullptr){
             m_currentDirectory->setDirectoryList(nullptr);
 
             delete directory;
+            return true;
+        }else{
+            return false;
         }
+    }else{
+        return false;
     }
 }
 
@@ -599,7 +609,23 @@ unsigned int INodeSimulation::getNumberOfCurrentlySavedFiles() {
 }
 
 void INodeSimulation::updateEditableOnContent(Directory *directory) {
+    if(directory == nullptr){
+        return;
+    }
 
+    directory->clrBit(directory->getAttributes()->attributes, 0);
+
+    AbstractFile* file = directory->getFileList();
+    while (file != nullptr){
+        file->clrBit(file->getAttributes()->attributes, 0);
+        file = file->getNextFile();
+    }
+
+    Directory* subDirectory = directory->getSubDirectoryList();
+    while(subDirectory != nullptr){
+        updateEditableOnContent(subDirectory);
+        subDirectory = subDirectory->getNextDirectory();
+    }
 }
 
 bool INodeSimulation::checkIfEditIsValid(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
@@ -645,6 +671,11 @@ void INodeSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
         auto* file = dynamic_cast<AbstractFile*>(copiedFile);
         m_currentDirectory->createChildFile(file);
         m_numberOfFiles++;
+        Directory* directory = m_currentDirectory;
+        while (directory != nullptr){
+            directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
+            directory = directory->getParentDirectory();
+        }
     }
 }
 

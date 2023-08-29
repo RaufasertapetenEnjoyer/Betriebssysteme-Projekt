@@ -107,6 +107,10 @@ void BSFatSimulation::defragmentDisk(Directory *directory, int &currentPosition)
                 }else{
                     if(currentPosition != current->getIndex()){
                         BSCluster* secondCurrent = searchClusterByIndex(getRootDirectory(), currentPosition);
+                        if(secondCurrent == nullptr){
+                            std::cout<<"wrong"<<std::endl;
+                        }
+
                         int saver = current->getIndex();
                         current->setIndex(secondCurrent->getIndex());
                         secondCurrent->setIndex(saver);
@@ -446,7 +450,7 @@ BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned
     }
 
     auto* file = dynamic_cast<BSFatFile*>(directory->getFileList());
-    BSCluster* bsCluster;
+    BSCluster* bsCluster = nullptr;
     while(file != nullptr){
         bsCluster = file->getFirstBlock();
 
@@ -479,6 +483,9 @@ BSCluster * BSFatSimulation::searchClusterByIndex(Directory *directory, unsigned
  * @param AbstractFile* file
  */
 void BSFatSimulation::deleteFile(AbstractFile *file) {
+    if(file->isSystem()){
+         return;
+    }
     if(file->getNextFile() == nullptr && file->getPrevFile() != nullptr){
         AbstractFile* prevFile = file->getPrevFile();
         prevFile->setNextFile(nullptr);
@@ -524,13 +531,20 @@ void BSFatSimulation::deleteFile(AbstractFile *file) {
         directory = directory->getParentDirectory();
     }
     m_numberOfFiles--;
+    AbstractFile *test = m_currentDirectory->getFileList();
+    while(test != nullptr){
+        std::cout<<test->getName()<<", ";
+        test = test->getNextFile();
+    }
+    std::cout<<std::endl;
 }
 
 /**
  * Deletes the given directory under the current directory, if and only if the directory is empty.
  * @param directory
+ * @return bool success
  */
-void BSFatSimulation::deleteDirectory(Directory *directory) {
+bool BSFatSimulation::deleteDirectory(Directory *directory) {
     if(directory->getSubDirectoryList() == nullptr && directory->getFileList() == nullptr){
         if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() != nullptr){
             Directory* preDirectory = directory->getPrevDirectory();
@@ -539,7 +553,7 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
             directory->setPreviousDirectory(nullptr);
 
             delete directory;
-            return;
+            return true;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() == nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             nextDirectory->setPreviousDirectory(nullptr);
@@ -549,7 +563,7 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
             directory->setNextDirectory(nullptr);
 
             delete directory;
-            return;
+            return true;
         }else if(directory->getNextDirectory() != nullptr && directory->getPrevDirectory() != nullptr){
             Directory* nextDirectory = directory->getNextDirectory();
             Directory* prevDirectory = directory->getPrevDirectory();
@@ -560,11 +574,17 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
             directory->setNextDirectory(nullptr);
 
             delete directory;
+            return true;
         }else if(directory->getNextDirectory() == nullptr && directory->getPrevDirectory() == nullptr){
             m_currentDirectory->setDirectoryList(nullptr);
 
             delete directory;
+            return true;
+        }else{
+            return false;
         }
+    }else{
+        return false;
     }
 }
 
@@ -580,7 +600,7 @@ void BSFatSimulation::deleteDirectory(Directory *directory) {
  */
 void BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, bool isAscii, bool isRamFile,
                                  AbstractFile *file, int size) {//evtl. ausgaben oder ähnliches nötig
-    if(file->tstBit(file->getAttributes()->attributes, 0)){
+    if(file->isEditable()){
         if(!file->isSystem()){
             if(strcmp(file->getName(), name) != 0){
                 file->setName(name);
@@ -619,30 +639,38 @@ void BSFatSimulation::updateFile(char *name, bool isEditable, bool isSystem, boo
                 }
             }
             file->setSize(size);
-        }
-        //nur attribute können gesetzt werden
-        if(isEditable != file->isEditable()){
-            file->tstBit(file->getAttributes()->attributes, 0) ? file->clrBit(file->getAttributes()->attributes, 0) : file->setBit(file->getAttributes()->attributes, 0);
-        }
-        if(isAscii != file->isAscii()){
-            file->tstBit(file->getAttributes()->attributes, 2) ? file->clrBit(file->getAttributes()->attributes, 2) : file->setBit(file->getAttributes()->attributes, 2);
-        }
-        if (isRamFile != file->isRandAccFile()){
-            file->tstBit(file->getAttributes()->attributes, 3) ? file->clrBit(file->getAttributes()->attributes, 3) : file->setBit(file->getAttributes()->attributes, 3);
-        }
-        file->getAttributes()->dateOfLastEdit = time(nullptr);
+            if(isEditable != file->isEditable()){
+                file->tstBit(file->getAttributes()->attributes, 0) ? file->clrBit(file->getAttributes()->attributes, 0) : file->setBit(file->getAttributes()->attributes, 0);
+            }
+            if(isAscii != file->isAscii()){
+                file->tstBit(file->getAttributes()->attributes, 2) ? file->clrBit(file->getAttributes()->attributes, 2) : file->setBit(file->getAttributes()->attributes, 2);
+            }
+            if (isRamFile != file->isRandAccFile()){
+                file->tstBit(file->getAttributes()->attributes, 3) ? file->clrBit(file->getAttributes()->attributes, 3) : file->setBit(file->getAttributes()->attributes, 3);
+            }
+            file->getAttributes()->dateOfLastEdit = time(nullptr);
+        }      
     }
-    //keine Bearbeitung möglich
 }
 
-void BSFatSimulation::updateDirectory(char* name, bool isEditable, Directory* directory) {
+/**
+ * @brief updates a directory
+ * @param char* name
+ * @param bool isEditable
+ * @param Directory * directory
+ * @return bool success
+ */
+bool BSFatSimulation::updateDirectory(char* name, bool isEditable, Directory* directory) {
     if(directory->isEditable()){
         if(strcmp(name, directory->getName()) != 0){
             directory->setName(name);
         }
-        if(isEditable != directory->isEditable()){
-            directory->setEditable(isEditable);
+        if(isEditable != directory->isEditable() ){
+            updateEditableOnContent(directory);
         }
+        return true;
+    }else{
+        return false;
     }
 }
 
@@ -703,7 +731,7 @@ void BSFatSimulation::freeFileMemory(AbstractFile *file) {
 
     bsFatFile->setFirstBlock(nullptr);
 
-    while(cluster->getNextBlock() != nullptr){
+    while(cluster != nullptr){
         m_statusArray[cluster->getIndex()] = FREE;
         BSCluster* pre = cluster;
         cluster = cluster->getNextBlock();
@@ -801,8 +829,9 @@ char* BSFatSimulation::getName(){
  * Copy an given directory with all its content to the current directory of the BSFat.
  * @param CDRomDirectory* directoryToCopy
  * @param const int cdRomBlockSize
+ * @return bool success
  */
-void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize) {
+bool BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSize) {
     int numberOfBlocksForFat = ceil((double) cdRomFile->getSize() / (double) m_blockSize);
     int numberOfBlocksForCDRom = ceil((double) cdRomFile->getSize() / (double) cdRomBlockSize);
 
@@ -853,6 +882,14 @@ void BSFatSimulation::copyCDRomFile(CDRomFile* cdRomFile, const int cdRomBlockSi
         auto* file = dynamic_cast<AbstractFile*>(bsFatFile);
         m_currentDirectory->createChildFile(file);
         m_numberOfFiles++;
+        Directory* directory = m_currentDirectory;
+        while (directory != nullptr){
+            directory->setNumberOfFiles(directory->getNumberOfFiles() + 1);
+            directory = directory->getParentDirectory();
+        }
+        return true;
+    }else{
+        return false;
     }
 }
 

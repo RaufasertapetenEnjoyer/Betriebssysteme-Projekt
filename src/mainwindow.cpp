@@ -10,22 +10,65 @@
 #include "BSFatStructure/BSFatSimulation.cpp"
 #include "INodeStructure/INodeSimulation.h"
 #include "CDRomStructure/CDRomSimulation.h"
+#include "mbr.h"
 #include <QDialog>
 #include <QAction>
 #include <iostream>
 #include <cstring>
 
+/**
+ * @brief int platte, marks the currently chosen simulation (BsFat=1) (InodeSim=2)
+ */
 int platte;
+
+/**
+ * @brief marks if the cd is 'opened' or not
+ */
 bool cd = false;
-BSFatSimulation * bsSim = new BSFatSimulation(512, 16384*5,"BsFat-Platte");
-INodeSimulation * inSim = new INodeSimulation(512, 16384*50,"INode-Platte");
+
+/**
+ * @brief creates/starts simulations
+ */
+MBR * mbr = new MBR();
+/**
+ * @brief assigns bsFatSimulation
+ */
+BSFatSimulation * bsSim = mbr->getBsFat();
+
+/**
+ * @brief assigns INodeSimulatoin
+ */
+INodeSimulation * inSim = mbr->getINode();
+
+/**
+ * @brief creates CDRomSimulation
+ */
 CDRomSimulation * cdSim = new CDRomSimulation(256, 16384, "Meine CD-Rom", "Songs");
 
+/**
+ * @brief the element chosen to copy from cd
+ */
 AbstractElementCDRom * copyElement = nullptr;
+
+/**
+ * @brief currently selected file
+ */
 AbstractFile * selectedFile;
+
+/**
+ * @brief currently selected dir
+ */
 Directory * selectedDir;
+
+/**
+ * @brief currently selected CDFile
+ */
 CDRomFile * selectedCDFile;
 
+/**
+ * @brief creates MainWindow and opens opening Dialog
+ * @param parent
+ */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -35,19 +78,23 @@ MainWindow::MainWindow(QWidget *parent)
     Dialog *dia = new Dialog(this,bsSim,inSim);
     if(dia->exec() == QDialog::Accepted){
         platte = dia->getPlatte();
-        std::cout<<"num of saved files:" <<inSim->getNumberOfCurrentlySavedFiles()<<std::endl;
         reload();
     }
 
 
 }
 
-
+/**
+ * @brief MainWindow::~MainWindow
+ */
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+/**
+ * @brief (re)loads the page. fills File list, builds directory trees, calculates fragmentation
+ */
 void MainWindow::reload(){
     ui->listWidget->clear();
     ui->treeWidget_2->clear();
@@ -109,7 +156,6 @@ void MainWindow::reload(){
         ui->listWidget->addItem(item);
         file=file->getNextFile();
     }
-    std::cout <<"added files"<< std::endl;
     Directory * directory =d->getSubDirectoryList();
     while(directory != nullptr){
         QListWidgetItem *item = new QListWidgetItem(directory->getName());
@@ -117,7 +163,6 @@ void MainWindow::reload(){
         ui->listWidget->addItem(item);
         directory = directory->getNextDirectory();
     }
-    std::cout <<"added dirs"<< std::endl;
     ui->listWidget->sortItems();
 
     ui->treeWidget->clear();
@@ -136,6 +181,10 @@ void MainWindow::reload(){
     ui->treeWidget->sortItems(0,Qt::AscendingOrder);
 }
 
+/**
+ * @brief calculates current path
+ * @return std::string path
+ */
 std::string MainWindow::getPath(){
     std::string path = "";
     Directory* directoryCur;
@@ -165,6 +214,11 @@ std::string MainWindow::getPath(){
     return path;
 }
 
+/**
+ * @brief recursively builds directory tree for Bsfat or inode simulation
+ * @param Directory dir for directory to add to tree
+ * @param QTreeWidgetItem for parentItem of directory
+ */
 void MainWindow::buildTree(Directory* dir,QTreeWidgetItem *parent){
 
     QTreeWidgetItem * root;
@@ -195,6 +249,11 @@ void MainWindow::buildTree(Directory* dir,QTreeWidgetItem *parent){
 
 }
 
+/**
+ * @brief recursively builds directory tree for cd
+ * @param CDRomDirectory dir for directory to add to tree
+ * @param QTreeWidgetItem for parentItem of directory
+ */
 void MainWindow::buildCDTree(CDRomDirectory * dir, QTreeWidgetItem *parent){
     QTreeWidgetItem * root;
     QString path;
@@ -226,6 +285,9 @@ void MainWindow::buildCDTree(CDRomDirectory * dir, QTreeWidgetItem *parent){
     }
 }
 
+/**
+ * @brief opens delete file dialog/deletes file
+*/
 void MainWindow::deleteFile(){
     DeleteFile *deleteDia = new DeleteFile(this);
     if(deleteDia->exec() == QDialog::Accepted){
@@ -234,11 +296,14 @@ void MainWindow::deleteFile(){
         }else{
             inSim->deleteFile(selectedFile);
         }
-        std::cout<<"delete File: "<<selectedFile->getName()<<std::endl;
+        ui->terminal->append("File successfully deleted!");
         reload();
     }
 }
 
+/**
+ * @brief opens file-properties dialog/saves file
+ */
 void MainWindow::fileProperties(){
     FileProperties *prop;
     if(cd){
@@ -257,6 +322,7 @@ void MainWindow::fileProperties(){
             std::cout<<"Update Values: "<<nameP<<" "<<prop->getSize()<<" "<<prop->getEditable()<<" "<<prop->getSystem()<<" "<<prop->getAscii()<<" "<<prop->getRandomAccess()<<std::endl;
             if(bsSim->checkIfEditIsValid(nameP,prop->getEditable(),prop->getSystem(),prop->getAscii(),prop->getRandomAccess(),selectedFile,prop->getSize())){
                 bsSim->updateFile(nameP,prop->getEditable(),prop->getSystem(),prop->getAscii(),prop->getRandomAccess(),selectedFile,prop->getSize());
+                ui->terminal->append("File succesfully saved!");
             }else{
                 ui->terminal->append(" !! File Edit not accepted or Naming Conventions not followed! File did not save !!");
             }
@@ -264,11 +330,15 @@ void MainWindow::fileProperties(){
         }else{
             std::cout<<"Update Values: "<<nameP<<" "<<prop->getSize()<<" "<<prop->getEditable()<<" "<<prop->getSystem()<<" "<<prop->getAscii()<<" "<<prop->getRandomAccess()<<std::endl;
             inSim->updateFile(nameP,prop->getEditable(),prop->getSystem(),prop->getAscii(),prop->getRandomAccess(),selectedFile,prop->getSize());
+            ui->terminal->append("File succesfully saved!");
         }
         reload();
     }
 }
 
+/**
+ * @brief opens create File dialog/saves new file
+ */
 void MainWindow::createFile(){
    CreateFile *file = new CreateFile(this);
     if(file->exec() == QDialog::Accepted){
@@ -277,13 +347,18 @@ void MainWindow::createFile(){
         strcpy(nameP,name.c_str());
         if(platte==1){
             bsSim->createFile(nameP, file->getEditable(), file->getSystem(), file->getAscii(), file->getRandomAccess(), file->getSize());
+            ui->terminal->append("File succesfully created!");
         }else{
             inSim->createFile(nameP, file->getEditable(), file->getSystem(), file->getAscii(), file->getRandomAccess(), file->getSize());
+            ui->terminal->append("File succesfully created!");
         }
         reload();
     }
 }
 
+/**
+ * @brief opens create directory dialog/ saves new directory
+ */
 void MainWindow::createDir(){
     CreateDirectory *dir = new CreateDirectory(this);
     if(dir->exec() == QDialog::Accepted){
@@ -299,60 +374,91 @@ void MainWindow::createDir(){
         }else{
             inSim->createDirectory(nameP, attributes);
         }
+        ui->terminal->append("Directory succesfully created!");
         reload();
     }
 }
 
+/**
+ * @brief opens delete directory dialog/deletes dir
+ */
 void MainWindow::deleteDir(){
     deleteDirectory *dir = new deleteDirectory(this);
     if(dir->exec()==Dialog::Accepted){
+        bool success = false;
         if(platte==1){
             Directory * toDelete = bsSim->getCurrentDirectory();
             bsSim->setCurrentDirectory(toDelete->getParentDirectory());
-            bsSim->deleteDirectory(toDelete);
+            success = bsSim->deleteDirectory(toDelete);
         }else{
             Directory * toDelete = inSim->getCurrentDirectory();
             inSim->setCurrentDirectory(toDelete->getParentDirectory());
-            inSim->deleteDirectory(toDelete);
+            success = inSim->deleteDirectory(toDelete);
+        }
+        if(success){
+            ui->terminal->append("Directory succesfully deleted!");
+        }else{
+            ui->terminal->append("!!Could not delete Directory!!");
         }
         reload();
     }
 }
 
+/**
+ * @brief sets directory from cd to copy
+ */
 void MainWindow::copyDir(){
     if(cd){
      copyElement = cdSim->getCurrentDirectory();
     }
 }
 
+/**
+ * @brief sets file from cd to copy
+ */
 void MainWindow::copyFile(){
     if(cd){
      copyElement = selectedCDFile;
     }
 }
 
+/**
+ * @brief inserts 'copyElement' into bsFat/INode simulation
+ */
 void MainWindow::insert(){
     if(!cd){
+        bool success = false;
         if(platte==1){
             if(instanceof<CDRomFile>(copyElement)){
                 CDRomFile* file = dynamic_cast<CDRomFile*>(copyElement);
-                bsSim->copyCDRomFile(file, cdSim->getBlockSize());
+                success = bsSim->copyCDRomFile(file, cdSim->getBlockSize());
+                if(success){
+                    ui->terminal->append("Inserted File successfully");
+                }
             }else{
-                bsSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement),cdSim->getBlockSize());
+                 bsSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement),cdSim->getBlockSize());
+                 ui->terminal->append("Inserted Directory successfully");
             }
 
         }else{
             if(instanceof<CDRomFile>(copyElement)){
-                //inSim->copyCDRomFile(dynamic_cast<CDRomFile*>(copyElement));
+                inSim->copyCDRomFile(dynamic_cast<CDRomFile*>(copyElement),cdSim->getBlockSize());
+                if(success){
+                    ui->terminal->append("Inserted File successfully");
+                }
             }else{
-                //inSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement));
+                inSim->copyCDRomDirectory(dynamic_cast<CDRomDirectory*>(copyElement),cdSim->getBlockSize());
+                ui->terminal->append("Inserted Directory successfully");
             }
         }
+
         reload();
     }
 }
 
-
+/**
+ * @brief opens directory properties dialog/ saves directory
+ */
 void MainWindow::dirProperties(){
     Directory* current ;
     if(platte==1){
@@ -374,16 +480,25 @@ void MainWindow::dirProperties(){
         std::string name = dir->getName().toStdString();
         char* nameP = new char[name.length()];
         strcpy(nameP,name.c_str());
+        bool success = false;
         if(platte==1){
-            bsSim->updateDirectory(nameP,dir->getEditable(),current);
+             success = bsSim->updateDirectory(nameP,dir->getEditable(),current);
         }else{
-            inSim->updateDirectory(nameP,dir->getEditable(),current);
+            success = inSim->updateDirectory(nameP,dir->getEditable(),current);
         }
-
+        if(success){
+            ui->terminal->append("Updated Directory successfully");
+        }else{
+            ui->terminal->append("!!Could not update Directory!!");
+        }
+        reload();
     }
 }
 
-
+/**
+ * @brief if double clicks directory, open it. if double clicked file, open menu
+ * @param QListWidgetItem * item clickedItem
+ */
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
     QString content = item->data(Qt::UserRole).toString();
@@ -471,9 +586,9 @@ void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 
 }
 
-
-
-
+/**
+ * @brief opens option-menu
+ */
 void MainWindow::on_pushButton_2_clicked()
 {
     QMenu myMenu;
@@ -493,7 +608,7 @@ void MainWindow::on_pushButton_2_clicked()
         insert->setEnabled(copyElement != nullptr);
         myMenu.addAction(insert);
     }else{
-        QAction *copyThisDir = new QAction("Dieses Verzeichnis kopieren",this);
+        QAction *copyThisDir = new QAction("Verzeichnis kopieren",this);
         connect(copyThisDir,SIGNAL(triggered()), this, SLOT(copyDir()));
         myMenu.addAction(copyThisDir);
     }
@@ -503,12 +618,11 @@ void MainWindow::on_pushButton_2_clicked()
 
 
     myMenu.exec(QCursor::pos());
-
-
-
 }
 
-
+/**
+ * @brief executes defragmentation and recalculates fragmentation
+ */
 void MainWindow::on_pushButton_clicked()
 {
     if(cd){
@@ -525,6 +639,9 @@ void MainWindow::on_pushButton_clicked()
         if(bsSim->getNumberOfCurrentlySavedFiles()==0){
             fragmentation = 0;
         }
+        for (int i = 0; i < bsSim->getNumberOfFilesThatCanBeSaved(); i++) {
+            std::cout << bsSim->getStatusArray()[i] << ", ";
+        }
     }else{
         inSim->defragmentDisk(inSim->getRootDirectory(), currPos);
         inSim->getFragmentation(inSim->getRootDirectory(),fragmentation);
@@ -537,13 +654,15 @@ void MainWindow::on_pushButton_clicked()
         }
     }
 
-    std::cout<<"Fragmentierung:" << fragmentation<<std::endl;
+    std::cout<<"Fragmentierung post de-:" << fragmentation<<std::endl;
     ui->progressBar->setValue(fragmentation);
 
 
 }
 
-
+/**
+ * @brief opens parent directory, if present
+ */
 void MainWindow::on_pushButton_4_clicked()
 {
     if(cd){
@@ -566,7 +685,11 @@ void MainWindow::on_pushButton_4_clicked()
     }
 }
 
-
+/**
+ * @brief opens clicked directory in list
+ * @param item clicked Item
+ * @param column column of tree(=0)
+ */
 void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     cd=false;
@@ -576,7 +699,9 @@ void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int colu
 
 }
 
-
+/**
+ * @brief reads path and-if possible- opens it
+ */
 void MainWindow::on_pushButton_5_clicked()
 {
         cd=false;
@@ -586,6 +711,10 @@ void MainWindow::on_pushButton_5_clicked()
 
 }
 
+/**
+ * @brief opens the path given as QString
+ * @param QString path
+ */
 void MainWindow::openPath(QString path){
     std::cout<<"execute open Path"<<std::endl;
     QStringList p = path.split("/");
@@ -634,22 +763,30 @@ void MainWindow::openPath(QString path){
     }
 }
 
+/**
+ * @brief opens default dialog to reset/switch simulation
+ */
 void MainWindow::on_pushButton_3_clicked()
 {
-    Dialog *dia = new Dialog(this,bsSim,inSim);
+    mbr = new MBR();
+    Dialog *dia = new Dialog(this,mbr->getBsFat(),mbr->getINode());
     if(dia->exec() == QDialog::Accepted){
            platte = dia->getPlatte();
            if(platte == 1){
-                bsSim = new BSFatSimulation(512,16384*4,"BsFat-Platte");
+                bsSim = mbr->getBsFat();
            }
            else{
-                inSim = new INodeSimulation(512,16384*4,"INode-Platte");
+                inSim = mbr->getINode();
             }
            reload();
     }
 }
 
-
+/**
+ * @brief opens directory from cd
+ * @param item clicked item
+ * @param column column of tree(=0)
+ */
 void MainWindow::on_treeWidget_2_itemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     cd=true;
@@ -658,6 +795,10 @@ void MainWindow::on_treeWidget_2_itemDoubleClicked(QTreeWidgetItem *item, int co
     openCDPath(path);
 }
 
+/**
+ * @brief opens path for cd
+ * @param path
+ */
 void MainWindow::openCDPath(QString path){
     QStringList p = path.split("/");
 
@@ -698,6 +839,9 @@ void MainWindow::openCDPath(QString path){
 
 }
 
+/**
+ * @brief loads cd files/directories into file list
+ */
 void MainWindow::loadCD(){
     AbstractElementCDRom * element = cdSim->getCurrentDirectory()->getList();
     while(element!=nullptr ){
@@ -717,5 +861,6 @@ void MainWindow::loadCD(){
 
         element= element->getNextElement();
 }
+
 }
 

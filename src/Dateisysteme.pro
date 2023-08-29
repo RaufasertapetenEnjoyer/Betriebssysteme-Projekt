@@ -29,7 +29,8 @@ SOURCES += \
     dialog.cpp \
     fileproperties.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    mbr.cpp
 
 HEADERS += \
     CDRomStructure/AbstractElementCDRom.h \
@@ -45,7 +46,8 @@ HEADERS += \
     deletefile.h \
     dialog.h \
     fileproperties.h \
-    mainwindow.h
+    mainwindow.h \
+    mbr.h
 
 FORMS += \
     createdirectory.ui \
